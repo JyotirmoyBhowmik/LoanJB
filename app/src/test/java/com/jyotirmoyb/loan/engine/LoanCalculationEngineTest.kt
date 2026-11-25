@@ -396,4 +396,77 @@ class LoanCalculationEngineTest {
             }
         }
     }
+
+    @Test
+    fun knownAnswer_28LakhAt10Point5PercentFor6Years_baselineAndPrepaymentModes() {
+        val baseInput = CalculationInput(
+            categoryId = "home",
+            ruleFlags = listOf("RATE_FLOATING", "EMI_STANDARD", "DISB_FULL"),
+            principal = 2800000.0,
+            assetValue = 3800000.0,
+            annualRate = 10.5,
+            tenureMonths = 72,
+            startYear = 2026,
+            startMonth = 10,
+            startDay = 22,
+            processingFeePercent = 0.0,
+            prepaymentFeePercent = 0.0
+        )
+        val baseline = LoanCalculationEngine.calculate(baseInput, homeCategory)
+        assertTrue(baseline.isValid)
+        // Exact standard EMI for Rs 28,00,000 @ 10.5% p.a. over 72 months = Rs 52,581.11
+        assertEquals(52581.11, baseline.monthlyEmi, 0.05)
+        // Month 1 interest = 28,00,000 * 10.5% / 12 = Rs 24,500.00
+        assertEquals(24500.0, baseline.schedule.first().interestPaid, 0.01)
+        // Total interest without prepayment = 72 * 52,581.1149 - 28,00,000 = Rs 9,85,840.27
+        assertEquals(985840.27, baseline.totalInterest, 2.0)
+        assertEquals(0.0, baseline.schedule.last().closingBalance, 0.001)
+
+        // With Rs 6,00,000 one-time prepayment at Month 7 (April, matching reference screenshot) — REDUCE TENURE
+        val prepayReduceTenure = LoanCalculationEngine.calculate(
+            baseInput.copy(
+                prepaymentEnabled = true,
+                prepayments = listOf(
+                    PrepaymentRule(
+                        startMonth = 7,
+                        amount = 600000.0,
+                        isRecurring = false,
+                        mode = PrepaymentMode.REDUCE_TENURE.name
+                    )
+                )
+            ),
+            homeCategory
+        )
+        assertTrue(prepayReduceTenure.isValid)
+        assertEquals(600000.0, prepayReduceTenure.schedule[6].extraPrepayment, 0.01)
+        // Interest in Month 8 drops sharply after 6L prepayment (around Rs 17,484 vs ~22,993 in Month 7)
+        assertTrue(prepayReduceTenure.schedule[7].interestPaid < 18000.0)
+        assertTrue(prepayReduceTenure.actualTenureMonths < 72)
+        assertEquals(607948.0, prepayReduceTenure.totalInterest, 150.0)
+        assertEquals(0.0, prepayReduceTenure.schedule.last().closingBalance, 0.001)
+        assertNotNull(prepayReduceTenure.insights.prepaymentImpact)
+        assertTrue(prepayReduceTenure.insights.prepaymentImpact!!.interestSaved > 370000.0)
+
+        // Same Rs 6,00,000 prepayment at Month 7 — REDUCE EMI
+        val prepayReduceEmi = LoanCalculationEngine.calculate(
+            baseInput.copy(
+                prepaymentEnabled = true,
+                prepayments = listOf(
+                    PrepaymentRule(
+                        startMonth = 7,
+                        amount = 600000.0,
+                        isRecurring = false,
+                        mode = PrepaymentMode.REDUCE_EMI.name
+                    )
+                )
+            ),
+            homeCategory
+        )
+        assertTrue(prepayReduceEmi.isValid)
+        assertEquals(72, prepayReduceEmi.actualTenureMonths)
+        assertTrue(prepayReduceEmi.schedule[7].emiPaid < baseline.monthlyEmi)
+        assertTrue(prepayReduceEmi.totalInterest < baseline.totalInterest)
+        assertTrue(prepayReduceTenure.totalInterest < prepayReduceEmi.totalInterest)
+        assertEquals(0.0, prepayReduceEmi.schedule.last().closingBalance, 0.001)
+    }
 }

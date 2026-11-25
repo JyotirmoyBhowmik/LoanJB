@@ -1,21 +1,30 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# LoanJB R8 / ProGuard rules (Room, Moshi, Coroutines, DataStore, Navigation)
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keepattributes Signature, InnerClasses, EnclosingMethod, RuntimeVisibleAnnotations, RuntimeInvisibleAnnotations
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Moshi & generated JsonAdapters
+-keepclasseswithmembers class * {
+    @com.squareup.moshi.* <methods>;
+}
+-keep @com.squareup.moshi.JsonClass class * { *; }
+-keep class **JsonAdapter {
+    public <init>(com.squareup.moshi.Moshi);
+    public <init>(com.squareup.moshi.Moshi, java.lang.reflect.Type[]);
+}
+-keep class com.jyotirmoyb.loan.engine.** { *; }
+-keep class com.jyotirmoyb.loan.data.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Kotlin Metadata for Moshi KotlinJsonAdapterFactory fallback
+-keep class kotlin.Metadata { *; }
+
+# Room entities, DAOs, and generated database implementations
+-keep class * extends androidx.room.RoomDatabase { *; }
+-keep @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao interface * { *; }
+-dontwarn androidx.room.paging.**
+
+# Preserve BroadcastReceiver referenced in AndroidManifest.xml
+-keep class com.jyotirmoyb.loan.util.EmiReminderReceiver { *; }
+
+# Kotlin Coroutines
+-dontwarn kotlinx.coroutines.debug.**

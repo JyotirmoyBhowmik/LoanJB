@@ -1,14 +1,107 @@
 <resources>
     <string name="app_name">LoanJB</string>
-    <string name="nav_explore">Explore</string>
+    <string name="app_bar_title">EMI Calculator</string>
+    <string name="app_bar_subtitle">Powered by LoanJB</string>
+
+    <!-- Bottom Navigation -->
     <string name="nav_calculator">Calculator</string>
-    <string name="nav_my_loans">My Loans</string>
+    <string name="nav_emi">EMI</string>
+    <string name="nav_articles">Articles</string>
+    <string name="nav_market">Market</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_explore">Loan Guide</string>
+    <string name="nav_my_loans">Saved Loans</string>
     <string name="nav_compare">Compare</string>
     <string name="nav_settings">Settings</string>
-    <string name="disclaimer_text">Estimates only. Actual bank terms, rates and rules (including Nepal Rastra Bank limits) may differ.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Know Your EMI, Own Your Plan</string>
+    <string name="onboarding_sub_1">Calculate before you commit.</string>
+    <string name="onboarding_title_2">See Where Every Rupee Goes</string>
+    <string name="onboarding_sub_2">Break down every monthly payment</string>
+    <string name="onboarding_title_3">Big Plans Start Here</string>
+    <string name="onboarding_sub_3">Loans, savings and goals in one place</string>
+    <string name="onboarding_title_4">Plan Today, Be Ready for Tomorrow</string>
+    <string name="onboarding_sub_4">Plan investments, tax and retirement.</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+
+    <!-- Hub Sections -->
+    <string name="hub_search_hint">Search EMI, SIP, FD, Tax, Pension...</string>
+    <string name="hub_quick_tools">YOUR LOAN WORKSPACE</string>
+    <string name="hub_quick_tools_badge">OFFLINE</string>
+    <string name="hub_saved_loans_title">Saved Loans</string>
+    <string name="hub_saved_loans_sub">Track EMIs, reminders &amp; DTI</string>
+    <string name="hub_loan_guide_title">Loan Types Guide</string>
+    <string name="hub_loan_guide_sub">Explore rules &amp; best fits</string>
+    <string name="hub_no_results">No matching calculators found.</string>
+    <string name="hub_clear_search">Clear Search</string>
+
+    <!-- EMI Calculator -->
+    <string name="emi_screen_title">Loan (EMI)</string>
+    <string name="emi_loan_type_label">Loan Category</string>
+    <string name="emi_amount_label">Loan Amount</string>
+    <string name="emi_rate_label">Interest Rate (%)</string>
+    <string name="emi_tenure_label">Tenure</string>
+    <string name="emi_tenure_year">Year</string>
+    <string name="emi_tenure_month">Month</string>
+    <string name="emi_start_date_label">Loan Start Date</string>
+    <string name="emi_today">Today</string>
+    <string name="emi_change">Change</string>
+    <string name="emi_advance_settings">Advance Settings</string>
+    <string name="emi_calculate_cta">Calculate EMI &amp; Schedule</string>
+    <string name="emi_type_row">EMI Type</string>
+    <string name="emi_processing_fee_row">Processing Fee</string>
+    <string name="emi_prepayment_row">Prepayment / Part Payment</string>
+    <string name="emi_moratorium_row">Moratorium Period</string>
+    <string name="emi_ltv_row">Asset Value &amp; LTV</string>
+    <string name="emi_insurance_row">Loan Protection Insurance</string>
+    <string name="emi_rate_timeline_row">Floating Rate Timeline</string>
+    <string name="emi_offset_row">Offset / Overdraft Balance</string>
+    <string name="emi_tranche_row">Tranche + Pre-EMI Schedule</string>
+    <string name="emi_bt_row">Balance Transfer Evaluator</string>
+    <string name="emi_topup_row">Top-Up Blended EMI</string>
+
+    <!-- Results -->
+    <string name="results_tab_yearly">Yearly</string>
+    <string name="results_tab_monthly">Monthly</string>
+    <string name="results_tab_graph">Graph</string>
+    <string name="results_principal">PRINCIPAL</string>
+    <string name="results_total_interest">TOTAL INTEREST</string>
+    <string name="results_total_payment">TOTAL PAYMENT</string>
+    <string name="results_col_month">MONTH</string>
+    <string name="results_col_principal">PRINCIPAL PAID</string>
+    <string name="results_col_interest">INTEREST PAID</string>
+    <string name="results_col_balance">MONTH END BALANCE</string>
+    <string name="results_total_row">Total</string>
+    <string name="results_share">Share</string>
     <string name="export_csv">Export CSV</string>
     <string name="export_pdf">Export PDF</string>
     <string name="use_in_calculator">Use in Calculator</string>
-    <string name="save_loan">Save to My Loans</string>
-    <string name="add_to_compare">Add to Compare</string>
+    <string name="save_loan">Save Loan</string>
+    <string name="add_to_compare">Compare</string>
+
+    <!-- Bank Staff Loan -->
+    <string name="bank_staff_title">Bank Staff Loan</string>
+    <string name="bank_staff_subtitle">Subsidized Indian bank employee loan presets — fully editable</string>
+
+    <!-- Coming Soon / Placeholders -->
+    <string name="coming_soon_badge">COMING SOON</string>
+    <string name="coming_soon_body">This module is registered in LoanJB and scheduled for an upcoming offline update. All Loans &amp; EMI calculators are ready to use right now.</string>
+    <string name="coming_soon_back">Back to Calculator Hub</string>
+    <string name="articles_title">Financial Guides &amp; Articles</string>
+    <string name="articles_subtitle">Bite-sized Indian personal finance explainers on EMI strategies, prepayment math, tax slabs, and credit scores are coming soon.</string>
+    <string name="market_title">Rates &amp; Market Watch</string>
+    <string name="market_subtitle">Offline reference benchmarks for RBI repo rate history, Indian bank home loan spreads, and FD slabs are coming soon.</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_open_menu">Open workspace menu</string>
+    <string name="cd_search">Toggle calculator search</string>
+    <string name="cd_info">View info</string>
+    <string name="cd_back">Navigate back</string>
+    <string name="cd_close">Close</string>
+
+    <!-- Disclaimer -->
+    <string name="disclaimer_text">Estimates only. Actual bank terms, rates and rules (including Indian RBI guidelines) may differ.</string>
 </resources>

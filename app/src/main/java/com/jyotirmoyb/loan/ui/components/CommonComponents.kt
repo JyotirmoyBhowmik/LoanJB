@@ -66,10 +66,10 @@ fun FintechCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         border = BorderStroke(1.dp, borderColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp), content = content)
     }
@@ -156,7 +156,8 @@ fun NumericInputField(
                 Text(
                     text = badge,
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(end = 12.dp)
                 )
             }
@@ -165,7 +166,7 @@ fun NumericInputField(
         isError = isError,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -188,7 +189,7 @@ fun DisclaimerBanner(modifier: Modifier = Modifier) {
         ) {
             Icon(
                 imageVector = Icons.Outlined.Info,
-                contentDescription = "Disclaimer",
+                contentDescription = stringResource(R.string.cd_info),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )

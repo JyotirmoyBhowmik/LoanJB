@@ -95,6 +95,7 @@ class LoanRepository(
     suspend fun setCurrency(currency: CurrencyCode) = prefsRepo.setCurrency(currency)
     suspend fun setThemeMode(mode: AppThemeMode) = prefsRepo.setThemeMode(mode)
     suspend fun setMonthlyIncome(income: Double) = prefsRepo.setMonthlyIncome(income)
+    suspend fun setOnboardingCompleted(completed: Boolean) = prefsRepo.setOnboardingCompleted(completed)
 
     suspend fun createBackupJson(): String {
         val prefs = prefsRepo.preferencesFlow.first()
