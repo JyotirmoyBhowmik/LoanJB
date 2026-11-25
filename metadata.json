@@ -1,0 +1,6 @@
+{
+  "name": "LoanJB",
+  "description": "Offline multi-category loan planner, EMI calculator, comparison tool, and loan tracker with editable catalog.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

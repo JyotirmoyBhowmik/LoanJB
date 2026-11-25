@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">LoanJB</string>
+    <string name="nav_explore">Explore</string>
+    <string name="nav_calculator">Calculator</string>
+    <string name="nav_my_loans">My Loans</string>
+    <string name="nav_compare">Compare</string>
+    <string name="nav_settings">Settings</string>
+    <string name="disclaimer_text">Estimates only. Actual bank terms, rates and rules (including Nepal Rastra Bank limits) may differ.</string>
+    <string name="export_csv">Export CSV</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="use_in_calculator">Use in Calculator</string>
+    <string name="save_loan">Save to My Loans</string>
+    <string name="add_to_compare">Add to Compare</string>
+</resources>

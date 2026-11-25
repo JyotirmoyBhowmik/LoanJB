@@ -1,0 +1,705 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-11-25",
+  "disclaimer": "Estimates only. Actual bank terms, rates and rules (including Nepal Rastra Bank limits) may differ.",
+  "categories": [
+    {
+      "id": "home",
+      "name": "Home Loan",
+      "shortName": "Home",
+      "icon": "home",
+      "accentHex": "#0B8A7B",
+      "description": "Long-term secured financing (5-30 years, 60-80% LTV) for buying, constructing, renovating, topping up, or refinancing residential property.",
+      "tenureMinMonths": 60,
+      "tenureMaxMonths": 360,
+      "defaultTenureMonths": 240,
+      "rateRangeMin": 7.5,
+      "rateRangeMax": 12.5,
+      "defaultAmountInr": 5000000,
+      "defaultAssetValueInr": 6500000,
+      "ltvMinPercent": 60,
+      "ltvMaxPercent": 80,
+      "defaultProcessingFeePercent": 0.5,
+      "defaultPrepaymentFeeFixed": 2.0,
+      "defaultPrepaymentFeeFloating": 0.0,
+      "secured": true,
+      "checklistItems": [],
+      "variantGroups": [
+        {
+          "id": "rate_type",
+          "name": "Interest Rate Type",
+          "required": true,
+          "variants": [
+            {
+              "id": "home_fixed",
+              "name": "Fixed Rate",
+              "howItWorks": "Your interest rate remains locked for the entire tenure, keeping every monthly EMI identical regardless of central bank rate movements.",
+              "bestFor": "Borrowers who prioritize strict monthly budget predictability and expect market rates to rise.",
+              "ruleFlag": "RATE_FIXED",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 12.5,
+              "typicalTenureLabel": "5 - 20 yrs",
+              "prepaymentFeePercent": 2.0
+            },
+            {
+              "id": "home_floating",
+              "name": "Floating (Variable)",
+              "howItWorks": "Linked to a bank benchmark/base rate plus spread. When rates change, your tenure or EMI adjusts automatically. Prepayments are typically penalty-free.",
+              "bestFor": "Long-term home buyers planning periodic prepayments or expecting stable/falling rates.",
+              "ruleFlag": "RATE_FLOATING",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 11.5,
+              "typicalTenureLabel": "10 - 30 yrs",
+              "prepaymentFeePercent": 0.0
+            },
+            {
+              "id": "home_hybrid",
+              "name": "Hybrid (Fixed 2-5 yrs, then Floating)",
+              "howItWorks": "Starts with a fixed rate for the first 2 to 5 years for early certainty, then automatically converts to a floating rate for the remaining tenure.",
+              "bestFor": "New homeowners who want early cash-flow stability during furnishing/move-in years.",
+              "ruleFlag": "RATE_HYBRID",
+              "rateRangeMin": 8.0,
+              "rateRangeMax": 11.8,
+              "typicalTenureLabel": "10 - 25 yrs",
+              "prepaymentFeePercent": 1.0
+            }
+          ]
+        },
+        {
+          "id": "emi_structure",
+          "name": "EMI Structure",
+          "required": true,
+          "variants": [
+            {
+              "id": "home_emi_standard",
+              "name": "Standard Level EMI",
+              "howItWorks": "Equal monthly installments throughout the loan. Early payments go mostly to interest; later payments reduce principal faster.",
+              "bestFor": "Salaried borrowers with steady, predictable monthly income.",
+              "ruleFlag": "EMI_STANDARD",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "5 - 30 yrs"
+            },
+            {
+              "id": "home_emi_step_up",
+              "name": "Step-Up EMI",
+              "howItWorks": "Begins with a lower initial EMI that steps up by a fixed percentage every 12-24 months, matching expected salary growth and shortening total tenure.",
+              "bestFor": "Early-career professionals expecting regular income increments who want higher eligibility today.",
+              "ruleFlag": "EMI_STEP_UP",
+              "rateRangeMin": 8.0,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "10 - 25 yrs"
+            },
+            {
+              "id": "home_emi_step_down",
+              "name": "Step-Down EMI",
+              "howItWorks": "Higher EMIs in the early years that step down periodically, front-loading principal reduction and cutting lifetime interest.",
+              "bestFor": "Borrowers nearing retirement or expecting higher future household expenses.",
+              "ruleFlag": "EMI_STEP_DOWN",
+              "rateRangeMin": 8.0,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "10 - 20 yrs"
+            },
+            {
+              "id": "home_emi_offset",
+              "name": "Overdraft / Offset",
+              "howItWorks": "Linked savings/overdraft account where parked cash is subtracted from your principal when computing interest, while staying liquid.",
+              "bestFor": "Business owners or high-savings households who hold surplus cash buffers.",
+              "ruleFlag": "EMI_OFFSET",
+              "rateRangeMin": 8.2,
+              "rateRangeMax": 12.5,
+              "typicalTenureLabel": "10 - 25 yrs"
+            }
+          ]
+        },
+        {
+          "id": "disbursement",
+          "name": "Disbursement",
+          "required": true,
+          "variants": [
+            {
+              "id": "home_disb_full",
+              "name": "Full Disbursement",
+              "howItWorks": "100% of the sanctioned loan is released upfront (typical for ready-to-move properties) and full EMIs begin immediately.",
+              "bestFor": "Ready-to-move apartments and resale home purchases.",
+              "ruleFlag": "DISB_FULL",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "5 - 30 yrs"
+            },
+            {
+              "id": "home_disb_tranche",
+              "name": "Tranche + Pre-EMI",
+              "howItWorks": "Loan is released in construction-linked stages. You pay interest-only (Pre-EMI) on the disbursed amount during construction, then full EMI after handover.",
+              "bestFor": "Under-construction homes or self-construction projects where you are also paying rent.",
+              "ruleFlag": "DISB_TRANCHE_PRE_EMI",
+              "rateRangeMin": 7.8,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "10 - 30 yrs"
+            }
+          ]
+        },
+        {
+          "id": "purpose",
+          "name": "Purpose",
+          "required": true,
+          "variants": [
+            {
+              "id": "home_purchase",
+              "name": "Purchase / Construction",
+              "howItWorks": "Primary mortgage for acquiring a ready home, plot plus construction, or building on owned land within LTV limits (60-80%).",
+              "bestFor": "First-time or upgrade homebuyers.",
+              "ruleFlag": "PURPOSE_PURCHASE",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 11.5,
+              "typicalTenureLabel": "10 - 30 yrs"
+            },
+            {
+              "id": "home_renovation",
+              "name": "Renovation / Extension",
+              "howItWorks": "Funds structural remodeling, extra floors, or upgrades against existing home equity, usually with shorter tenure.",
+              "bestFor": "Existing homeowners upgrading or expanding living space.",
+              "ruleFlag": "PURPOSE_RENOVATION",
+              "rateRangeMin": 8.0,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "5 - 15 yrs"
+            },
+            {
+              "id": "home_topup",
+              "name": "Top-Up Loan",
+              "howItWorks": "Additional borrowing on top of your existing home loan after a clean repayment track record, giving a combined blended EMI at mortgage rates.",
+              "bestFor": "Existing home loan holders needing extra funds cheaper than a personal loan.",
+              "ruleFlag": "PURPOSE_TOP_UP",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 12.5,
+              "typicalTenureLabel": "5 - 20 yrs"
+            },
+            {
+              "id": "home_bt",
+              "name": "Balance Transfer",
+              "howItWorks": "Move your remaining loan balance to a new lender offering a lower rate; weigh processing/transfer fees against monthly savings to find break-even.",
+              "bestFor": "Borrowers paying 0.75%+ above current market rates with 5+ years left.",
+              "ruleFlag": "PURPOSE_BALANCE_TRANSFER",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 10.5,
+              "typicalTenureLabel": "5 - 25 yrs"
+            }
+          ]
+        },
+        {
+          "id": "key_terms",
+          "name": "Key Terms",
+          "required": false,
+          "variants": [
+            {
+              "id": "home_term_ltv",
+              "name": "LTV / Down Payment",
+              "howItWorks": "Auto-computes Loan-to-Value (60-80% cap) and required upfront down payment (20-40%) from the property valuation.",
+              "bestFor": "Buyers budgeting upfront cash alongside monthly mortgage EMIs.",
+              "ruleFlag": "TERM_LTV_STANDARD",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "5 - 30 yrs"
+            },
+            {
+              "id": "home_term_prepayment",
+              "name": "Prepayment / Foreclosure",
+              "howItWorks": "Part-payments or early closure are penalty-free on floating home loans and typically carry an editable 2% fee on fixed-rate loans.",
+              "bestFor": "Borrowers planning annual bonus prepayments to cut years off tenure.",
+              "ruleFlag": "TERM_PREPAYMENT",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "5 - 30 yrs"
+            },
+            {
+              "id": "home_term_moratorium",
+              "name": "Moratorium Period (6-12m)",
+              "howItWorks": "Principal repayment is paused for 6-12 months during initial occupancy or grace window while interest is paid monthly or capitalized.",
+              "bestFor": "Borrowers needing initial cash-flow breathing room.",
+              "ruleFlag": "TERM_MORATORIUM",
+              "rateRangeMin": 8.0,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "10 - 30 yrs"
+            },
+            {
+              "id": "home_term_insurance",
+              "name": "Loan Protection Insurance",
+              "howItWorks": "Includes credit life / mortgage protection cover premium in your effective total borrowing cost.",
+              "bestFor": "Single-income households wanting mortgage liability protection.",
+              "ruleFlag": "TERM_INSURANCE",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "10 - 30 yrs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "personal",
+      "name": "Personal Loan",
+      "shortName": "Personal",
+      "icon": "person",
+      "accentHex": "#2563EB",
+      "description": "Fast, unsecured multi-purpose borrowing (1-7 years) with reducing vs flat rate comparison and flexi credit-line options.",
+      "tenureMinMonths": 12,
+      "tenureMaxMonths": 84,
+      "defaultTenureMonths": 48,
+      "rateRangeMin": 10.5,
+      "rateRangeMax": 22.0,
+      "defaultAmountInr": 500000,
+      "defaultAssetValueInr": 0,
+      "ltvMinPercent": 0,
+      "ltvMaxPercent": 100,
+      "defaultProcessingFeePercent": 1.5,
+      "defaultPrepaymentFeeFixed": 3.0,
+      "defaultPrepaymentFeeFloating": 0.0,
+      "secured": false,
+      "checklistItems": [],
+      "variantGroups": [
+        {
+          "id": "facility",
+          "name": "Facility Type",
+          "required": true,
+          "variants": [
+            {
+              "id": "personal_term",
+              "name": "Standard Term Loan",
+              "howItWorks": "Fixed lump sum credited upfront and repaid in equal monthly EMIs over 1 to 7 years with no collateral.",
+              "bestFor": "One-time known expenses like debt consolidation or weddings.",
+              "ruleFlag": "FAC_TERM",
+              "rateRangeMin": 10.5,
+              "rateRangeMax": 18.0,
+              "typicalTenureLabel": "1 - 7 yrs"
+            },
+            {
+              "id": "personal_flexi",
+              "name": "Flexi / Line of Credit",
+              "howItWorks": "Approved credit limit where you withdraw and repay freely; interest is charged ONLY on the used amount.",
+              "bestFor": "Irregular cash needs where you want to draw only what you use and repay early.",
+              "ruleFlag": "FAC_FLEXI_LOC",
+              "rateRangeMin": 12.0,
+              "rateRangeMax": 20.0,
+              "typicalTenureLabel": "1 - 5 yrs"
+            },
+            {
+              "id": "personal_od",
+              "name": "Overdraft Facility",
+              "howItWorks": "Revolving credit line linked to your salary or savings account. Depositing cash immediately lowers interest-bearing balance.",
+              "bestFor": "Salaried professionals needing an emergency standby liquidity line.",
+              "ruleFlag": "FAC_OVERDRAFT",
+              "rateRangeMin": 11.5,
+              "rateRangeMax": 19.0,
+              "typicalTenureLabel": "1 - 5 yrs"
+            },
+            {
+              "id": "personal_instant",
+              "name": "Pre-Approved / Instant",
+              "howItWorks": "Fast-track digital disbursement for existing bank customers with minimal paperwork, typically carrying slightly higher processing fees.",
+              "bestFor": "Urgent short-term funding needs requiring same-day disbursal.",
+              "ruleFlag": "FAC_PREAPPROVED",
+              "rateRangeMin": 11.0,
+              "rateRangeMax": 22.0,
+              "typicalTenureLabel": "1 - 5 yrs"
+            }
+          ]
+        },
+        {
+          "id": "rate_basis",
+          "name": "Rate Basis",
+          "required": true,
+          "variants": [
+            {
+              "id": "personal_reducing",
+              "name": "Reducing Balance Rate",
+              "howItWorks": "Interest is computed each month only on the remaining unpaid principal, steadily decreasing interest outgo over time.",
+              "bestFor": "Transparent bank personal loans — always compare offers on reducing basis.",
+              "ruleFlag": "BASIS_REDUCING",
+              "rateRangeMin": 10.5,
+              "rateRangeMax": 18.0,
+              "typicalTenureLabel": "1 - 7 yrs"
+            },
+            {
+              "id": "personal_flat",
+              "name": "Flat Rate vs Reducing Balance",
+              "howItWorks": "Flat rate charges interest on the FULL original principal every month regardless of repayments — shows both side-by-side plus extra interest cost and effective annual rate.",
+              "bestFor": "Spotting hidden cost when a lender quotes an attractively low 'flat' rate.",
+              "ruleFlag": "BASIS_FLAT_COMPARE",
+              "rateRangeMin": 7.0,
+              "rateRangeMax": 15.0,
+              "typicalTenureLabel": "1 - 5 yrs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "auto",
+      "name": "Auto / Vehicle Loan",
+      "shortName": "Auto",
+      "icon": "directions_car",
+      "accentHex": "#D97706",
+      "description": "Secured vehicle financing (3-7 years) with editable EV vs Fuel LTV caps (Nepal Rastra Bank rules), balloon options, and NOC hypothecation checklist.",
+      "tenureMinMonths": 36,
+      "tenureMaxMonths": 84,
+      "defaultTenureMonths": 60,
+      "rateRangeMin": 8.5,
+      "rateRangeMax": 14.5,
+      "defaultAmountInr": 1200000,
+      "defaultAssetValueInr": 1600000,
+      "ltvMinPercent": 50,
+      "ltvMaxPercent": 80,
+      "defaultProcessingFeePercent": 1.0,
+      "defaultPrepaymentFeeFixed": 2.0,
+      "defaultPrepaymentFeeFloating": 0.0,
+      "secured": true,
+      "checklistItems": [
+        "Confirm final EMI cleared and zero balance statement issued",
+        "Request Bank Hypothecation Release NOC letter (Form 35 / Bank NOC)",
+        "Collect original RC/Bluebook & remove hypothecation endorsement on insurance",
+        "Submit NOC at Transport Office (RTO / DOTM) to release vehicle hypothecation"
+      ],
+      "variantGroups": [
+        {
+          "id": "structure",
+          "name": "Repayment Structure",
+          "required": true,
+          "variants": [
+            {
+              "id": "auto_standard",
+              "name": "Standard Amortizing",
+              "howItWorks": "Fixed monthly EMIs fully amortize your vehicle loan to zero by the end of 3 to 7 years.",
+              "bestFor": "Buyers planning to keep the car long-term and own it outright.",
+              "ruleFlag": "EMI_STANDARD",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 13.0,
+              "typicalTenureLabel": "3 - 7 yrs"
+            },
+            {
+              "id": "auto_balloon",
+              "name": "Balloon Payment",
+              "howItWorks": "Enjoy 20-35% lower monthly EMIs during the tenure by deferring a large lump sum (balloon) to the final month.",
+              "bestFor": "Drivers who upgrade cars every 3-5 years or expect a future bonus/resale payout.",
+              "ruleFlag": "EMI_BALLOON",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 13.5,
+              "typicalTenureLabel": "3 - 5 yrs"
+            },
+            {
+              "id": "auto_step",
+              "name": "Step-Up / Step-Down EMI",
+              "howItWorks": "Start with lower EMIs that scale up annually (or higher early EMIs that taper down) to fit your income trajectory.",
+              "bestFor": "Young professionals buying their first vehicle with rising income.",
+              "ruleFlag": "EMI_STEP_UP",
+              "rateRangeMin": 8.8,
+              "rateRangeMax": 13.5,
+              "typicalTenureLabel": "3 - 7 yrs"
+            },
+            {
+              "id": "auto_low_down",
+              "name": "Zero / Low Down Payment (80-100%)",
+              "howItWorks": "High financing up to 80-100% of on-road price, preserving upfront cash at the expense of higher monthly EMI and interest.",
+              "bestFor": "Buyers who prefer keeping liquid savings invested rather than paying heavy down payment.",
+              "ruleFlag": "LTV_HIGH_FINANCING",
+              "rateRangeMin": 9.5,
+              "rateRangeMax": 14.5,
+              "typicalTenureLabel": "3 - 7 yrs",
+              "ltvCapOverride": 100
+            }
+          ]
+        },
+        {
+          "id": "vehicle_type",
+          "name": "Vehicle Type (Editable NRB LTV Caps)",
+          "required": true,
+          "variants": [
+            {
+              "id": "auto_ev",
+              "name": "Electric Vehicle (EV)",
+              "howItWorks": "Favorable EV financing LTV cap (up to 80% per Nepal Rastra Bank rules, editable in catalog) and lower green-mobility interest rates.",
+              "bestFor": "EV buyers seeking lower down payment (20%) and preferential interest rates.",
+              "ruleFlag": "VEH_EV",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 12.0,
+              "typicalTenureLabel": "3 - 7 yrs",
+              "ltvCapOverride": 80
+            },
+            {
+              "id": "auto_fuel",
+              "name": "Fuel (Petrol / Diesel)",
+              "howItWorks": "Conventional fuel vehicle financing with stricter LTV cap (50% per Nepal Rastra Bank private vehicle guideline, editable in catalog).",
+              "bestFor": "Conventional petrol/diesel/hybrid cars under regulatory LTV caps.",
+              "ruleFlag": "VEH_FUEL",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 14.0,
+              "typicalTenureLabel": "3 - 7 yrs",
+              "ltvCapOverride": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "name": "Education Loan",
+      "shortName": "Education",
+      "icon": "school",
+      "accentHex": "#7C3AED",
+      "description": "Higher-study financing featuring study + 6-12m moratorium, simple vs compound interest treatment, collateral options, and semester-wise tranches.",
+      "tenureMinMonths": 12,
+      "tenureMaxMonths": 180,
+      "defaultTenureMonths": 120,
+      "rateRangeMin": 8.5,
+      "rateRangeMax": 14.0,
+      "defaultAmountInr": 2000000,
+      "defaultAssetValueInr": 2500000,
+      "ltvMinPercent": 0,
+      "ltvMaxPercent": 100,
+      "defaultProcessingFeePercent": 0.5,
+      "defaultPrepaymentFeeFixed": 0.0,
+      "defaultPrepaymentFeeFloating": 0.0,
+      "secured": false,
+      "checklistItems": [],
+      "variantGroups": [
+        {
+          "id": "moratorium_interest",
+          "name": "Moratorium & Interest Treatment",
+          "required": true,
+          "variants": [
+            {
+              "id": "edu_mor_simple",
+              "name": "Simple Interest in Moratorium",
+              "howItWorks": "Principal is paused during study period + 6-12 months grace. Paying simple interest monthly while studying prevents capitalization and saves heavily.",
+              "bestFor": "Families able to service modest monthly interest during the study period.",
+              "ruleFlag": "MOR_SIMPLE",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 12.5,
+              "typicalTenureLabel": "5 - 15 yrs"
+            },
+            {
+              "id": "edu_mor_compound",
+              "name": "Compound / Capitalized Moratorium",
+              "howItWorks": "Zero payments while studying + 6-12 months grace, but unpaid moratorium interest gets capitalized into principal before full EMI starts.",
+              "bestFor": "Students with zero cash flow during university who will repay fully after graduation.",
+              "ruleFlag": "MOR_COMPOUND",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 14.0,
+              "typicalTenureLabel": "7 - 15 yrs"
+            }
+          ]
+        },
+        {
+          "id": "collateral",
+          "name": "Collateral vs Non-Collateral",
+          "required": true,
+          "variants": [
+            {
+              "id": "edu_secured",
+              "name": "Collateral-Backed (Property / FD)",
+              "howItWorks": "Backed by residential property or fixed deposit, unlocking higher loan amounts and lower interest rates.",
+              "bestFor": "Overseas degrees or high-tuition programs needing lower rates.",
+              "ruleFlag": "COL_SECURED",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 11.5,
+              "typicalTenureLabel": "7 - 15 yrs"
+            },
+            {
+              "id": "edu_unsecured",
+              "name": "Non-Collateral (Co-Signer)",
+              "howItWorks": "Approved based on university ranking and co-signer income without pledging property, usually at a higher interest rate.",
+              "bestFor": "Admits to top-ranked universities without pledgeable real estate.",
+              "ruleFlag": "COL_UNSECURED",
+              "rateRangeMin": 10.5,
+              "rateRangeMax": 14.0,
+              "typicalTenureLabel": "5 - 12 yrs"
+            }
+          ]
+        },
+        {
+          "id": "disbursement",
+          "name": "Disbursement Schedule",
+          "required": true,
+          "variants": [
+            {
+              "id": "edu_tranche",
+              "name": "Direct-to-Institution Tranches",
+              "howItWorks": "Disbursed semester-by-semester directly to the university. Interest accrues ONLY on each disbursed tranche.",
+              "bestFor": "Multi-year degree programs billed per semester or academic year.",
+              "ruleFlag": "DISB_TRANCHE_PRE_EMI",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 13.0,
+              "typicalTenureLabel": "5 - 15 yrs"
+            },
+            {
+              "id": "edu_lump",
+              "name": "Full Upfront Disbursement",
+              "howItWorks": "Single full release (e.g., GIC / blocked account + full year tuition). Interest starts accruing on the entire balance from day one.",
+              "bestFor": "Short 1-year postgraduate diplomas or blocked-account visa requirements.",
+              "ruleFlag": "DISB_FULL",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 13.5,
+              "typicalTenureLabel": "3 - 10 yrs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "business",
+      "name": "Business & Working Capital",
+      "shortName": "Business",
+      "icon": "business_center",
+      "accentHex": "#0F766E",
+      "description": "Working capital/cash credit, business term loans (1-10 years), invoice/bill discounting (30-90 days), and import LC/Trust Receipt financing.",
+      "tenureMinMonths": 1,
+      "tenureMaxMonths": 120,
+      "defaultTenureMonths": 36,
+      "rateRangeMin": 9.0,
+      "rateRangeMax": 18.0,
+      "defaultAmountInr": 2500000,
+      "defaultAssetValueInr": 3500000,
+      "ltvMinPercent": 60,
+      "ltvMaxPercent": 85,
+      "defaultProcessingFeePercent": 1.0,
+      "defaultPrepaymentFeeFixed": 2.0,
+      "defaultPrepaymentFeeFloating": 0.0,
+      "secured": true,
+      "checklistItems": [],
+      "variantGroups": [
+        {
+          "id": "product",
+          "name": "Business Credit Product",
+          "required": true,
+          "variants": [
+            {
+              "id": "biz_cc",
+              "name": "Working Capital / Cash Credit",
+              "howItWorks": "Revolving credit limit against inventory & receivables. Interest accrues daily ONLY on the utilized amount as you draw and repay.",
+              "bestFor": "Seasonal inventory purchases and smoothing day-to-day receivables.",
+              "ruleFlag": "BIZ_CASH_CREDIT",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 15.0,
+              "typicalTenureLabel": "Revolving (12m)"
+            },
+            {
+              "id": "biz_term",
+              "name": "Business Term Loan (1-10 yrs)",
+              "howItWorks": "Structured capital loan repaid in fixed or floating EMIs over 1 to 10 years for machinery, expansion, or office build-out.",
+              "bestFor": "Capex investments with multi-year payback horizons.",
+              "ruleFlag": "BIZ_TERM",
+              "rateRangeMin": 9.5,
+              "rateRangeMax": 16.0,
+              "typicalTenureLabel": "1 - 10 yrs"
+            },
+            {
+              "id": "biz_bill",
+              "name": "Invoice / Bill Discounting",
+              "howItWorks": "Bank advances 70-85% of your unpaid B2B invoice upfront for 30-90 days after deducting a discount fee; computes true effective annualized cost.",
+              "bestFor": "B2B suppliers waiting 30-90 days for corporate buyers to settle invoices.",
+              "ruleFlag": "BIZ_BILL_DISCOUNT",
+              "rateRangeMin": 10.0,
+              "rateRangeMax": 18.0,
+              "typicalTenureLabel": "30 - 90 days"
+            },
+            {
+              "id": "biz_lc_tr",
+              "name": "Letter of Credit / Trust Receipt",
+              "howItWorks": "Import financing where the bank settles overseas suppliers under LC and grants a defined Trust Receipt repayment window.",
+              "bestFor": "Importers and trading firms funding goods in transit until domestic sale.",
+              "ruleFlag": "BIZ_LC_TR",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 14.0,
+              "typicalTenureLabel": "60 - 180 days"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "asset_backed",
+      "name": "Loan Against Assets",
+      "shortName": "Assets",
+      "icon": "account_balance",
+      "accentHex": "#B45309",
+      "description": "Leverage Fixed Deposits (80-90% LTV), Gold (EMI / Interest-Only / Bullet), or Shares (Margin Call monitor) for low-cost liquidity.",
+      "tenureMinMonths": 3,
+      "tenureMaxMonths": 120,
+      "defaultTenureMonths": 24,
+      "rateRangeMin": 7.5,
+      "rateRangeMax": 15.0,
+      "defaultAmountInr": 800000,
+      "defaultAssetValueInr": 1000000,
+      "ltvMinPercent": 50,
+      "ltvMaxPercent": 90,
+      "defaultProcessingFeePercent": 0.25,
+      "defaultPrepaymentFeeFixed": 0.0,
+      "defaultPrepaymentFeeFloating": 0.0,
+      "secured": true,
+      "checklistItems": [],
+      "variantGroups": [
+        {
+          "id": "asset_type",
+          "name": "Pledged Asset & Repayment",
+          "required": true,
+          "variants": [
+            {
+              "id": "asset_fd",
+              "name": "Loan Against FD",
+              "howItWorks": "Borrow up to 80-90% of your Fixed Deposit at FD rate + 1-2% spread. Your FD keeps earning interest, showing your true net borrowing cost.",
+              "bestFor": "Short-to-medium liquidity without breaking an FD and paying premature penalty.",
+              "ruleFlag": "ASSET_FD",
+              "rateRangeMin": 7.5,
+              "rateRangeMax": 10.5,
+              "typicalTenureLabel": "3m - FD maturity",
+              "ltvCapOverride": 90
+            },
+            {
+              "id": "asset_gold_emi",
+              "name": "Gold Loan — EMI",
+              "howItWorks": "Pledge gold ornaments/bullion up to 75% LTV and repay principal + interest smoothly via standard monthly EMIs.",
+              "bestFor": "Borrowers wanting disciplined monthly closure of a gold-backed loan.",
+              "ruleFlag": "ASSET_GOLD_EMI",
+              "rateRangeMin": 8.5,
+              "rateRangeMax": 14.0,
+              "typicalTenureLabel": "6 - 36 months",
+              "ltvCapOverride": 75
+            },
+            {
+              "id": "asset_gold_io",
+              "name": "Gold Loan — Monthly Interest-Only",
+              "howItWorks": "Pay only monthly interest during the tenure and settle the entire principal in one lump sum at maturity.",
+              "bestFor": "Short-term cash-flow bridge with minimal monthly burden.",
+              "ruleFlag": "ASSET_GOLD_INTEREST_ONLY",
+              "rateRangeMin": 9.0,
+              "rateRangeMax": 14.5,
+              "typicalTenureLabel": "6 - 24 months",
+              "ltvCapOverride": 75
+            },
+            {
+              "id": "asset_gold_bullet",
+              "name": "Gold Loan — Bullet at Maturity",
+              "howItWorks": "Zero monthly payments during tenure. All accrued interest plus full principal are settled together in one bullet payment at maturity.",
+              "bestFor": "Agricultural, seasonal, or lump-sum receivable borrowers.",
+              "ruleFlag": "ASSET_GOLD_BULLET",
+              "rateRangeMin": 9.5,
+              "rateRangeMax": 15.0,
+              "typicalTenureLabel": "3 - 12 months",
+              "ltvCapOverride": 75
+            },
+            {
+              "id": "asset_margin",
+              "name": "Margin / Share Loan",
+              "howItWorks": "Borrow against demat shares within regulatory LTV cap (50-70%) with minimum margin tracking and live Margin Call alert when share value drops.",
+              "bestFor": "Investors leveraging equity portfolios while monitoring downside margin risk.",
+              "ruleFlag": "ASSET_MARGIN_SHARE",
+              "rateRangeMin": 9.5,
+              "rateRangeMax": 14.5,
+              "typicalTenureLabel": "6 - 24 months",
+              "ltvCapOverride": 70
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
