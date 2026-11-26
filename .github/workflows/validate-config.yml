@@ -1,0 +1,51 @@
+name: Validate Remote Config JSON
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'remote-config/**'
+      - '.github/workflows/validate-config.yml'
+  pull_request:
+    paths:
+      - 'remote-config/**'
+
+jobs:
+  validate-json-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install jsonschema
+        run: pip install jsonschema
+
+      - name: Validate all remote-config JSON files against schema
+        run: |
+          python3 - << 'EOF'
+          import glob, json, sys
+          from jsonschema import validate, ValidationError
+
+          with open("remote-config/schema.json", "r", encoding="utf-8") as f:
+              schema = json.load(f)
+
+          files = sorted(p for p in glob.glob("remote-config/*.json") if not p.endswith("schema.json"))
+          if not files:
+              print("No remote-config JSON files found!")
+              sys.exit(1)
+
+          for path in files:
+              with open(path, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+              try:
+                  validate(instance=data, schema=schema)
+                  print(f"OK: {path} ({len(data['items'])} items, v{data['dataVersion']})")
+              except ValidationError as e:
+                  print(f"SCHEMA ERROR in {path}: {e.message}")
+                  sys.exit(1)
+          EOF

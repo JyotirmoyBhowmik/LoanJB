@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,10 +24,12 @@ import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.CompareArrows
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.PictureAsPdf
+import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,16 +55,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.features.emi.EmiUiState
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
+import com.jyotirmoyb.loan.ui.theme.LocalIsDarkTheme
 import com.jyotirmoyb.loan.ui.theme.MintTopStartDark
 import com.jyotirmoyb.loan.ui.theme.MintTopStartLight
 import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle
 import com.jyotirmoyb.loan.ui.theme.MonoSmallStyle
 import com.jyotirmoyb.loan.ui.theme.PrincipalEmerald
 import com.jyotirmoyb.loan.ui.theme.SavingsGreen
-import com.jyotirmoyb.loan.ui.theme.TealPrimary
 import com.jyotirmoyb.loan.util.ScheduleExporter
 
 @Composable
@@ -71,7 +72,7 @@ fun EmiResultsScreen(
     uiState: EmiUiState,
     shareSummaryText: () -> String,
     onBack: () -> Unit,
-    onSaveLoan: (String, String, Boolean, Int) -> Unit,
+    onSaveLoan: (String, String, Boolean, Int, Int, Boolean) -> Unit,
     onAddToCompare: () -> Unit,
     onShowMessage: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -79,9 +80,9 @@ fun EmiResultsScreen(
     val context = LocalContext.current
     val result = uiState.result
     val currency = uiState.currency
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalIsDarkTheme.current
 
-    // 0 = Yearly, 1 = Monthly (default matching screenshot 2), 2 = Graph
+    // 0 = Yearly, 1 = Monthly (default), 2 = Graph
     var selectedTab by remember { mutableIntStateOf(1) }
     var showSaveDialog by remember { mutableStateOf(false) }
 
@@ -99,7 +100,7 @@ fun EmiResultsScreen(
             .background(MaterialTheme.colorScheme.background)
             .testTag("emi_results_screen")
     ) {
-        // Mint-to-white header + tabs + KPI strip
+        // Mint-to-white header + tabs + Summary Header Card
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -177,7 +178,7 @@ fun EmiResultsScreen(
                             text = label,
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                            color = if (active) TealPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(8.dp))
                         Box(
@@ -185,7 +186,7 @@ fun EmiResultsScreen(
                                 .fillMaxWidth(0.55f)
                                 .height(3.dp)
                                 .background(
-                                    if (active) TealPrimary else Color.Transparent,
+                                    if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
                                     RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
                                 )
                         )
@@ -195,7 +196,7 @@ fun EmiResultsScreen(
 
             Spacer(Modifier.height(10.dp))
 
-            // MoneyWink 3-Column Summary Strip Card
+            // Summary Header Card: EMI, Total Interest, Total Payable, Interest/Principal %, Loan-Free Date
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -212,8 +213,8 @@ fun EmiResultsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         SummaryStripColumn(
-                            label = stringResource(R.string.results_principal),
-                            value = CurrencyFormatter.format(result.totalPrincipal, currency),
+                            label = stringResource(R.string.results_monthly_emi),
+                            value = CurrencyFormatter.format(result.monthlyEmi, currency, false),
                             valueColor = PrincipalEmerald,
                             modifier = Modifier.weight(1f)
                         )
@@ -232,37 +233,74 @@ fun EmiResultsScreen(
                     }
 
                     Spacer(Modifier.height(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.height(8.dp))
 
-                    // EMI + Prepayment highlight chip row
+                    // Secondary KPI Row: Interest-to-Principal % & Loan-Free Date
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
+                        Column {
                             Text(
-                                text = "EMI: ${CurrencyFormatter.format(result.monthlyEmi, currency, true)}/mo • ${result.actualTenureMonths}m",
+                                text = stringResource(R.string.results_interest_ratio),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "${String.format("%.1f", result.interestToPrincipalPercent)}% of principal",
                                 style = MonoSmallStyle,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                color = InterestAmber
                             )
                         }
-                        result.insights.prepaymentImpact?.let { prep ->
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = stringResource(R.string.results_loan_free_date),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "${result.loanFreeDateLabel} (${result.actualTenureMonths}m)",
+                                style = MonoSmallStyle,
+                                fontWeight = FontWeight.Bold,
+                                color = PrincipalEmerald,
+                                modifier = Modifier.testTag("results_loan_free_date_text")
+                            )
+                        }
+                    }
+
+                    // Total Saved Banner when prepayments save interest or tenure
+                    result.insights.prepaymentImpact?.let { prep ->
+                        if (prep.netSavings > 0.0 || prep.monthsSaved > 0) {
+                            Spacer(Modifier.height(8.dp))
                             Surface(
                                 color = SavingsGreen.copy(alpha = 0.14f),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, SavingsGreen.copy(alpha = 0.35f)),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("results_total_saved_banner")
                             ) {
-                                Text(
-                                    text = "Saved ${CurrencyFormatter.formatCompact(prep.interestSaved, currency)}",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = SavingsGreen,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Savings,
+                                        contentDescription = null,
+                                        tint = SavingsGreen,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = "${stringResource(R.string.emi_total_saved_banner)}: ${CurrencyFormatter.format(prep.netSavings, currency)} • ${prep.monthsSaved} month(s) saved",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = SavingsGreen
+                                    )
+                                }
                             }
                         }
                     }
@@ -351,10 +389,11 @@ fun EmiResultsScreen(
     if (showSaveDialog) {
         SaveLoanDialog(
             defaultNickname = "${uiState.selectedCategory?.shortName ?: "Loan"} Plan",
+            defaultEmiDay = uiState.input.emiDayOfMonth.coerceIn(1, 28),
             onDismiss = { showSaveDialog = false },
-            onConfirm = { nickname, lender, reminder, daysBefore ->
+            onConfirm = { nickname, lender, reminder, daysBefore, emiDay, autoDebitNach ->
                 showSaveDialog = false
-                onSaveLoan(nickname, lender, reminder, daysBefore)
+                onSaveLoan(nickname, lender, reminder, daysBefore, emiDay, autoDebitNach)
             }
         )
     }
@@ -391,32 +430,49 @@ private fun SummaryStripColumn(
 @Composable
 private fun SaveLoanDialog(
     defaultNickname: String,
+    defaultEmiDay: Int,
     onDismiss: () -> Unit,
-    onConfirm: (String, String, Boolean, Int) -> Unit
+    onConfirm: (String, String, Boolean, Int, Int, Boolean) -> Unit
 ) {
     var nickname by remember { mutableStateOf(defaultNickname) }
     var lender by remember { mutableStateOf("SBI / HDFC / ICICI") }
+    var emiDayText by remember { mutableStateOf(defaultEmiDay.toString()) }
+    var autoDebitNach by remember { mutableStateOf(true) }
     var reminderEnabled by remember { mutableStateOf(true) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save to Saved Loans", fontWeight = FontWeight.Bold) },
+        title = { Text("Save to My Loans", fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
                     value = nickname,
                     onValueChange = { nickname = it },
-                    label = { Text("Loan Nickname") },
+                    label = { Text("Account Nickname") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = lender,
                     onValueChange = { lender = it },
-                    label = { Text("Bank / Lender") },
+                    label = { Text("Bank / NBFC Lender") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+                OutlinedTextField(
+                    value = emiDayText,
+                    onValueChange = { txt -> emiDayText = txt.filter { it.isDigit() }.take(2) },
+                    label = { Text("Monthly EMI Due Date (Day 1–28)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { autoDebitNach = !autoDebitNach }
+                ) {
+                    Checkbox(checked = autoDebitNach, onCheckedChange = { autoDebitNach = it })
+                    Text("Auto-Debit / NACH mandate enabled", style = MaterialTheme.typography.bodySmall)
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable { reminderEnabled = !reminderEnabled }
@@ -428,7 +484,10 @@ private fun SaveLoanDialog(
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm(nickname, lender, reminderEnabled, 3) },
+                onClick = {
+                    val emiDay = (emiDayText.toIntOrNull() ?: defaultEmiDay).coerceIn(1, 28)
+                    onConfirm(nickname, lender, reminderEnabled, 3, emiDay, autoDebitNach)
+                },
                 modifier = Modifier.testTag("save_loan_confirm_btn")
             ) {
                 Text("Save Loan", fontWeight = FontWeight.Bold)

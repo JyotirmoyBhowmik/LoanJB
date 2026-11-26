@@ -1,37 +1,47 @@
 package com.jyotirmoyb.loan.domain
 
-/**
- * Pure Kotlin domain models representing the configurable loan catalog.
- * Kept framework-agnostic so business rules can be tested on the JVM without Android dependencies.
- */
+import com.squareup.moshi.JsonClass
+
+const val STANDARD_PLANNING_DISCLAIMER =
+    "Estimates for planning only. Not financial, tax or investment advice. Verify with your bank or a qualified professional."
+
+@JsonClass(generateAdapter = true)
 data class LoanCatalog(
-    val version: Int = 1,
+    val version: Int = 2,
     val lastUpdated: String = "2026-11-25",
-    val disclaimer: String = "Estimates only. Actual bank terms, rates and rules may differ.",
+    val disclaimer: String = STANDARD_PLANNING_DISCLAIMER,
     val categories: List<LoanCategory> = emptyList()
 )
 
+@JsonClass(generateAdapter = true)
 data class LoanCategory(
     val id: String,
     val name: String,
     val shortName: String,
+    val icon: String = "account_balance",
+    val accentHex: String = "#0B8A7B",
     val description: String = "",
     val tenureMinMonths: Int = 12,
     val tenureMaxMonths: Int = 360,
     val defaultTenureMonths: Int = 120,
     val rateRangeMin: Double = 8.0,
     val rateRangeMax: Double = 14.0,
-    val defaultAmountInr: Double = 1_000_000.0,
-    val defaultAssetValueInr: Double = 1_500_000.0,
+    val rateMinKey: String? = null,
+    val rateMaxKey: String? = null,
+    val defaultAmountInr: Double = 1000000.0,
+    val defaultAssetValueInr: Double = 1500000.0,
     val ltvMinPercent: Double = 0.0,
     val ltvMaxPercent: Double = 80.0,
+    val ltvCapKey: String? = null,
     val defaultProcessingFeePercent: Double = 0.5,
     val defaultPrepaymentFeeFixed: Double = 2.0,
     val defaultPrepaymentFeeFloating: Double = 0.0,
     val secured: Boolean = true,
+    val checklistItems: List<String> = emptyList(),
     val variantGroups: List<VariantGroup> = emptyList()
 )
 
+@JsonClass(generateAdapter = true)
 data class VariantGroup(
     val id: String,
     val name: String,
@@ -39,6 +49,7 @@ data class VariantGroup(
     val variants: List<LoanVariant> = emptyList()
 )
 
+@JsonClass(generateAdapter = true)
 data class LoanVariant(
     val id: String,
     val name: String,
@@ -47,13 +58,16 @@ data class LoanVariant(
     val ruleFlag: String,
     val rateRangeMin: Double = 8.0,
     val rateRangeMax: Double = 14.0,
-    val typicalTenureLabel: String = "5 - 30 yrs",
+    val rateMinKey: String? = null,
+    val rateMaxKey: String? = null,
+    val typicalTenureLabel: String = "5 - 20 yrs",
     val prepaymentFeePercent: Double? = null,
-    val ltvCapOverride: Double? = null
+    val ltvCapOverride: Double? = null,
+    val ltvCapKey: String? = null
 )
 
 /**
- * Seed domain defaults for the Home Loan category (Step 1: Fixed-Rate Home Loan).
+ * Pure Kotlin seed defaults for the Home Loan category (used by fixed-rate helper & tests).
  */
 object HomeLoanCatalogDefaults {
     const val CATEGORY_ID_HOME = "home"

@@ -1,7 +1,6 @@
 package com.jyotirmoyb.loan.features.emi
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,21 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,34 +37,37 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.LoanCategory
-import com.jyotirmoyb.loan.engine.PrepaymentMode
-import com.jyotirmoyb.loan.engine.PrepaymentRule
+import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CalculationResult
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.LoanCategory
+import com.jyotirmoyb.loan.domain.PrepaymentMode
+import com.jyotirmoyb.loan.domain.PrepaymentRule
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.NumericInputField
-import com.jyotirmoyb.loan.ui.theme.DangerRed
-import com.jyotirmoyb.loan.ui.theme.TealPrimary
-import com.jyotirmoyb.loan.ui.theme.TealPrimaryDark
+import com.jyotirmoyb.loan.ui.components.ValueSourceBadgesRow
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AdvanceSettingsCard(
     input: CalculationInput,
+    result: CalculationResult,
     category: LoanCategory?,
     currency: CurrencyCode,
+    resolvedConfig: Map<String, ResolvedConfigItem>,
+    gstSourceItem: ResolvedConfigItem?,
     onUpdateInput: ((CalculationInput) -> CalculationInput) -> Unit,
     onSelectEmiMode: (String) -> Unit,
     onToggleMoratorium: (Boolean) -> Unit,
+    onApplyRepoScenario: (Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var cardExpanded by remember { mutableStateOf(true) }
@@ -89,31 +85,36 @@ fun AdvanceSettingsCard(
         else -> "Reducing"
     }
     val isCustomEmiMode = currentEmiModeLabel != "Reducing"
-    val isFeeActive = input.processingFeePercent > 0.0 || input.insurancePremium > 0.0
+    val isFeeActive = input.processingFeePercent > 0.0 || input.insurancePremium > 0.0 || input.gstOnFeesEnabled
     val isPrepayActive = input.prepaymentEnabled && input.prepayments.isNotEmpty()
     val isMoratoriumActive = flags.contains("MOR_SIMPLE") || flags.contains("MOR_COMPOUND") || flags.contains("MORATORIUM")
 
     val activeLabels = buildList {
         if (isCustomEmiMode) add(currentEmiModeLabel)
-        if (isFeeActive) add("Processing Fee")
+        if (isFeeActive) add(if (input.gstOnFeesEnabled) "Fee + GST" else "Processing Fee")
         if (isPrepayActive) add("Prepayment")
         if (isMoratoriumActive) add("Moratorium")
+        if (input.pmaySubsidyEnabled) add("PMAY Subsidy")
         if (input.balanceTransfer.enabled) add("Balance Transfer")
         if (input.topUp.enabled) add("Top-Up")
     }
 
     val prepayChipText = if (isPrepayActive) {
         val first = input.prepayments.first()
-        val amtStr = CurrencyFormatter.format(first.amount, currency)
-        val suffix = if (first.isRecurring) "/${first.intervalMonths}m" else "Once"
+        val amtStr = CurrencyFormatter.formatShortLabel(first.amount, currency)
+        val suffix = when {
+            !first.isRecurring -> "Once"
+            first.intervalMonths == 1 -> "/mo"
+            first.intervalMonths == 12 -> "/yr"
+            else -> "/${first.intervalMonths}m"
+        }
         if (input.prepayments.size == 1) "$amtStr $suffix" else "$amtStr +${input.prepayments.size - 1}"
     } else null
 
     FintechCard(
-        borderColor = if (cardExpanded) TealPrimary.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outline,
+        borderColor = if (cardExpanded) MaterialTheme.colorScheme.primary.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outline,
         modifier = modifier.testTag("emi_advance_settings_card")
     ) {
-        // Card Header Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,7 +138,7 @@ fun AdvanceSettingsCard(
                     Icon(
                         imageVector = Icons.Outlined.Tune,
                         contentDescription = null,
-                        tint = TealPrimaryDark,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -152,7 +153,7 @@ fun AdvanceSettingsCard(
                         if (activeLabels.isNotEmpty()) {
                             Spacer(Modifier.width(8.dp))
                             Surface(
-                                color = TealPrimary,
+                                color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier.testTag("emi_advance_active_badge")
                             ) {
@@ -160,7 +161,7 @@ fun AdvanceSettingsCard(
                                     text = "${activeLabels.size} Active",
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                                 )
                             }
@@ -168,12 +169,12 @@ fun AdvanceSettingsCard(
                     }
                     Text(
                         text = if (activeLabels.isEmpty()) {
-                            "Optional fees, prepayments & EMI rules"
+                            "Fees, GST, prepayments, repo scenarios & subsidies"
                         } else {
                             activeLabels.joinToString(", ")
                         },
                         style = MaterialTheme.typography.labelSmall,
-                        color = TealPrimaryDark,
+                        color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -188,7 +189,7 @@ fun AdvanceSettingsCard(
                 Icon(
                     imageVector = if (cardExpanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
                     contentDescription = if (cardExpanded) "Collapse advance settings" else "Expand advance settings",
-                    tint = TealPrimaryDark,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -218,7 +219,7 @@ fun AdvanceSettingsCard(
                     },
                     onInfoClick = {
                         infoDialogContent = "EMI Structure Type" to
-                            "Reducing balance charges interest only on the remaining principal each month (RBI standard). Flat rate charges interest on the full original principal for the entire tenure. Step-Up/Step-Down change your EMI periodically, Balloon keeps a lump sum for the final month, and Hybrid locks the rate initially before floating."
+                            "Reducing balance charges interest only on the remaining principal each month (RBI KFS standard). Flat rate charges interest on the full original principal. Step-Up/Step-Down change your EMI periodically, Balloon keeps a lump sum for the final month, and Offset reduces interest-bearing principal by parked overdraft cash."
                     },
                     onExpandToggle = {
                         expandedRowKey = if (expandedRowKey == "emi_type") null else "emi_type"
@@ -305,11 +306,21 @@ fun AdvanceSettingsCard(
                     }
                 }
 
-                // 2. Processing Fee & Insurance Row
+                // 2. Processing Fee, GST on Fees & Insurance Row
+                val feeChip = buildString {
+                    if (input.processingFeePercent > 0.0) {
+                        append("${String.format("%.2f", input.processingFeePercent).trimEnd('0').trimEnd('.')}%")
+                    }
+                    if (input.gstOnFeesEnabled) {
+                        if (isNotEmpty()) append(" ")
+                        append("+GST")
+                    }
+                }.ifBlank { null }
+
                 AdvanceSettingRow(
                     title = stringResource(R.string.emi_processing_fee_row),
                     checked = isFeeActive,
-                    chipText = if (isFeeActive) "${String.format("%.2f", input.processingFeePercent).trimEnd('0').trimEnd('.')}%" else null,
+                    chipText = feeChip,
                     chipHighlighted = isFeeActive,
                     expanded = expandedRowKey == "processing_fee",
                     testTag = "adv_row_processing_fee",
@@ -318,34 +329,64 @@ fun AdvanceSettingsCard(
                             onUpdateInput { it.copy(processingFeePercent = if (it.processingFeePercent <= 0.0) 0.5 else it.processingFeePercent) }
                             expandedRowKey = "processing_fee"
                         } else {
-                            onUpdateInput { it.copy(processingFeePercent = 0.0, insurancePremium = 0.0) }
+                            onUpdateInput { it.copy(processingFeePercent = 0.0, insurancePremium = 0.0, gstOnFeesEnabled = false) }
                         }
                     },
                     onInfoClick = {
-                        infoDialogContent = "Processing Fee & Insurance" to
-                            "One-time bank processing fee (typically 0.25%–2% of loan amount, plus applicable GST) and optional loan protection insurance. Included in your Effective Total Cost."
+                        infoDialogContent = "Processing Fee, GST & Insurance" to
+                            "Indian lenders typically charge 0.25%–2% processing fee plus ${String.format("%.0f", input.gstRatePercent)}% GST on banking fees (and on monthly Credit Card EMI interest). Edit the GST rate centrally under Profile → Data & Rates."
                     },
                     onExpandToggle = {
                         expandedRowKey = if (expandedRowKey == "processing_fee") null else "processing_fee"
                     }
                 ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        NumericInputField(
-                            label = "Processing Fee (%)",
-                            valueText = if (input.processingFeePercent == 0.0) "" else input.processingFeePercent.toString(),
-                            onValueChange = { txt ->
-                                onUpdateInput { it.copy(processingFeePercent = (txt.toDoubleOrNull() ?: 0.0).coerceIn(0.0, 10.0)) }
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
-                        NumericInputField(
-                            label = "Insurance (${currency.symbol})",
-                            valueText = if (input.insurancePremium == 0.0) "" else input.insurancePremium.toLong().toString(),
-                            onValueChange = { txt ->
-                                onUpdateInput { it.copy(insurancePremium = (txt.toDoubleOrNull() ?: 0.0).coerceAtLeast(0.0)) }
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            NumericInputField(
+                                label = "Processing Fee (%)",
+                                valueText = if (input.processingFeePercent == 0.0) "" else input.processingFeePercent.toString(),
+                                onValueChange = { txt ->
+                                    onUpdateInput { it.copy(processingFeePercent = (txt.toDoubleOrNull() ?: 0.0).coerceIn(0.0, 10.0)) }
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                            NumericInputField(
+                                label = "Insurance (${currency.symbol})",
+                                valueText = if (input.insurancePremium == 0.0) "" else input.insurancePremium.toLong().toString(),
+                                onValueChange = { txt ->
+                                    onUpdateInput { it.copy(insurancePremium = (txt.toDoubleOrNull() ?: 0.0).coerceAtLeast(0.0)) }
+                                },
+                                trailingBadge = if (input.insurancePremium > 0) {
+                                    CurrencyFormatter.formatShortLabel(input.insurancePremium, currency)
+                                } else null,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                                Text(
+                                    text = "${stringResource(R.string.emi_gst_on_fees_label)} (${String.format("%.0f", input.gstRatePercent)}%)",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                gstSourceItem?.let {
+                                    Spacer(Modifier.height(3.dp))
+                                    ValueSourceBadgesRow(item = it)
+                                }
+                            }
+                            Switch(
+                                checked = input.gstOnFeesEnabled,
+                                onCheckedChange = { enabled ->
+                                    onUpdateInput { it.copy(gstOnFeesEnabled = enabled) }
+                                },
+                                modifier = Modifier.testTag("emi_gst_on_fees_switch")
+                            )
+                        }
                     }
                 }
 
@@ -378,7 +419,7 @@ fun AdvanceSettingsCard(
                     },
                     onInfoClick = {
                         infoDialogContent = "Prepayment / Part Payment" to
-                            "Pay extra principal either once or periodically. Under RBI rules, individual floating-rate loans have zero foreclosure/prepayment penalty. Reducing Tenure usually saves significantly more interest than Reducing EMI."
+                            "Pay extra principal once, monthly, or yearly. Under RBI guidelines, individual floating-rate home loans carry 0% prepayment penalty. Reducing Tenure usually saves far more interest than Reducing EMI."
                     },
                     onExpandToggle = {
                         expandedRowKey = if (expandedRowKey == "prepayment") null else "prepayment"
@@ -386,6 +427,7 @@ fun AdvanceSettingsCard(
                 ) {
                     PrepaymentEditorContent(
                         input = input,
+                        result = result,
                         currency = currency,
                         onUpdateInput = onUpdateInput
                     )
@@ -407,7 +449,7 @@ fun AdvanceSettingsCard(
                     },
                     onInfoClick = {
                         infoDialogContent = "Moratorium / Grace Period" to
-                            "Pause principal repayment for initial months (common in Education or Home construction loans). Choose Simple Interest to pay interest monthly during moratorium, or Compound to capitalize unpaid interest into principal."
+                            "Pause principal repayment for initial months (Education course + 6–12m grace or Home construction). Part-payments mapped during moratorium reduce principal directly."
                     },
                     onExpandToggle = {
                         expandedRowKey = if (expandedRowKey == "moratorium") null else "moratorium"
@@ -447,17 +489,19 @@ fun AdvanceSettingsCard(
                     }
                 }
 
-                // 5. Variant-Adaptive Advance Rows (only rendered when selected catalog variant needs them)
+                // 5. Variant-Adaptive Advance Rows
                 VariantAdaptiveAdvanceRows(
                     input = input,
                     category = category,
                     currency = currency,
+                    resolvedConfig = resolvedConfig,
                     expandedRowKey = expandedRowKey,
                     onToggleExpand = { key ->
                         expandedRowKey = if (expandedRowKey == key) null else key
                     },
                     onShowInfo = { title, body -> infoDialogContent = title to body },
-                    onUpdateInput = onUpdateInput
+                    onUpdateInput = onUpdateInput,
+                    onApplyRepoScenario = onApplyRepoScenario
                 )
             }
         }
@@ -474,276 +518,5 @@ fun AdvanceSettingsCard(
                 }
             }
         )
-    }
-}
-
-@Composable
-internal fun AdvanceSettingRow(
-    title: String,
-    checked: Boolean,
-    chipText: String?,
-    chipHighlighted: Boolean,
-    expanded: Boolean,
-    testTag: String,
-    onCheckedChange: (Boolean) -> Unit,
-    onInfoClick: () -> Unit,
-    onExpandToggle: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = if (checked) {
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.22f)
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-        },
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (checked) TealPrimary.copy(alpha = 0.35f) else MaterialTheme.colorScheme.outlineVariant
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(testTag)
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onExpandToggle)
-                    .padding(start = 4.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = checked,
-                    onCheckedChange = onCheckedChange,
-                    colors = CheckboxDefaults.colors(checkedColor = TealPrimary),
-                    modifier = Modifier.testTag("${testTag}_checkbox")
-                )
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (checked) FontWeight.SemiBold else FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-                if (!chipText.isNullOrBlank()) {
-                    Spacer(Modifier.width(6.dp))
-                    Surface(
-                        color = if (chipHighlighted) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        },
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = chipText,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (chipHighlighted) TealPrimaryDark else MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
-                        )
-                    }
-                }
-                IconButton(
-                    onClick = onInfoClick,
-                    modifier = Modifier.size(38.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = stringResource(R.string.cd_info),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-                Icon(
-                    imageVector = if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
-                    contentDescription = if (expanded) "Collapse $title" else "Expand $title",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            AnimatedVisibility(visible = expanded) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 14.dp, end = 14.dp, bottom = 12.dp, top = 4.dp)
-                ) {
-                    content()
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PrepaymentEditorContent(
-    input: CalculationInput,
-    currency: CurrencyCode,
-    onUpdateInput: ((CalculationInput) -> CalculationInput) -> Unit
-) {
-    val rules = input.prepayments
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        rules.forEachIndexed { idx, rule ->
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-            ) {
-                Column(
-                    modifier = Modifier.padding(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Prepayment #${idx + 1}",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = TealPrimaryDark
-                        )
-                        IconButton(
-                            onClick = {
-                                val next = rules.toMutableList().apply { removeAt(idx) }
-                                onUpdateInput {
-                                    it.copy(
-                                        prepayments = next,
-                                        prepaymentEnabled = next.isNotEmpty()
-                                    )
-                                }
-                            },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.DeleteOutline,
-                                contentDescription = "Remove prepayment",
-                                tint = DangerRed,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        NumericInputField(
-                            label = "Amount (${currency.symbol})",
-                            valueText = if (rule.amount == 0.0) "" else rule.amount.toLong().toString(),
-                            onValueChange = { txt ->
-                                val amt = (txt.toDoubleOrNull() ?: 0.0).coerceAtLeast(0.0)
-                                val updated = rules.toMutableList().apply { set(idx, rule.copy(amount = amt)) }
-                                onUpdateInput { it.copy(prepaymentEnabled = true, prepayments = updated) }
-                            },
-                            modifier = Modifier.weight(1.2f)
-                        )
-                        NumericInputField(
-                            label = "At Month #",
-                            valueText = rule.startMonth.toString(),
-                            onValueChange = { txt ->
-                                val m = (txt.toIntOrNull() ?: 1).coerceIn(1, input.tenureMonths)
-                                val updated = rules.toMutableList().apply { set(idx, rule.copy(startMonth = m)) }
-                                onUpdateInput { it.copy(prepaymentEnabled = true, prepayments = updated) }
-                            },
-                            modifier = Modifier.weight(0.8f)
-                        )
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(
-                            selected = !rule.isRecurring,
-                            onClick = {
-                                val updated = rules.toMutableList().apply { set(idx, rule.copy(isRecurring = false)) }
-                                onUpdateInput { it.copy(prepayments = updated) }
-                            },
-                            label = { Text("One-Time") }
-                        )
-                        FilterChip(
-                            selected = rule.isRecurring,
-                            onClick = {
-                                val updated = rules.toMutableList().apply { set(idx, rule.copy(isRecurring = true)) }
-                                onUpdateInput { it.copy(prepayments = updated) }
-                            },
-                            label = { Text("Recurring") }
-                        )
-                    }
-
-                    if (rule.isRecurring) {
-                        NumericInputField(
-                            label = "Repeat Every (Months)",
-                            valueText = rule.intervalMonths.toString(),
-                            onValueChange = { txt ->
-                                val iv = (txt.toIntOrNull() ?: 12).coerceIn(1, 60)
-                                val updated = rules.toMutableList().apply { set(idx, rule.copy(intervalMonths = iv)) }
-                                onUpdateInput { it.copy(prepayments = updated) }
-                            }
-                        )
-                    }
-
-                    val reduceTenure = rule.mode != PrepaymentMode.REDUCE_EMI.name
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(
-                            selected = reduceTenure,
-                            onClick = {
-                                val updated = rules.toMutableList().apply {
-                                    set(idx, rule.copy(mode = PrepaymentMode.REDUCE_TENURE.name))
-                                }
-                                onUpdateInput { it.copy(prepayments = updated) }
-                            },
-                            label = { Text("Reduce Tenure") },
-                            modifier = Modifier.testTag("prepay_mode_tenure_$idx")
-                        )
-                        FilterChip(
-                            selected = !reduceTenure,
-                            onClick = {
-                                val updated = rules.toMutableList().apply {
-                                    set(idx, rule.copy(mode = PrepaymentMode.REDUCE_EMI.name))
-                                }
-                                onUpdateInput { it.copy(prepayments = updated) }
-                            },
-                            label = { Text("Reduce EMI") },
-                            modifier = Modifier.testTag("prepay_mode_emi_$idx")
-                        )
-                    }
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            NumericInputField(
-                label = "Prepayment Fee (%)",
-                valueText = if (input.prepaymentFeePercent == 0.0) "0" else input.prepaymentFeePercent.toString(),
-                onValueChange = { txt ->
-                    onUpdateInput { it.copy(prepaymentFeePercent = (txt.toDoubleOrNull() ?: 0.0).coerceIn(0.0, 10.0)) }
-                },
-                modifier = Modifier.weight(1f)
-            )
-            OutlinedButton(
-                onClick = {
-                    val nextMonth = ((rules.lastOrNull()?.startMonth ?: 6) + 12).coerceAtMost(input.tenureMonths)
-                    val nextRule = PrepaymentRule(
-                        startMonth = nextMonth,
-                        amount = 200000.0,
-                        isRecurring = false,
-                        mode = PrepaymentMode.REDUCE_TENURE.name
-                    )
-                    onUpdateInput { it.copy(prepaymentEnabled = true, prepayments = it.prepayments + nextRule) }
-                },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.testTag("add_prepayment_rule_btn")
-            ) {
-                Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(4.dp))
-                Text("Add")
-            }
-        }
     }
 }

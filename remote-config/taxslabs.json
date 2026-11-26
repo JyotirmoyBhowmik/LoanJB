@@ -1,0 +1,902 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "2026.11.1",
+  "publishedOn": "2026-11-25",
+  "items": [
+    {
+      "key": "tax.gst.banking_services",
+      "label": "GST on Loan Processing Fees & CC EMI Interest",
+      "category": "TAX_SLABS",
+      "value": 18.0,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "CBIC GST Council (Seed)",
+      "sourceUrl": "https://cbic-gst.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec24b.self_occupied_cap",
+      "label": "Section 24(b) Home Loan Interest Deduction Cap",
+      "category": "TAX_SLABS",
+      "value": 200000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec80c.cap",
+      "label": "Section 80C Principal & Investments Cap",
+      "category": "TAX_SLABS",
+      "value": 150000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec80e.max_years",
+      "label": "Section 80E Education Loan Interest Deduction Years",
+      "category": "TAX_SLABS",
+      "value": 8,
+      "unit": "years",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec80ccd1b.nps_cap",
+      "label": "Section 80CCD(1B) Additional NPS Cap",
+      "category": "TAX_SLABS",
+      "value": 50000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.std_deduction",
+      "label": "New Regime Standard Deduction (Salaried)",
+      "category": "TAX_SLABS",
+      "value": 75000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Union Budget India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.old_regime.std_deduction",
+      "label": "Old Regime Standard Deduction (Salaried)",
+      "category": "TAX_SLABS",
+      "value": 50000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.rebate_limit",
+      "label": "Section 87A New Regime Rebate Income Limit",
+      "category": "TAX_SLABS",
+      "value": 1200000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.hra.metro_percent",
+      "label": "HRA Exemption Limit (Metro Cities)",
+      "category": "TAX_SLABS",
+      "value": 50.0,
+      "unit": "% of Basic",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Rules 2A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.hra.non_metro_percent",
+      "label": "HRA Exemption Limit (Non-Metro)",
+      "category": "TAX_SLABS",
+      "value": 40.0,
+      "unit": "% of Basic",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Rules 2A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.cess_percent",
+      "label": "Health & Education Cess",
+      "category": "TAX_SLABS",
+      "value": 4.0,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec24b.let_out_loss_setoff_cap",
+      "label": "Section 71(3A) Let-Out Property Loss Set-Off Cap",
+      "category": "TAX_SLABS",
+      "value": 200000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.old_regime.rebate_limit",
+      "label": "Section 87A Old Regime Rebate Limit",
+      "category": "TAX_SLABS",
+      "value": 500000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.old_regime.slab1_limit",
+      "label": "Old Regime 0% Slab Limit",
+      "category": "TAX_SLABS",
+      "value": 250000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.old_regime.slab2_limit",
+      "label": "Old Regime 5% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 500000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.old_regime.slab3_limit",
+      "label": "Old Regime 20% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 1000000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act, India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.slab1_limit",
+      "label": "New Regime 0% Slab Limit",
+      "category": "TAX_SLABS",
+      "value": 400000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.slab2_limit",
+      "label": "New Regime 5% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 800000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.slab3_limit",
+      "label": "New Regime 10% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 1200000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.slab4_limit",
+      "label": "New Regime 15% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 1600000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.slab5_limit",
+      "label": "New Regime 20% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 2000000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.slab6_limit",
+      "label": "New Regime 25% Slab Upper Limit",
+      "category": "TAX_SLABS",
+      "value": 2400000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.sec24b_self_occupied_allowed",
+      "label": "New Regime Sec 24(b) Self-Occupied Allowed (0=No, 1=Yes)",
+      "category": "TAX_SLABS",
+      "value": 0,
+      "unit": "flag",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.sec80c_allowed",
+      "label": "New Regime Sec 80C Principal Allowed (0=No, 1=Yes)",
+      "category": "TAX_SLABS",
+      "value": 0,
+      "unit": "flag",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.new_regime.sec80e_allowed",
+      "label": "New Regime Sec 80E Education Interest Allowed (0=No, 1=Yes)",
+      "category": "TAX_SLABS",
+      "value": 0,
+      "unit": "flag",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act India (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.tds.fd_general_threshold",
+      "label": "Sec 194A FD TDS Threshold (General)",
+      "category": "TAX_SLABS",
+      "value": 50000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 194A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.tds.fd_senior_threshold",
+      "label": "Sec 194A FD TDS Threshold (Senior Citizen)",
+      "category": "TAX_SLABS",
+      "value": 100000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 194A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.tds.rate_with_pan",
+      "label": "FD Interest TDS Rate (With PAN)",
+      "category": "TAX_SLABS",
+      "value": 10.0,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 194A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.tds.rate_without_pan",
+      "label": "FD Interest TDS Rate (Without PAN — Sec 206AA)",
+      "category": "TAX_SLABS",
+      "value": 20.0,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 206AA (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.mf.equity_ltcg_holding_months",
+      "label": "Equity MF LTCG Minimum Holding Period",
+      "category": "TAX_SLABS",
+      "value": 12,
+      "unit": "months",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 112A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.mf.equity_ltcg_exemption",
+      "label": "Equity MF LTCG Annual Tax-Free Exemption",
+      "category": "TAX_SLABS",
+      "value": 125000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act Sec 112A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.mf.equity_ltcg_rate",
+      "label": "Equity MF LTCG Tax Rate (Above Exemption)",
+      "category": "TAX_SLABS",
+      "value": 12.5,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act Sec 112A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.mf.equity_stcg_rate",
+      "label": "Equity MF STCG Tax Rate (< 12 Months)",
+      "category": "TAX_SLABS",
+      "value": 20.0,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act Sec 111A (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.mf.hybrid_ltcg_holding_months",
+      "label": "Gold / International / Hybrid MF LTCG Holding Period",
+      "category": "TAX_SLABS",
+      "value": 24,
+      "unit": "months",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act Sec 112 (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.mf.hybrid_ltcg_rate",
+      "label": "Gold / International / Hybrid MF LTCG Tax Rate",
+      "category": "TAX_SLABS",
+      "value": 12.5,
+      "unit": "%",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Finance Act Sec 112 (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec80d.self_cap",
+      "label": "Section 80D Health Insurance Cap (Below 60)",
+      "category": "TAX_SLABS",
+      "value": 25000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 80D (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.sec80d.senior_cap",
+      "label": "Section 80D Health Insurance Cap (Senior 60+)",
+      "category": "TAX_SLABS",
+      "value": 50000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 80D (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "tax.advance_tax.threshold",
+      "label": "Advance Tax Minimum Net Liability Threshold (Sec 208)",
+      "category": "TAX_SLABS",
+      "value": 10000,
+      "unit": "INR/yr",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "Income Tax Act Sec 208 (Seed)",
+      "sourceUrl": "https://www.incometax.gov.in",
+      "lastVerified": "UNVERIFIED"
+    }
+  ],
+  "gstSlabs": [0.0, 3.0, 5.0, 12.0, 18.0, 28.0],
+  "advanceTaxThreshold": 10000,
+  "advanceTaxSchedule": [
+    {
+      "dueDateLabel": "15 Jun",
+      "calendarMonth": 6,
+      "calendarDay": 15,
+      "cumulativePercent": 15.0,
+      "label": "1st Instalment (15% cumulative)"
+    },
+    {
+      "dueDateLabel": "15 Sep",
+      "calendarMonth": 9,
+      "calendarDay": 15,
+      "cumulativePercent": 45.0,
+      "label": "2nd Instalment (45% cumulative)"
+    },
+    {
+      "dueDateLabel": "15 Dec",
+      "calendarMonth": 12,
+      "calendarDay": 15,
+      "cumulativePercent": 75.0,
+      "label": "3rd Instalment (75% cumulative)"
+    },
+    {
+      "dueDateLabel": "15 Mar",
+      "calendarMonth": 3,
+      "calendarDay": 15,
+      "cumulativePercent": 100.0,
+      "label": "4th Instalment (100% cumulative)"
+    }
+  ],
+  "taxYears": [
+    {
+      "fyCode": "FY 2026-27",
+      "ayCode": "AY 2027-28",
+      "lawReference": "Income-tax Act, 2025 / Finance Act 2026",
+      "effectiveFrom": "2026-04-01",
+      "cessPercent": 4.0,
+      "newRegime": {
+        "regimeId": "NEW",
+        "displayName": "New Regime (Default)",
+        "standardDeductionSalaried": 75000,
+        "rebateIncomeLimit": 1200000,
+        "maxRebateAmount": 60000,
+        "rebateMarginalRelief": true,
+        "slabsGeneral": [
+          { "upTo": 400000, "ratePercent": 0.0 },
+          { "upTo": 800000, "ratePercent": 5.0 },
+          { "upTo": 1200000, "ratePercent": 10.0 },
+          { "upTo": 1600000, "ratePercent": 15.0 },
+          { "upTo": 2000000, "ratePercent": 20.0 },
+          { "upTo": 2400000, "ratePercent": 25.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "surchargeBands": [
+          { "aboveIncome": 5000000, "ratePercent": 10.0 },
+          { "aboveIncome": 10000000, "ratePercent": 15.0 },
+          { "aboveIncome": 20000000, "ratePercent": 25.0 }
+        ],
+        "surchargeMarginalRelief": true
+      },
+      "oldRegime": {
+        "regimeId": "OLD",
+        "displayName": "Old Regime",
+        "standardDeductionSalaried": 50000,
+        "rebateIncomeLimit": 500000,
+        "maxRebateAmount": 12500,
+        "rebateMarginalRelief": false,
+        "slabsGeneral": [
+          { "upTo": 250000, "ratePercent": 0.0 },
+          { "upTo": 500000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "slabsSenior": [
+          { "upTo": 300000, "ratePercent": 0.0 },
+          { "upTo": 500000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "slabsSuperSenior": [
+          { "upTo": 500000, "ratePercent": 0.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "surchargeBands": [
+          { "aboveIncome": 5000000, "ratePercent": 10.0 },
+          { "aboveIncome": 10000000, "ratePercent": 15.0 },
+          { "aboveIncome": 20000000, "ratePercent": 25.0 },
+          { "aboveIncome": 50000000, "ratePercent": 37.0 }
+        ],
+        "surchargeMarginalRelief": true
+      },
+      "deductions": [
+        {
+          "id": "hra",
+          "label": "HRA Exemption (Exempt Portion)",
+          "section": "Sec 10(13A)",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Computed via least-of-3 HRA rules"
+        },
+        {
+          "id": "sec80c",
+          "label": "80C (PPF, ELSS, EPF, LIC, Home Principal)",
+          "section": "Sec 80C",
+          "capGeneral": 150000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Max ₹1.5 Lakh per FY"
+        },
+        {
+          "id": "sec80ccd1b",
+          "label": "80CCD(1B) Self NPS Contribution",
+          "section": "Sec 80CCD(1B)",
+          "capGeneral": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Additional ₹50,000 over 80C"
+        },
+        {
+          "id": "sec80ccd2",
+          "label": "80CCD(2) Employer NPS Contribution",
+          "section": "Sec 80CCD(2)",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": true,
+          "hint": "Allowed in both regimes (up to 14% Basic+DA in New)"
+        },
+        {
+          "id": "sec80d_self",
+          "label": "80D Health Insurance (Self & Family)",
+          "section": "Sec 80D",
+          "capGeneral": 25000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹25,000 (<60) or ₹50,000 (Senior)"
+        },
+        {
+          "id": "sec80d_parents",
+          "label": "80D Health Insurance (Parents)",
+          "section": "Sec 80D",
+          "capGeneral": 25000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹25,000 (or ₹50,000 if senior parents)"
+        },
+        {
+          "id": "sec24b",
+          "label": "Home Loan Interest (Self-Occupied)",
+          "section": "Sec 24(b)",
+          "capGeneral": 200000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Max ₹2 Lakh self-occupied under Old Regime"
+        },
+        {
+          "id": "sec80e",
+          "label": "Education Loan Interest",
+          "section": "Sec 80E",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Uncapped interest for up to 8 years"
+        },
+        {
+          "id": "sec80tta_ttb",
+          "label": "Savings / Senior Deposit Interest",
+          "section": "Sec 80TTA / 80TTB",
+          "capGeneral": 10000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹10k savings (80TTA) / ₹50k FD+SB senior (80TTB)"
+        }
+      ]
+    },
+    {
+      "fyCode": "FY 2025-26",
+      "ayCode": "AY 2026-27",
+      "lawReference": "Finance Act, 2025 (Income-tax Act, 1961)",
+      "effectiveFrom": "2025-04-01",
+      "cessPercent": 4.0,
+      "newRegime": {
+        "regimeId": "NEW",
+        "displayName": "New Regime (Default)",
+        "standardDeductionSalaried": 75000,
+        "rebateIncomeLimit": 1200000,
+        "maxRebateAmount": 60000,
+        "rebateMarginalRelief": true,
+        "slabsGeneral": [
+          { "upTo": 400000, "ratePercent": 0.0 },
+          { "upTo": 800000, "ratePercent": 5.0 },
+          { "upTo": 1200000, "ratePercent": 10.0 },
+          { "upTo": 1600000, "ratePercent": 15.0 },
+          { "upTo": 2000000, "ratePercent": 20.0 },
+          { "upTo": 2400000, "ratePercent": 25.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "surchargeBands": [
+          { "aboveIncome": 5000000, "ratePercent": 10.0 },
+          { "aboveIncome": 10000000, "ratePercent": 15.0 },
+          { "aboveIncome": 20000000, "ratePercent": 25.0 }
+        ],
+        "surchargeMarginalRelief": true
+      },
+      "oldRegime": {
+        "regimeId": "OLD",
+        "displayName": "Old Regime",
+        "standardDeductionSalaried": 50000,
+        "rebateIncomeLimit": 500000,
+        "maxRebateAmount": 12500,
+        "rebateMarginalRelief": false,
+        "slabsGeneral": [
+          { "upTo": 250000, "ratePercent": 0.0 },
+          { "upTo": 500000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "slabsSenior": [
+          { "upTo": 300000, "ratePercent": 0.0 },
+          { "upTo": 500000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "slabsSuperSenior": [
+          { "upTo": 500000, "ratePercent": 0.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "surchargeBands": [
+          { "aboveIncome": 5000000, "ratePercent": 10.0 },
+          { "aboveIncome": 10000000, "ratePercent": 15.0 },
+          { "aboveIncome": 20000000, "ratePercent": 25.0 },
+          { "aboveIncome": 50000000, "ratePercent": 37.0 }
+        ],
+        "surchargeMarginalRelief": true
+      },
+      "deductions": [
+        {
+          "id": "hra",
+          "label": "HRA Exemption (Exempt Portion)",
+          "section": "Sec 10(13A)",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Computed via least-of-3 HRA rules"
+        },
+        {
+          "id": "sec80c",
+          "label": "80C (PPF, ELSS, EPF, LIC, Home Principal)",
+          "section": "Sec 80C",
+          "capGeneral": 150000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Max ₹1.5 Lakh per FY"
+        },
+        {
+          "id": "sec80ccd1b",
+          "label": "80CCD(1B) Self NPS Contribution",
+          "section": "Sec 80CCD(1B)",
+          "capGeneral": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Additional ₹50,000 over 80C"
+        },
+        {
+          "id": "sec80ccd2",
+          "label": "80CCD(2) Employer NPS Contribution",
+          "section": "Sec 80CCD(2)",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": true,
+          "hint": "Allowed in both regimes (up to 14% Basic+DA in New)"
+        },
+        {
+          "id": "sec80d_self",
+          "label": "80D Health Insurance (Self & Family)",
+          "section": "Sec 80D",
+          "capGeneral": 25000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹25,000 (<60) or ₹50,000 (Senior)"
+        },
+        {
+          "id": "sec80d_parents",
+          "label": "80D Health Insurance (Parents)",
+          "section": "Sec 80D",
+          "capGeneral": 25000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹25,000 (or ₹50,000 if senior parents)"
+        },
+        {
+          "id": "sec24b",
+          "label": "Home Loan Interest (Self-Occupied)",
+          "section": "Sec 24(b)",
+          "capGeneral": 200000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Max ₹2 Lakh self-occupied under Old Regime"
+        },
+        {
+          "id": "sec80e",
+          "label": "Education Loan Interest",
+          "section": "Sec 80E",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Uncapped interest for up to 8 years"
+        },
+        {
+          "id": "sec80tta_ttb",
+          "label": "Savings / Senior Deposit Interest",
+          "section": "Sec 80TTA / 80TTB",
+          "capGeneral": 10000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹10k savings (80TTA) / ₹50k FD+SB senior (80TTB)"
+        }
+      ]
+    },
+    {
+      "fyCode": "FY 2024-25",
+      "ayCode": "AY 2025-26",
+      "lawReference": "Finance (No. 2) Act, 2024",
+      "effectiveFrom": "2024-04-01",
+      "cessPercent": 4.0,
+      "newRegime": {
+        "regimeId": "NEW",
+        "displayName": "New Regime (Default)",
+        "standardDeductionSalaried": 75000,
+        "rebateIncomeLimit": 700000,
+        "maxRebateAmount": 25000,
+        "rebateMarginalRelief": true,
+        "slabsGeneral": [
+          { "upTo": 300000, "ratePercent": 0.0 },
+          { "upTo": 700000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 10.0 },
+          { "upTo": 1200000, "ratePercent": 15.0 },
+          { "upTo": 1500000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "surchargeBands": [
+          { "aboveIncome": 5000000, "ratePercent": 10.0 },
+          { "aboveIncome": 10000000, "ratePercent": 15.0 },
+          { "aboveIncome": 20000000, "ratePercent": 25.0 }
+        ],
+        "surchargeMarginalRelief": true
+      },
+      "oldRegime": {
+        "regimeId": "OLD",
+        "displayName": "Old Regime",
+        "standardDeductionSalaried": 50000,
+        "rebateIncomeLimit": 500000,
+        "maxRebateAmount": 12500,
+        "rebateMarginalRelief": false,
+        "slabsGeneral": [
+          { "upTo": 250000, "ratePercent": 0.0 },
+          { "upTo": 500000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "slabsSenior": [
+          { "upTo": 300000, "ratePercent": 0.0 },
+          { "upTo": 500000, "ratePercent": 5.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "slabsSuperSenior": [
+          { "upTo": 500000, "ratePercent": 0.0 },
+          { "upTo": 1000000, "ratePercent": 20.0 },
+          { "upTo": null, "ratePercent": 30.0 }
+        ],
+        "surchargeBands": [
+          { "aboveIncome": 5000000, "ratePercent": 10.0 },
+          { "aboveIncome": 10000000, "ratePercent": 15.0 },
+          { "aboveIncome": 20000000, "ratePercent": 25.0 },
+          { "aboveIncome": 50000000, "ratePercent": 37.0 }
+        ],
+        "surchargeMarginalRelief": true
+      },
+      "deductions": [
+        {
+          "id": "hra",
+          "label": "HRA Exemption (Exempt Portion)",
+          "section": "Sec 10(13A)",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Computed via least-of-3 HRA rules"
+        },
+        {
+          "id": "sec80c",
+          "label": "80C (PPF, ELSS, EPF, LIC, Home Principal)",
+          "section": "Sec 80C",
+          "capGeneral": 150000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Max ₹1.5 Lakh per FY"
+        },
+        {
+          "id": "sec80ccd1b",
+          "label": "80CCD(1B) Self NPS Contribution",
+          "section": "Sec 80CCD(1B)",
+          "capGeneral": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Additional ₹50,000 over 80C"
+        },
+        {
+          "id": "sec80ccd2",
+          "label": "80CCD(2) Employer NPS Contribution",
+          "section": "Sec 80CCD(2)",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": true,
+          "hint": "Allowed in both regimes (up to 14% Basic+DA in New)"
+        },
+        {
+          "id": "sec80d_self",
+          "label": "80D Health Insurance (Self & Family)",
+          "section": "Sec 80D",
+          "capGeneral": 25000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹25,000 (<60) or ₹50,000 (Senior)"
+        },
+        {
+          "id": "sec80d_parents",
+          "label": "80D Health Insurance (Parents)",
+          "section": "Sec 80D",
+          "capGeneral": 25000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹25,000 (or ₹50,000 if senior parents)"
+        },
+        {
+          "id": "sec24b",
+          "label": "Home Loan Interest (Self-Occupied)",
+          "section": "Sec 24(b)",
+          "capGeneral": 200000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Max ₹2 Lakh self-occupied under Old Regime"
+        },
+        {
+          "id": "sec80e",
+          "label": "Education Loan Interest",
+          "section": "Sec 80E",
+          "capGeneral": null,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "Uncapped interest for up to 8 years"
+        },
+        {
+          "id": "sec80tta_ttb",
+          "label": "Savings / Senior Deposit Interest",
+          "section": "Sec 80TTA / 80TTB",
+          "capGeneral": 10000,
+          "capSenior": 50000,
+          "allowedInOld": true,
+          "allowedInNew": false,
+          "hint": "₹10k savings (80TTA) / ₹50k FD+SB senior (80TTB)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
+
+Open Ended Schemes(Equity Scheme - Flexi Cap Fund)
+
+Parag Parikh Mutual Fund
+122639;INF879O01027;-;Parag Parikh Flexi Cap Fund - Direct Plan - Growth;89.4521;24-Nov-2026
+122640;INF879O01019;-;Parag Parikh Flexi Cap Fund - Regular Plan - Growth;81.1234;24-Nov-2026
+122641;INF879O01035;INF879O01043;Parag Parikh Flexi Cap Fund - Direct Plan - IDCW;N.A.;24-Nov-2026
+
+HDFC Mutual Fund
+118989;INF179K01UT0;-;HDFC Mid-Cap Opportunities Fund - Direct Plan - Growth;196.7840;24-Nov-2026
+118990;INF179K01UU8;INF179K01UV6;HDFC Mid-Cap Opportunities Fund - Direct Plan - IDCW;78.5400;24-Nov-2026
+BADCODE;INF179K01999;-;Malformed Scheme Code Row;45.1000;24-Nov-2026
+
+Open Ended Schemes(Equity Scheme - Large Cap Fund)
+
+SBI Mutual Fund
+119598;INF200K01QX4;-;SBI Bluechip Fund - Direct Plan - Growth;95.6215;24-Nov-2026
+119599;INF200K01QY2;INF200K01QZ9;SBI Bluechip Fund - Direct Plan - IDCW;54.2310;24-Nov-2026
+119600;INF200K01R01;-;Zero Nav Row Should Skip;0.0000;24-Nov-2026
+
+Open Ended Schemes(Debt Scheme - Liquid Fund)
+
+ICICI Prudential Mutual Fund
+120586;INF109K01Q49;-;ICICI Prudential Liquid Fund - Direct Plan - Growth;372.4182;24-Nov-2026
+120587;INF109K01Q56;INF109K01Q64;ICICI Prudential Liquid Fund - Direct Plan - Weekly IDCW;100.2145;24-Nov-2026
+120588;IncompleteRowWithTooFewColumns

@@ -2,7 +2,6 @@ package com.jyotirmoyb.loan.features.emi.results
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,13 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.AmortizationRow
-import com.jyotirmoyb.loan.engine.CalculationResult
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.YearlySummary
+import com.jyotirmoyb.loan.domain.AmortizationRow
+import com.jyotirmoyb.loan.domain.CalculationResult
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.YearlySummary
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
+import com.jyotirmoyb.loan.ui.theme.LocalIsDarkTheme
 import com.jyotirmoyb.loan.ui.theme.MonoSmallStyle
 import com.jyotirmoyb.loan.ui.theme.PrepaymentHighlightDark
 import com.jyotirmoyb.loan.ui.theme.PrepaymentHighlightLight
@@ -69,7 +69,7 @@ fun MonthlyScheduleTab(
     currency: CurrencyCode,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalIsDarkTheme.current
     val prepayBg = if (isDark) PrepaymentHighlightDark else PrepaymentHighlightLight
 
     // Flatten into virtualized LazyColumn items so 360-row schedules scroll smoothly at 60fps

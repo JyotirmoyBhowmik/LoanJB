@@ -1,0 +1,601 @@
+<resources>
+    <string name="app_name">LoanJB</string>
+    <string name="app_bar_title">ईएमआई कैलकुलेटर</string>
+    <string name="app_bar_subtitle">भारत ऑफ़लाइन लोन प्लानर</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_calculator">कैलकुलेटर</string>
+    <string name="nav_emi">ईएमआई</string>
+    <string name="nav_articles">लेख</string>
+    <string name="nav_market">बाज़ार</string>
+    <string name="nav_profile">प्रोफ़ाइल</string>
+    <string name="nav_explore">लोन गाइड</string>
+    <string name="nav_my_loans">सहेजे गए लोन</string>
+    <string name="nav_compare">तुलना</string>
+    <string name="nav_settings">सेटिंग्स</string>
+    <string name="nav_data_rates">डेटा और दरें</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">अपनी ईएमआई जानें, योजना बनाएं</string>
+    <string name="onboarding_sub_1">निर्णय लेने से पहले सही गणना करें।</string>
+    <string name="onboarding_title_2">जानें हर रुपया कहाँ जाता है</string>
+    <string name="onboarding_sub_2">हर मासिक किस्त का पूरा विवरण देखें</string>
+    <string name="onboarding_title_3">बड़ी योजनाओं की शुरुआत यहाँ</string>
+    <string name="onboarding_sub_3">लोन, बचत और लक्ष्य एक ही जगह पर</string>
+    <string name="onboarding_title_4">आज योजना बनाएं, कल के लिए तैयार रहें</string>
+    <string name="onboarding_sub_4">निवेश, कर और सेवानिवृत्ति की योजना बनाएं।</string>
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_next">अगला</string>
+    <string name="onboarding_get_started">शुरू करें</string>
+
+    <!-- Hub Sections -->
+    <string name="hub_search_hint">EMI, SIP, FD, टैक्स, पेंशन खोजें...</string>
+    <string name="hub_quick_tools">आपका लोन कार्यक्षेत्र</string>
+    <string name="hub_quick_tools_badge">ऑफ़लाइन</string>
+    <string name="hub_saved_loans_title">सहेजे गए लोन</string>
+    <string name="hub_saved_loans_sub">ईएमआई, रिमाइंडर और DTI ट्रैक करें</string>
+    <string name="hub_loan_guide_title">लोन प्रकार गाइड</string>
+    <string name="hub_loan_guide_sub">नियम और सही विकल्प जानें</string>
+    <string name="hub_no_results">कोई मिलता-जुलता कैलकुलेटर नहीं मिला।</string>
+    <string name="hub_clear_search">खोज साफ़ करें</string>
+
+    <!-- Data & Rates / Source Chips -->
+    <string name="data_rates_title">डेटा और दरें</string>
+    <string name="data_rates_subtitle">भारतीय ब्याज दरें, टैक्स स्लैब और मैनुअल बदलाव प्रबंधित करें</string>
+    <string name="source_manual">मैनुअल</string>
+    <string name="source_online">ऑनलाइन</string>
+    <string name="source_built_in">बिल्ट-इन</string>
+    <string name="badge_unverified">असत्यापित</string>
+    <string name="as_of_date">दिनांक %1$s तक</string>
+    <string name="reset_to_default">डिफ़ॉल्ट पर रीसेट करें</string>
+    <string name="reset_all_overrides">सभी बदलाव रीसेट करें</string>
+    <string name="use_online_data">ऑनलाइन डेटा उपयोग करें</string>
+    <string name="use_online_data_sub">ऑनलाइन होने पर HTTPS से नई दरें और स्लैब प्राप्त करें</string>
+    <string name="refresh_now">अभी रीफ़्रेश करें</string>
+    <string name="syncing_now">सिंक हो रहा है…</string>
+    <string name="last_sync_label">अंतिम सिंक</string>
+    <string name="last_sync_never">अभी सिंक नहीं हुआ (बिल्ट-इन डेटा उपयोग में)</string>
+    <string name="export_overrides">बदलाव एक्सपोर्ट करें</string>
+    <string name="import_overrides">बदलाव इम्पोर्ट करें</string>
+    <string name="edit_value">मान संपादित करें</string>
+    <string name="save_override">सहेजें</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="region_label">क्षेत्र और संख्या प्रारूप</string>
+
+    <!-- EMI Calculator -->
+    <string name="emi_screen_title">लोन (ईएमआई)</string>
+    <string name="emi_loan_type_label">लोन श्रेणी</string>
+    <string name="emi_amount_label">लोन राशि</string>
+    <string name="emi_rate_label">ब्याज दर (%)</string>
+    <string name="emi_tenure_label">अवधि</string>
+    <string name="emi_tenure_year">वर्ष</string>
+    <string name="emi_tenure_month">माह</string>
+    <string name="emi_start_date_label">लोन प्रारंभ तिथि</string>
+    <string name="emi_day_of_month_label">मासिक ईएमआई तिथि</string>
+    <string name="emi_pro_rata_label">प्रथम माह का आनुपातिक ब्याज</string>
+    <string name="emi_pro_rata_sub">पहली ईएमआई से पहले के दिनों का ब्याज जोड़ें</string>
+    <string name="emi_today">आज</string>
+    <string name="emi_change">बदलें</string>
+    <string name="emi_advance_settings">उन्नत सेटिंग्स</string>
+    <string name="emi_calculate_cta">ईएमआई और अनुसूची की गणना करें</string>
+    <string name="emi_type_row">ईएमआई प्रकार</string>
+    <string name="emi_processing_fee_row">प्रोसेसिंग शुल्क</string>
+    <string name="emi_gst_on_fees_label">शुल्क पर GST जोड़ें</string>
+    <string name="emi_prepayment_row">प्रीपेमेंट / आंशिक भुगतान</string>
+    <string name="emi_moratorium_row">मोरेटोरियम अवधि</string>
+    <string name="emi_ltv_row">संपत्ति मूल्य और LTV</string>
+    <string name="emi_insurance_row">लोन सुरक्षा बीमा</string>
+    <string name="emi_rate_timeline_row">फ्लोटिंग दर समयरेखा (रेपो / MCLR)</string>
+    <string name="emi_offset_row">ऑफ़सेट / ओवरड्राफ़्ट बैलेंस</string>
+    <string name="emi_tranche_row">किस्तवार वितरण + प्री-ईएमआई</string>
+    <string name="emi_pmay_row">PMAY ब्याज सब्सिडी</string>
+    <string name="emi_bt_row">बैलेंस ट्रांसफ़र मूल्यांकन</string>
+    <string name="emi_topup_row">टॉप-अप मिश्रित ईएमआई</string>
+    <string name="emi_repo_scenario_label">एक-टैप रेपो कटौती / बढ़ोतरी</string>
+    <string name="emi_gold_auction_alert">नीलामी जोखिम चेतावनी: गोल्ड LTV सीमा से ऊपर है</string>
+    <string name="emi_vehicle_checklist_title">हाइपोथिकेशन हटाने की चेकलिस्ट (RTO)</string>
+    <string name="emi_tax_benefit_title">भारतीय कर लाभ अनुमान (पुरानी व्यवस्था)</string>
+    <string name="emi_total_saved_banner">प्रीपेमेंट से कुल बचत</string>
+
+    <!-- Results -->
+    <string name="results_tab_yearly">वार्षिक</string>
+    <string name="results_tab_monthly">मासिक</string>
+    <string name="results_tab_graph">ग्राफ़</string>
+    <string name="results_monthly_emi">मासिक ईएमआई</string>
+    <string name="results_principal">मूलधन</string>
+    <string name="results_total_interest">कुल ब्याज</string>
+    <string name="results_total_payment">कुल देय राशि</string>
+    <string name="results_interest_ratio">ब्याज / मूलधन</string>
+    <string name="results_loan_free_date">लोन-मुक्त तिथि</string>
+    <string name="results_col_month">माह</string>
+    <string name="results_col_principal">मूलधन भुगतान</string>
+    <string name="results_col_interest">ब्याज भुगतान</string>
+    <string name="results_col_balance">माह के अंत में शेष</string>
+    <string name="results_total_row">कुल</string>
+    <string name="results_share">साझा करें</string>
+    <string name="export_csv">CSV एक्सपोर्ट</string>
+    <string name="export_pdf">PDF एक्सपोर्ट</string>
+    <string name="use_in_calculator">कैलकुलेटर में उपयोग करें</string>
+    <string name="save_loan">लोन सहेजें</string>
+    <string name="add_to_compare">तुलना करें</string>
+
+    <!-- Bank Staff Loan -->
+    <string name="bank_staff_title">बैंक स्टाफ़ लोन</string>
+    <string name="bank_staff_subtitle">भारतीय बैंक कर्मचारियों के लिए रियायती लोन प्रीसेट — पूरी तरह संपादन योग्य</string>
+
+    <!-- Coming Soon / Placeholders -->
+    <string name="coming_soon_badge">जल्द आ रहा है</string>
+    <string name="coming_soon_body">यह मॉड्यूल LoanJB में पंजीकृत है और अगले ऑफ़लाइन अपडेट में उपलब्ध होगा। सभी लोन और ईएमआई कैलकुलेटर अभी उपयोग के लिए तैयार हैं।</string>
+    <string name="coming_soon_back">कैलकुलेटर हब पर लौटें</string>
+    <string name="articles_title">वित्तीय गाइड और लेख</string>
+    <string name="articles_subtitle">ईएमआई रणनीति, प्रीपेमेंट गणित, टैक्स स्लैब और क्रेडिट स्कोर पर सरल भारतीय गाइड जल्द आ रहे हैं।</string>
+    <string name="market_title">दरें और बाज़ार निगरानी</string>
+    <string name="market_subtitle">RBI रेपो दर इतिहास, भारतीय बैंक होम लोन स्प्रेड और FD दरों के संदर्भ जल्द आ रहे हैं।</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_open_menu">कार्यक्षेत्र मेनू खोलें</string>
+    <string name="cd_search">कैलकुलेटर खोज टॉगल करें</string>
+    <string name="cd_info">जानकारी देखें</string>
+    <string name="cd_back">पीछे जाएं</string>
+    <string name="cd_close">बंद करें</string>
+
+    <!-- लोन टूल्स सूट -->
+    <string name="compare_title">लोन तुलना</string>
+    <string name="compare_subtitle">3 ऑफ़र की साथ-साथ तुलना करें</string>
+    <string name="compare_cheapest_badge">सबसे सस्ता</string>
+    <string name="compare_seed_saved">सहेजे गए लोन से</string>
+    <string name="compare_seed_catalog">कैटलॉग से जोड़ें</string>
+    <string name="compare_share_image">इमेज साझा करें</string>
+    <string name="compare_share_pdf">PDF साझा करें</string>
+    <string name="compare_bar_chart_title">कुल लागत विवरण</string>
+    <string name="compare_line_chart_title">बकाया राशि घटने का ग्राफ</string>
+    <string name="compare_metric_emi">मासिक ईएमआई</string>
+    <string name="compare_metric_interest">कुल ब्याज</string>
+    <string name="compare_metric_fees_gst">शुल्क + जीएसटी</string>
+    <string name="compare_metric_total_cost">कुल लागत (जीएसटी सहित)</string>
+    <string name="compare_metric_tenure">अवधि</string>
+    <string name="compare_metric_loan_free">लोन-मुक्त तिथि</string>
+    <string name="compare_empty_title">3 लोन ऑफ़र की तुलना करें</string>
+    <string name="compare_empty_body">अपने सहेजे गए लोन, कैटलॉग वेरिएंट या भारतीय बैंक प्रीसेट से ऑफ़र जोड़ें।</string>
+    <string name="compare_select_saved_title">सहेजे गए लोन से चुनें</string>
+    <string name="compare_select_catalog_title">कैटलॉग वेरिएंट से चुनें</string>
+    <string name="compare_no_saved_loans">अभी कोई सहेजा गया लोन नहीं है। पहले ईएमआई कैलकुलेटर से लोन सहेजें।</string>
+
+    <string name="eligibility_title">पात्रता और सामर्थ्य</string>
+    <string name="eligibility_subtitle">FOIR, CIBIL और रिवर्स ईएमआई बजट जांच</string>
+    <string name="eligibility_mode_forward">पात्रता जांचें</string>
+    <string name="eligibility_mode_reverse">रिवर्स ईएमआई बजट</string>
+    <string name="eligibility_monthly_income">मासिक शुद्ध आय</string>
+    <string name="eligibility_existing_emis">मौजूदा मासिक ईएमआई</string>
+    <string name="eligibility_age">वर्तमान आयु (वर्ष)</string>
+    <string name="eligibility_retirement_age">सेवानिवृत्ति आयु (वर्ष)</string>
+    <string name="eligibility_rate">ब्याज दर (%)</string>
+    <string name="eligibility_tenure_years">इच्छित अवधि (वर्ष)</string>
+    <string name="eligibility_foir_label">FOIR सीमा (%)</string>
+    <string name="eligibility_cibil_label">CIBIL स्कोर बैंड</string>
+    <string name="eligibility_reverse_prompt">मैं प्रति माह इतना दे सकता/सकती हूँ</string>
+    <string name="eligibility_max_loan">अधिकतम पात्र लोन</string>
+    <string name="eligibility_max_emi">अधिकतम नई ईएमआई</string>
+    <string name="eligibility_meter_title">सामर्थ्य मीटर</string>
+    <string name="eligibility_zone_comfortable">आरामदायक</string>
+    <string name="eligibility_zone_stretch">खिंचावपूर्ण</string>
+    <string name="eligibility_zone_risky">जोखिम भरा</string>
+
+    <string name="bt_title">बैलेंस ट्रांसफर और टॉप-अप</string>
+    <string name="bt_subtitle">ब्रेक-ईवन माह और शुद्ध बचत विश्लेषण</string>
+    <string name="bt_current_loan_section">वर्तमान लोन</string>
+    <string name="bt_new_offer_section">नया बैंक ऑफ़र और शुल्क</string>
+    <string name="bt_outstanding">वर्तमान बकाया राशि</string>
+    <string name="bt_current_rate">वर्तमान दर (%)</string>
+    <string name="bt_remaining_months">शेष महीने</string>
+    <string name="bt_new_rate">नए बैंक की दर (%)</string>
+    <string name="bt_proc_fee_pct">प्रोसेसिंग शुल्क (%)</string>
+    <string name="bt_proc_fee_flat">निश्चित शुल्क</string>
+    <string name="bt_gst_toggle">शुल्क पर जीएसटी लागू करें</string>
+    <string name="bt_legal_charges">कानूनी और मूल्यांकन शुल्क</string>
+    <string name="bt_foreclosure_pct">फोरक्लोज़र शुल्क (%)</string>
+    <string name="bt_topup_toggle">टॉप-अप लोन जोड़ें</string>
+    <string name="bt_topup_amount">टॉप-अप राशि</string>
+    <string name="bt_topup_rate">टॉप-अप दर (%)</string>
+    <string name="bt_topup_tenure">टॉप-अप अवधि (माह)</string>
+    <string name="bt_net_savings">कुल शुद्ध बचत</string>
+    <string name="bt_breakeven">ब्रेक-ईवन माह</string>
+    <string name="bt_monthly_savings">मासिक ईएमआई बचत</string>
+    <string name="bt_switching_cost">कुल स्विचिंग लागत</string>
+    <string name="bt_blended_emi">संयुक्त ईएमआई (टॉप-अप सहित)</string>
+
+    <string name="tax_title">लोन टैक्स लाभ</string>
+    <string name="tax_subtitle">पुरानी बनाम नई कर व्यवस्था • डेटा-आधारित स्लैब</string>
+    <string name="tax_income_section">आय और लोन कटौतियाँ</string>
+    <string name="tax_gross_income">वार्षिक सकल आय</string>
+    <string name="tax_salaried_toggle">वेतनभोगी (मानक कटौती)</string>
+    <string name="tax_occupancy_self">स्वयं-अधिकृत घर</string>
+    <string name="tax_occupancy_letout">किराए पर दी गई संपत्ति</string>
+    <string name="tax_home_interest">वार्षिक होम लोन ब्याज (धारा 24b)</string>
+    <string name="tax_rental_income">वार्षिक किराया आय</string>
+    <string name="tax_home_principal">वार्षिक होम लोन मूलधन (धारा 80C)</string>
+    <string name="tax_other_80c">अन्य 80C निवेश (EPF/PPF/ELSS)</string>
+    <string name="tax_edu_interest">शिक्षा लोन ब्याज (धारा 80E)</string>
+    <string name="tax_old_regime">पुरानी व्यवस्था</string>
+    <string name="tax_new_regime">नई व्यवस्था</string>
+    <string name="tax_saved_label">लोन से अनुमानित कर बचत</string>
+    <string name="tax_before_loans">लोन से पहले कर</string>
+    <string name="tax_after_loans">लोन के बाद कर</string>
+    <string name="tax_caps_section">डेटा-आधारित सीमाएँ और स्लैब</string>
+
+    <string name="partpay_title">पार्ट-पेमेंट प्लानर</string>
+    <string name="partpay_subtitle">अपनी लोन-मुक्त तिथि तय करें</string>
+    <string name="partpay_inputs_section">वर्तमान लोन और लक्ष्य तिथि</string>
+    <string name="partpay_target_date_label">लक्ष्य लोन-मुक्त तिथि</string>
+    <string name="partpay_extra_monthly">आवश्यक अतिरिक्त मासिक राशि</string>
+    <string name="partpay_new_outlay">नया कुल मासिक भुगतान</string>
+    <string name="partpay_interest_saved">कुल ब्याज बचत</string>
+    <string name="partpay_months_saved">बचाया गया समय</string>
+    <string name="partpay_curve_title">सामान्य बनाम त्वरित भुगतान वक्र</string>
+
+    <string name="bank_staff_edit_templates">टेम्प्लेट संपादित करें</string>
+    <string name="bank_staff_template_editor_title">स्टाफ लोन टेम्प्लेट संपादित करें</string>
+    <string name="bank_staff_template_editor_sub">प्रीसेट दरें, डिफ़ॉल्ट राशि और अवधि अनुकूलित करें। मैन्युअल ओवरराइड के रूप में सहेजा जाएगा।</string>
+    <string name="bank_staff_save_template">टेम्प्लेट सहेजें</string>
+
+    <!-- बैंक जमा (Bank Deposits Suite) -->
+    <string name="fd_title">फिक्स्ड डिपॉजिट (FD)</string>
+    <string name="fd_payout_title">FD ब्याज भुगतान</string>
+    <string name="fd_mode_cumulative">संचयी (Cumulative)</string>
+    <string name="fd_mode_payout">ब्याज भुगतान (Payout)</string>
+    <string name="fd_deposit_amount">जमा राशि</string>
+    <string name="fd_interest_rate">वार्षिक ब्याज दर (%)</string>
+    <string name="fd_senior_citizen">वरिष्ठ नागरिक (+%1$s%% अतिरिक्त)</string>
+    <string name="fd_senior_desc">अतिरिक्त ब्याज दर और उच्च TDS छूट सीमा</string>
+    <string name="fd_compounding_label">चक्रवृद्धि आवृत्ति</string>
+    <string name="fd_payout_freq_label">भुगतान आवृत्ति</string>
+    <string name="fd_tenure_label">जमा अवधि</string>
+    <string name="fd_tenure_months">अवधि (महीने)</string>
+    <string name="fd_maturity_amount">परिपक्वता राशि (MATURITY)</string>
+    <string name="fd_periodic_payout">आवधिक ब्याज भुगतान</string>
+    <string name="fd_total_payouts">कुल प्राप्त ब्याज (%1$d भुगतान)</string>
+    <string name="fd_total_interest">कुल ब्याज</string>
+    <string name="fd_post_tax_maturity">कर के बाद राशि</string>
+    <string name="fd_pre_tax_yield">कर-पूर्व यील्ड</string>
+    <string name="fd_post_tax_yield">कर-पश्चात यील्ड</string>
+    <string name="fd_maturity_date">परिपक्वता तिथि</string>
+    <string name="fd_tds_section">TDS और कर के बाद अनुमान</string>
+    <string name="fd_pan_toggle">PAN लिंक है (धारा 194A / 206AA)</string>
+    <string name="fd_pan_yes">PAN उपलब्ध — सीमा से ऊपर %1$s%% TDS</string>
+    <string name="fd_pan_no">PAN नहीं — सीमा से ऊपर %1$s%% TDS</string>
+    <string name="fd_tax_slab_label">आपका आयकर स्लैब</string>
+    <string name="fd_tds_threshold_label">वार्षिक TDS छूट सीमा</string>
+    <string name="fd_estimated_tds">अनुमानित कटौती TDS</string>
+    <string name="fd_total_slab_tax">अनुमानित स्लैब कर (सेस सहित)</string>
+    <string name="fd_yearwise_title">वर्ष-वार विवरण</string>
+    <string name="fd_col_fy">वित्त वर्ष</string>
+    <string name="fd_col_opening">प्रारंभिक</string>
+    <string name="fd_col_interest">ब्याज</string>
+    <string name="fd_col_tds">TDS</string>
+    <string name="fd_col_closing">अंतिम</string>
+    <string name="fd_col_deposit">जमा</string>
+
+    <string name="rd_title">रिकरिंग डिपॉजिट (RD)</string>
+    <string name="rd_monthly_deposit">मासिक किस्त</string>
+    <string name="rd_compounding_note">त्रैमासिक चक्रवृद्धि (भारतीय IBA मानक)</string>
+    <string name="rd_total_deposited">कुल जमा</string>
+    <string name="rd_effective_yield">प्रभावी वार्षिक दर</string>
+
+    <string name="ss_title">लघु बचत योजनाएं</string>
+    <string name="ss_quarterly_note">दरें हर तिमाही बदलती हैं — सरकार द्वारा अधिसूचित लघु बचत ब्याज दरों की वित्त मंत्रालय हर तिमाही समीक्षा करता है।</string>
+    <string name="ss_as_of_quarter">अधिसूचित %1$s</string>
+    <string name="ss_yearly_deposit">वार्षिक जमा</string>
+    <string name="ss_monthly_deposit">मासिक जमा</string>
+    <string name="ss_lumpsum_deposit">एकमुश्त जमा</string>
+    <string name="ss_ppf_extension">5-वर्षीय विस्तार ब्लॉक</string>
+    <string name="ss_ppf_contribute_ext">विस्तार के दौरान योगदान जारी रखें</string>
+    <string name="ss_pomis_single">एकल खाता</string>
+    <string name="ss_pomis_joint">संयुक्त खाता</string>
+    <string name="ss_potd_tenure">टाइम डिपॉजिट अवधि</string>
+    <string name="ss_rate_override_label">योजना दर (% वार्षिक)</string>
+    <string name="ss_total_invested">कुल निवेश</string>
+
+    <string name="dep_cmp_title">FD बनाम RD बनाम PPF बनाम डेट</string>
+    <string name="dep_cmp_subtitle">आपके कर स्लैब के लिए कर-पश्चात रिटर्न तुलना</string>
+    <string name="dep_cmp_monthly_label">मासिक निवेश</string>
+    <string name="dep_cmp_horizon_label">निवेश अवधि</string>
+    <string name="dep_cmp_rates_section">अनुमानित वार्षिक रिटर्न (संपादन योग्य)</string>
+    <string name="dep_cmp_winner_badge">सर्वोच्च कर-पश्चात यील्ड</string>
+    <string name="dep_cmp_extra_vs_fd">FD की तुलना में अतिरिक्त कर-पश्चात लाभ</string>
+    <string name="dep_cmp_pre_tax">कर-पूर्व</string>
+    <string name="dep_cmp_tax_paid">अनुमानित कर</string>
+    <string name="dep_cmp_post_tax">कर के बाद राशि</string>
+    <string name="dep_cmp_post_tax_yield">कर-पश्चात यील्ड</string>
+
+    <!-- म्यूचुअल फंड (Mutual Fund Suite) -->
+    <string name="mf_market_risk_note">रिटर्न की गारंटी नहीं है, पिछला प्रदर्शन भविष्य के परिणामों का संकेत नहीं देता; म्यूचुअल फंड निवेश बाजार जोखिमों के अधीन हैं।</string>
+    <string name="mf_sip_title">SIP कैलकुलेटर</string>
+    <string name="mf_lumpsum_title">एकमुश्त (Lumpsum)</string>
+    <string name="mf_swp_title">SWP कैलकुलेटर</string>
+    <string name="mf_goal_title">लक्ष्य (Goal) SIP</string>
+    <string name="mf_xirr_title">XIRR कैलकुलेटर</string>
+    <string name="mf_tax_title">म्यूचुअल फंड कर</string>
+    <string name="mf_nav_title">लाइव NAV और फंड्स</string>
+
+    <string name="mf_monthly_sip">मासिक SIP</string>
+    <string name="mf_expected_return">अनुमानित वार्षिक रिटर्न (%)</string>
+    <string name="mf_horizon_years">निवेश अवधि (वर्ष)</string>
+    <string name="mf_annual_step_up">वार्षिक स्टेप-अप (%)</string>
+    <string name="mf_inflation_rate">अनुमानित महंगाई (%)</string>
+    <string name="mf_projected_value">अनुमानित कोष (CORPUS)</string>
+    <string name="mf_total_invested">कुल निवेश</string>
+    <string name="mf_est_returns">अनुमानित लाभ</string>
+    <string name="mf_inflation_adjusted">आज का मूल्य (महंगाई समायोजित)</string>
+    <string name="mf_growth_chart_title">निवेश बनाम संपत्ति वृद्धि</string>
+    <string name="mf_yearwise_title">वर्ष-वार विवरण</string>
+    <string name="mf_lumpsum_amount">एकमुश्त निवेश राशि</string>
+
+    <string name="mf_swp_corpus">प्रारंभिक कोष</string>
+    <string name="mf_swp_withdrawal">मासिक निकासी</string>
+    <string name="mf_swp_stepup">वार्षिक निकासी वृद्धि (%)</string>
+    <string name="mf_swp_total_withdrawn">कुल निकासी</string>
+    <string name="mf_swp_final_balance">शेष कोष</string>
+    <string name="mf_swp_sustainable">टिकाऊ मासिक निकासी (%1$d वर्ष)</string>
+    <string name="mf_swp_perpetuity">कोष सुरक्षित रखने वाली मासिक निकासी</string>
+
+    <string name="mf_goal_target">लक्ष्य कोष (आज के मूल्य में)</string>
+    <string name="mf_goal_adjust_inflation">महंगाई के अनुसार लक्ष्य समायोजित करें</string>
+    <string name="mf_goal_required_sip">आवश्यक मासिक SIP</string>
+    <string name="mf_goal_future_target">महंगाई समायोजित लक्ष्य</string>
+
+    <string name="mf_xirr_annualized">वार्षिक XIRR</string>
+    <string name="mf_xirr_add_row">कैश फ्लो जोड़ें</string>
+    <string name="mf_xirr_bulk_paste">बल्क पेस्ट</string>
+    <string name="mf_xirr_load_sample">उदाहरण लोड करें</string>
+    <string name="mf_xirr_date_hint">तिथि (YYYY-MM-DD)</string>
+    <string name="mf_xirr_amount_hint">राशि (-निवेश / +निकासी)</string>
+    <string name="mf_xirr_paste_hint">प्रति पंक्ति एक: YYYY-MM-DD, राशि (निवेश के लिए ऋणात्मक, निकासी/वर्तमान मूल्य के लिए धनात्मक)</string>
+    <string name="mf_xirr_net_profit">शुद्ध लाभ / हानि</string>
+    <string name="mf_xirr_abs_return">कुल रिटर्न</string>
+
+    <string name="mf_tax_invested">खरीद / निवेश मूल्य</string>
+    <string name="mf_tax_redemption">निकासी / वर्तमान मूल्य</string>
+    <string name="mf_tax_holding_months">होल्डिंग अवधि (महीने)</string>
+    <string name="mf_tax_total_gain">कुल पूंजीगत लाभ</string>
+    <string name="mf_tax_exemption">LTCG छूट लागू</string>
+    <string name="mf_tax_taxable_gain">कर योग्य लाभ</string>
+    <string name="mf_tax_estimated_tax">अनुमानित पूंजीगत लाभ कर</string>
+    <string name="mf_tax_post_tax_proceeds">कर के बाद शुद्ध राशि</string>
+
+    <string name="mf_nav_search_hint">स्कीम का नाम, AMC, कोड या ISIN खोजें</string>
+    <string name="mf_nav_sync_now">AMFI NAV सिंक करें</string>
+    <string name="mf_nav_syncing">AMFI NAVAll.txt स्ट्रीम हो रहा है…</string>
+    <string name="mf_nav_tab_all">सभी स्कीमें</string>
+    <string name="mf_nav_tab_favs">पसंदीदा</string>
+    <string name="mf_nav_empty_title">अभी कोई कैश्ड AMFI स्कीम नहीं है</string>
+    <string name="mf_nav_empty_sub">ऑफलाइन खोज के लिए ऑनलाइन होने पर आधिकारिक AMFI दैनिक NAV सिंक करें।</string>
+    <string name="mf_nav_calc_cta">इस फंड के साथ SIP गणना करें</string>
+    <string name="mf_nav_cagr_label">ऐतिहासिक / अनुमानित CAGR (% वार्षिक)</string>
+
+    <!-- कराधान सूट (भारत) -->
+    <string name="tax_suite_income_title">आयकर कैलकुलेटर</string>
+    <string name="tax_suite_hra_title">HRA छूट</string>
+    <string name="tax_suite_gst_title">GST कैलकुलेटर</string>
+    <string name="tax_suite_advance_title">एडवांस टैक्स और TDS</string>
+
+    <string name="tax_select_fy">वित्तीय वर्ष (FY)</string>
+    <string name="tax_age_group">करदाता की आयु</string>
+    <string name="tax_salaried_label">वेतनभोगी / पेंशनभोगी</string>
+    <string name="tax_salaried_hint">दोनों व्यवस्थाओं में मानक कटौती स्वतः लागू होती है</string>
+    <string name="tax_gross_salary">वार्षिक सकल वेतन (₹)</string>
+    <string name="tax_other_income">अन्य आय — FD, किराया, ब्याज (₹)</string>
+    <string name="tax_deductions_title">कटौतियाँ और छूट (डेटा-आधारित)</string>
+    <string name="tax_filter_all">सभी लागू</string>
+    <string name="tax_filter_new">केवल नई व्यवस्था</string>
+    <string name="tax_filter_old">केवल पुरानी व्यवस्था</string>
+    <string name="tax_parents_senior">माता-पिता वरिष्ठ नागरिक (60+) हैं</string>
+    <string name="tax_better_regime_label">%1$s के लिए बेहतर व्यवस्था</string>
+    <string name="tax_saves_per_year">सालाना बचत %1$s (%2$s / माह)</string>
+    <string name="tax_payable">देय कर</string>
+    <string name="tax_monthly_tds">अनुमानित मासिक TDS</string>
+    <string name="tax_taxable_income">कर योग्य आय</string>
+    <string name="tax_slab_tax">स्लैब कर</string>
+    <string name="tax_rebate_87a">धारा 87A छूट</string>
+    <string name="tax_marginal_relief">मार्जिनल रिलीफ</string>
+    <string name="tax_surcharge">सरचार्ज</string>
+    <string name="tax_cess">स्वास्थ्य एवं शिक्षा उपकर</string>
+    <string name="tax_why_title">यह व्यवस्था क्यों बेहतर है</string>
+    <string name="tax_slab_breakdown_title">स्लैब-वार विवरण</string>
+    <string name="tax_rules_footer_title">कर नियम मेटाडेटा</string>
+    <string name="tax_rules_as_of">%1$s के कर नियम (प्रकाशित %2$s) • स्रोत: %3$s • अंतिम सत्यापन: %4$s</string>
+    <string name="tax_check_updates_btn">अद्यतन कर नियम जाँचें</string>
+    <string name="tax_checking_updates">रिमोट कर नियम जाँचे जा रहे हैं…</string>
+
+    <string name="hra_basic_da">मूल वेतन + DA (₹)</string>
+    <string name="hra_received">प्राप्त HRA (₹)</string>
+    <string name="hra_rent_paid">भुगतान किया गया किराया (₹)</string>
+    <string name="hra_input_annual">वार्षिक</string>
+    <string name="hra_input_monthly">मासिक</string>
+    <string name="hra_city_metro">मेट्रो शहर (%1$d%%)</string>
+    <string name="hra_city_non_metro">नॉन-मेट्रो (%1$d%%)</string>
+    <string name="hra_exempt_hero">कर-मुक्त HRA (वार्षिक)</string>
+    <string name="hra_taxable_label">कर योग्य HRA</string>
+    <string name="hra_three_rules_title">तीन नियमों में से न्यूनतम (धारा 10(13A))</string>
+    <string name="hra_least_badge">न्यूनतम (लागू)</string>
+    <string name="hra_rent_receipt_title">किराया रसीद और मकान मालिक का PAN नोट</string>
+    <string name="hra_rent_receipt_note">नियोक्ता/ITR सत्यापन के लिए हस्ताक्षरित मासिक किराया रसीदें और किराया अनुबंध सुरक्षित रखें। यदि वार्षिक किराया ₹1,00,000 (₹8,333/माह) से अधिक है, तो मकान मालिक का PAN देना अनिवार्य है। HRA छूट केवल पुरानी कर व्यवस्था में उपलब्ध है।</string>
+    <string name="hra_landlord_pan_required">वार्षिक किराया ₹1,00,000 से अधिक है — मकान मालिक का PAN अनिवार्य है।</string>
+
+    <string name="gst_amount_label">राशि (₹)</string>
+    <string name="gst_slab_label">GST स्लैब (taxslabs.json से)</string>
+    <string name="gst_custom_rate">कस्टम GST दर (%)</string>
+    <string name="gst_base_amount">मूल राशि (GST रहित)</string>
+    <string name="gst_total_gst">कुल GST</string>
+    <string name="gst_gross_amount">अंतिम राशि (GST सहित)</string>
+    <string name="gst_cgst_label">CGST (%1$s%%)</string>
+    <string name="gst_sgst_label">SGST (%1$s%%)</string>
+    <string name="gst_igst_label">IGST (%1$s%%)</string>
+
+    <string name="adv_tab_advance">एडवांस टैक्स</string>
+    <string name="adv_tab_tds">TDS सहायक</string>
+    <string name="adv_tab_cg">पूंजीगत लाभ</string>
+    <string name="adv_est_annual_tax">अनुमानित वार्षिक कर देयता (₹)</string>
+    <string name="adv_tds_deducted">पहले से काटा गया TDS / TCS (₹)</string>
+    <string name="adv_presumptive_toggle">प्रिजम्प्टिव टैक्स (धारा 44AD / 44ADA)</string>
+    <string name="adv_presumptive_hint">15 मार्च तक एकमुश्त 100% किश्त देय</string>
+    <string name="adv_senior_exempt_toggle">वरिष्ठ नागरिक (60+) बिना व्यवसाय आय</string>
+    <string name="adv_senior_exempt_hint">धारा 207 के तहत एडवांस टैक्स से छूट</string>
+    <string name="adv_net_payable">शुद्ध देय एडवांस टैक्स</string>
+    <string name="adv_schedule_title">वैधानिक किश्त अनुसूची (धारा 211)</string>
+    <string name="tds_fd_section_title">FD ब्याज TDS सहायक (धारा 194A)</string>
+    <string name="tds_fd_annual_interest">वार्षिक बैंक FD ब्याज (₹)</string>
+    <string name="tds_salary_section_title">वेतन मासिक TDS सहायक (धारा 192)</string>
+    <string name="tds_remaining_months">वित्तीय वर्ष में शेष महीने</string>
+    <string name="tds_open_income_tax">आयकर कैलकुलेटर में सटीक कर निकालें</string>
+    <string name="cg_helper_title">पूंजीगत लाभ कर सहायक (डेटा-आधारित)</string>
+    <string name="cg_open_mf_tax_btn">म्यूचुअल फंड पूंजीगत लाभ कैलकुलेटर खोलें</string>
+
+    <!-- Retirement & Pension Suite -->
+    <string name="ret_planner_title">रिटायरमेंट प्लानर</string>
+    <string name="ret_nps_title">NPS कैलकुलेटर</string>
+    <string name="ret_epf_title">EPF कैलकुलेटर</string>
+    <string name="ret_apy_title">अटल पेंशन योजना (APY)</string>
+    <string name="ret_pmsym_title">पीएम श्रम योगी मान-धन</string>
+    <string name="ret_pmvvy_title">PMVVY और वरिष्ठ योजनाएं</string>
+
+    <string name="ret_corpus_needed_hero">लक्ष्य रिटायरमेंट कोष</string>
+    <string name="ret_current_age">वर्तमान आयु</string>
+    <string name="ret_retire_age">सेवानिवृत्ति आयु</string>
+    <string name="ret_life_exp">जीवन प्रत्याशा</string>
+    <string name="ret_monthly_expenses">वर्तमान मासिक खर्च (₹)</string>
+    <string name="ret_existing_savings">मौजूदा रिटायरमेंट बचत (₹)</string>
+    <string name="ret_current_sip">वर्तमान मासिक SIP (₹)</string>
+    <string name="ret_inflation_label">अनुमानित महंगाई (% वा.)</string>
+    <string name="ret_pre_return_label">रिटायरमेंट से पहले रिटर्न (% वा.)</string>
+    <string name="ret_post_return_label">रिटायरमेंट के बाद रिटर्न (% वा.)</string>
+    <string name="ret_shortfall_chart_title">अनुमानित कोष बनाम लक्ष्य पथ</string>
+
+    <string name="nps_corpus_hero">अनुमानित NPS कोष</string>
+    <string name="nps_monthly_contrib">मासिक NPS योगदान (₹)</string>
+    <string name="nps_existing_corpus">मौजूदा NPS शेष (₹)</string>
+    <string name="nps_step_up">वार्षिक वृद्धि (%)</string>
+    <string name="nps_expected_return">अनुमानित रिटर्न (% वा.)</string>
+    <string name="nps_annuity_split">वार्षिकी (Annuity) हिस्सा (%)</string>
+    <string name="nps_annuity_rate">अनुमानित वार्षिकी दर (% वा.)</string>
+    <string name="nps_lumpsum_label">कर-मुक्त एकमुश्त</string>
+    <string name="nps_annuity_label">वार्षिकी कोष</string>
+    <string name="nps_est_pension">अनुमानित मासिक पेंशन</string>
+
+    <string name="epf_corpus_hero">अनुमानित EPF कोष</string>
+    <string name="epf_basic_da">मासिक बेसिक + DA वेतन (₹)</string>
+    <string name="epf_existing_bal">मौजूदा EPF शेष (₹)</string>
+    <string name="epf_vpf_extra">वैकल्पिक मासिक VPF (₹)</string>
+    <string name="epf_salary_growth">वार्षिक वेतन वृद्धि (%)</string>
+    <string name="epf_interest_rate">EPF ब्याज दर (% वा.)</string>
+    <string name="epf_wage_ceiling_toggle">₹15,000 वैधानिक वेतन सीमा लागू करें</string>
+    <string name="epf_wage_ceiling_hint">कर्मचारी और नियोक्ता PF को वैधानिक सीमा तक सीमित करता है</string>
+    <string name="epf_eps_note_title">EPS-95 पेंशन खाता नोट</string>
+
+    <string name="apy_monthly_hero">आवश्यक मासिक योगदान</string>
+    <string name="apy_entry_age">प्रवेश आयु (18–40 वर्ष)</string>
+    <string name="apy_desired_pension">60 वर्ष पर वांछित मासिक पेंशन</string>
+    <string name="apy_table_title">आधिकारिक APY मासिक योगदान तालिका</string>
+
+    <string name="pmsym_monthly_hero">आपका मासिक योगदान</string>
+    <string name="pmsym_monthly_income">मासिक आय (₹)</string>
+    <string name="pmsym_govt_match_note">पात्र असंगठित श्रमिकों (आय ≤ ₹15,000/माह) के लिए भारत सरकार 60 वर्ष की आयु तक हर महीने समान 1:1 राशि का योगदान करती है।</string>
+    <string name="pmsym_table_title">PM-SYM योगदान अनुसूची (आयु 18–40)</string>
+
+    <string name="pmvvy_closed_banner_title">नए नामांकन के लिए बंद</string>
+    <string name="pmvvy_open_banner_title">नए नामांकन के लिए खुला</string>
+    <string name="pmvvy_investment_amount">एकमुश्त निवेश राशि (₹)</string>
+    <string name="pmvvy_scheme_selector">वरिष्ठ पेंशन / आय योजना चुनें</string>
+
+    <!-- Wealth & Life Planners Suite -->
+    <string name="planner_goals_title">लक्ष्य प्लानर</string>
+    <string name="planner_rules_title">वित्तीय नियम</string>
+    <string name="planner_where_title">कहाँ निवेश करें</string>
+
+    <string name="goal_combined_sip_hero">कुल संयुक्त मासिक SIP आवश्यक</string>
+    <string name="goal_add_btn">लक्ष्य जोड़ें</string>
+    <string name="goal_name_label">लक्ष्य का नाम</string>
+    <string name="goal_cost_today">आज की लागत (₹)</string>
+    <string name="goal_current_saved">वर्तमान बचत (₹)</string>
+    <string name="goal_years_label">लक्ष्य तक वर्ष</string>
+    <string name="goal_inflation_label">लक्ष्य महंगाई (%)</string>
+    <string name="goal_return_label">अनुमानित रिटर्न (%)</string>
+
+    <string name="rules_tab_budget">50/30/20 बजट</string>
+    <string name="rules_tab_emergency">आपातकालीन निधि</string>
+    <string name="rules_tab_insurance">बीमा कवर</string>
+    <string name="rules_monthly_income">मासिक शुद्ध आय (₹)</string>
+    <string name="rules_needs">जरूरतें (Needs)</string>
+    <string name="rules_wants">इच्छाएं (Wants)</string>
+    <string name="rules_savings">बचत और निवेश</string>
+    <string name="rules_essential_exp">मासिक आवश्यक खर्च (₹)</string>
+    <string name="rules_liquid_saved">वर्तमान तरल बचत (₹)</string>
+    <string name="rules_monthly_alloc">मासिक आपातकालीन आवंटन (₹)</string>
+    <string name="rules_annual_income">वार्षिक सकल आय (₹)</string>
+    <string name="rules_liabilities">कुल बकाया ऋण (₹)</string>
+    <string name="rules_existing_term">मौजूदा टर्म लाइफ कवर (₹)</string>
+    <string name="rules_existing_health">मौजूदा स्वास्थ्य कवर (₹)</string>
+
+    <string name="wti_edu_disclaimer_title">केवल शैक्षिक मार्गदर्शिका — निवेश सलाह नहीं</string>
+    <string name="wti_edu_disclaimer_body">केवल शैक्षिक उद्देश्य के लिए, यह SEBI-पंजीकृत निवेश सलाह नहीं है। यह मार्गदर्शिका आयु और जोखिम क्षमता के आधार पर केवल सामान्य एसेट-क्लास मिश्रण दिखाती है और किसी म्यूचुअल फंड, शेयर या उत्पाद की सिफारिश नहीं करती। निवेश से पहले SEBI-पंजीकृत निवेश सलाहकार (RIA) से परामर्श लें।</string>
+    <string name="wti_age_label">आपकी आयु</string>
+    <string name="wti_questionnaire_title">जोखिम प्रोफ़ाइल प्रश्नावली</string>
+    <string name="wti_investable_surplus">विभाजित करने के लिए वैकल्पिक राशि (₹)</string>
+    <string name="wti_matrix_title">डेटा-आधारित एसेट एलोकेशन तालिका</string>
+
+    <!-- मार्केट वॉच और वैकल्पिक लाइव API प्रदाता -->
+    <string name="save">सहेजें</string>
+    <string name="reset_default">डिफ़ॉल्ट रीसेट करें</string>
+    <string name="market_stale_badge">पुराना डेटा</string>
+    <string name="market_no_history_yet">अभी कोई कैश्ड इतिहास डेटा नहीं है। बदलाव ट्रैक करने के लिए रीफ़्रेश करें या मैन्युअल मान दर्ज करें।</string>
+    <string name="market_as_of">अद्यतन तिथि</string>
+    <string name="market_cached_history">कैश्ड इतिहास</string>
+    <string name="market_manual_entry">मैन्युअल एंट्री ओवरराइड</string>
+    <string name="market_add_bank_fd">बैंक जोड़ें</string>
+    <string name="market_edit_bank_fd">बैंक FD दर संपादित करें</string>
+    <string name="market_api_providers_short">API और सीमा</string>
+    <string name="market_api_providers_title">वैकल्पिक लाइव मार्केट API और सीमा</string>
+    <string name="market_api_providers_desc">प्राथमिक दरें RemoteConfig (rates.json) और मैन्युअल एंट्री से आती हैं। वैकल्पिक रूप से नीचे अपनी API कुंजी जोड़ें—ये सुरक्षित Android EncryptedSharedPreferences में संग्रहीत होती हैं।</string>
+    <string name="market_stale_limit_label">मार्केट पुराना डेटा चेतावनी सीमा</string>
+    <string name="market_stale_limit_desc">इस अवधि से पुराने मार्केट कार्ड पर एम्बर चेतावनी बैज दिखाएं।</string>
+    <string name="market_small_savings_quarterly_note">सरकार द्वारा अधिसूचित लघु बचत दरों की समीक्षा वित्त मंत्रालय द्वारा हर तिमाही की जाती है।</string>
+    <string name="market_top_fd_rates_title">शीर्ष बैंक FD दरें</string>
+    <string name="market_top_fd_rates_sub">सांकेतिक खुदरा FD दरें (₹3 करोड़ से कम)। संपादित करने या अपना बैंक जोड़ने के लिए टैप करें।</string>
+
+    <!-- वित्तीय लेख और मार्गदर्शिकाएं -->
+    <string name="articles_library_subtitle">32+ ऑफलाइन भारतीय व्यक्तिगत वित्त गाइड — नेटिव रेंडरिंग और वैकल्पिक रिमोट अपडेट के साथ।</string>
+    <string name="articles_search_hint">लोन, EMI, CIBIL, SIP, टैक्स, FD, बीमा खोजें…</string>
+    <string name="articles_saved">सहेजे गए</string>
+    <string name="articles_no_results">कोई मेल खाने वाला लेख नहीं मिला</string>
+    <string name="articles_no_results_hint">कोई अन्य शब्द आज़माएँ या श्रेणी फ़िल्टर हटाएँ।</string>
+    <string name="articles_min_read">मिनट पढ़ें</string>
+    <string name="articles_last_reviewed">अंतिम समीक्षा</string>
+    <string name="articles_all_guides">सभी गाइड</string>
+
+    <!-- सुरक्षा, गोपनीयता और होम-स्क्रीन विजेट -->
+    <string name="privacy_security_title">गोपनीयता और सुरक्षा</string>
+    <string name="security_controls_title">ऐप लॉक और स्क्रीन सुरक्षा</string>
+    <string name="security_applock_title">बायोमेट्रिक / PIN ऐप लॉक</string>
+    <string name="security_applock_bio_available">फ़िंगरप्रिंट, फ़ेस, डिवाइस PIN या ऐप PIN से अनलॉक करें</string>
+    <string name="security_applock_pin_only">आपके स्थानीय ऐप PIN से सुरक्षित</string>
+    <string name="security_applock_setup_hint">LoanJB लॉक करने के लिए 4–6 अंकों का PIN सेट करें</string>
+    <string name="security_flag_secure_title">स्क्रीनशॉट ब्लॉक करें (FLAG_SECURE)</string>
+    <string name="security_flag_secure_desc">स्क्रीनशॉट, स्क्रीन रिकॉर्डिंग और रीसेंट-ऐप्स प्रीव्यू रोकता है</string>
+    <string name="security_lock_title">LoanJB लॉक है</string>
+    <string name="security_lock_subtitle">अपने सहेजे गए लोन और वित्तीय प्लानर खोलने के लिए सत्यापन करें।</string>
+    <string name="security_lock_prompt_title">LoanJB अनलॉक करें</string>
+    <string name="security_lock_prompt_sub">बायोमेट्रिक या डिवाइस लॉक से सत्यापित करें</string>
+    <string name="security_enter_pin">ऐप PIN दर्ज करें</string>
+    <string name="security_unlock_with_pin">PIN से अनलॉक करें</string>
+    <string name="security_unlock_biometric">बायोमेट्रिक / डिवाइस लॉक उपयोग करें</string>
+    <string name="privacy_architecture_title">गोपनीयता-प्रथम संरचना</string>
+    <string name="privacy_network_title">पारदर्शी नेटवर्क गतिविधि</string>
+
+    <string name="widget_next_emi_label">LoanJB अगली EMI</string>
+    <string name="widget_next_emi_desc">आपकी अगली देय EMI राशि, तिथि और NACH स्थिति दिखाता है</string>
+    <string name="widget_next_emi_header">LOANJB • अगली देय EMI</string>
+    <string name="widget_no_loans_title">कोई सक्रिय लोन नहीं</string>
+    <string name="widget_no_loans_sub">अगली EMI ट्रैक करने के लिए LoanJB में लोन सहेजें</string>
+
+    <!-- Disclaimer -->
+    <string name="disclaimer_text">केवल योजना के अनुमान के लिए। यह वित्तीय, कर या निवेश सलाह नहीं है। कृपया अपने बैंक या योग्य विशेषज्ञ से सत्यापन करें।</string>
+</resources>

@@ -35,9 +35,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.YearlySummary
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.YearlySummary
 import com.jyotirmoyb.loan.ui.theme.FeesIndigo
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle

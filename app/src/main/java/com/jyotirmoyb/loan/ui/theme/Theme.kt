@@ -1,5 +1,6 @@
 package com.jyotirmoyb.loan.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -7,32 +8,39 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 
 enum class AppThemeMode { SYSTEM, LIGHT, DARK }
 
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
+
 private val LightColors = lightColorScheme(
-    primary = TealPrimary,
+    primary = SageGreenDark,
     onPrimary = Color.White,
-    primaryContainer = TealContainerLight,
-    onPrimaryContainer = TealPrimaryDark,
-    secondary = SageGreen,
+    primaryContainer = SageContainerLight,
+    onPrimaryContainer = SageGreenDark,
+    secondary = TealPrimaryDark,
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE4EFE3),
-    onSecondaryContainer = SageGreenDark,
+    secondaryContainer = TealContainerLight,
+    onSecondaryContainer = TealPrimaryDark,
     tertiary = InterestAmber,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFFEF0E1),
-    onTertiaryContainer = Color(0xFF7D3C08),
+    tertiaryContainer = SoftAmberTile,
+    onTertiaryContainer = Color(0xFF8A4209),
     background = SurfaceTintLight,
     onBackground = TextPrimaryLight,
     surface = CardLight,
     onSurface = TextPrimaryLight,
-    surfaceVariant = Color(0xFFEDF5F3),
+    surfaceVariant = WarmIvoryTile,
     onSurfaceVariant = TextSecondaryLight,
     outline = CardBorderLight,
-    outlineVariant = Color(0xFFEAF2F0),
+    outlineVariant = Color(0xFFE6E2D6),
     error = DangerRed,
     onError = Color.White,
     errorContainer = DangerRedBg,
@@ -40,17 +48,17 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = TealPrimaryLight,
-    onPrimary = Color(0xFF003830),
-    primaryContainer = TealContainerDark,
-    onPrimaryContainer = Color(0xFFB3F7EC),
-    secondary = SageGreenLight,
-    onSecondary = Color(0xFF153315),
-    secondaryContainer = Color(0xFF223B22),
-    onSecondaryContainer = Color(0xFFCDE7CC),
+    primary = SageGreenLight,
+    onPrimary = Color(0xFF102A11),
+    primaryContainer = SageContainerDark,
+    onPrimaryContainer = Color(0xFFD2ECD1),
+    secondary = TealPrimaryLight,
+    onSecondary = Color(0xFF003730),
+    secondaryContainer = TealContainerDark,
+    onSecondaryContainer = Color(0xFFB5F5EA),
     tertiary = InterestAmberLight,
     onTertiary = Color(0xFF422006),
-    tertiaryContainer = Color(0xFF533108),
+    tertiaryContainer = Color(0xFF4B3012),
     onTertiaryContainer = Color(0xFFFDE68A),
     background = SurfaceDark,
     onBackground = TextPrimaryDark,
@@ -59,7 +67,7 @@ private val DarkColors = darkColorScheme(
     surfaceVariant = SlateNavySurface,
     onSurfaceVariant = TextSecondaryDark,
     outline = CardBorderDark,
-    outlineVariant = Color(0xFF1E2D42),
+    outlineVariant = Color(0xFF283328),
     error = Color(0xFFF87171),
     onError = Color(0xFF450A0A),
     errorContainer = Color(0xFF5C1515),
@@ -75,7 +83,7 @@ val LoanJBShapes = Shapes(
 
 @Composable
 fun LoanJBTheme(
-    themeMode: AppThemeMode = AppThemeMode.SYSTEM,
+    themeMode: AppThemeMode = AppThemeMode.LIGHT,
     content: @Composable () -> Unit
 ) {
     val useDark = when (themeMode) {
@@ -84,10 +92,24 @@ fun LoanJBTheme(
         AppThemeMode.DARK -> true
     }
 
-    MaterialTheme(
-        colorScheme = if (useDark) DarkColors else LightColors,
-        typography = LoanJBTypography,
-        shapes = LoanJBShapes,
-        content = content
-    )
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                val controller = WindowCompat.getInsetsController(window, view)
+                controller.isAppearanceLightStatusBars = !useDark
+                controller.isAppearanceLightNavigationBars = !useDark
+            }
+        }
+    }
+
+    CompositionLocalProvider(LocalIsDarkTheme provides useDark) {
+        MaterialTheme(
+            colorScheme = if (useDark) DarkColors else LightColors,
+            typography = LoanJBTypography,
+            shapes = LoanJBShapes,
+            content = content
+        )
+    }
 }

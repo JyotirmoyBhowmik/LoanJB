@@ -2,6 +2,7 @@ package com.jyotirmoyb.loan.ui.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
@@ -26,6 +28,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,11 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.data.UserPreferences
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.LoanCatalog
+import com.jyotirmoyb.loan.data.security.BackupCrypto
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.RegionCode
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.NumericInputField
@@ -57,14 +63,19 @@ fun SettingsScreen(
     preferences: UserPreferences,
     catalog: LoanCatalog,
     serializeCatalog: (LoanCatalog) -> String,
-    createBackupJson: suspend () -> String,
+    createEncryptedBackupJson: suspend (String) -> Result<String>,
+    onSetLanguage: (String) -> Unit,
+    onSetRegion: (RegionCode) -> Unit,
     onSetCurrency: (CurrencyCode) -> Unit,
     onSetThemeMode: (AppThemeMode) -> Unit,
     onSetMonthlyIncome: (Double) -> Unit,
+    onSetTaxRegime: (String) -> Unit,
+    onSetUserAge: (Int) -> Unit,
+    onSetRiskProfile: (String) -> Unit,
     onSaveCatalogObject: (LoanCatalog) -> Unit,
     onSaveCatalogRawJson: (String) -> Unit,
     onResetCatalogDefault: () -> Unit,
-    onRestoreBackupJson: (String) -> Unit,
+    onRestoreBackupJson: (String, String?) -> Unit,
     onResetAllData: () -> Unit,
     onShowMessage: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -73,8 +84,14 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     var showCatalogEditor by remember { mutableStateOf(false) }
     var showResetConfirm by remember { mutableStateOf(false) }
+    var showEncryptExportDialog by remember { mutableStateOf(false) }
+    var pendingEncryptedRestoreJson by remember { mutableStateOf<String?>(null) }
+
     var incomeText by remember(preferences.monthlyIncome) {
         mutableStateOf(if (preferences.monthlyIncome == 0.0) "" else preferences.monthlyIncome.toLong().toString())
+    }
+    var ageText by remember(preferences.userAge) {
+        mutableStateOf(preferences.userAge.toString())
     }
 
     val restoreLauncher = rememberLauncherForActivityResult(
@@ -84,10 +101,12 @@ fun SettingsScreen(
             runCatching {
                 context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
             }.onSuccess { json ->
-                if (!json.isNullOrBlank()) {
-                    onRestoreBackupJson(json)
-                } else {
+                if (json.isNullOrBlank()) {
                     onShowMessage("Selected file was empty.")
+                } else if (BackupCrypto.isEncryptedEnvelope(json)) {
+                    pendingEncryptedRestoreJson = json
+                } else {
+                    onRestoreBackupJson(json, null)
                 }
             }.onFailure {
                 onShowMessage("Could not read backup file.")
@@ -119,29 +138,29 @@ fun SettingsScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Currency
+        // Language & Appearance
         item {
             FintechCard {
-                SectionAccentHeader("Currency & Formatting", badge = preferences.currency.code)
+                SectionAccentHeader(
+                    title = "Language & Theme",
+                    badge = "${preferences.languageCode.uppercase()} • ${preferences.themeMode.name}"
+                )
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    CurrencyCode.entries.forEach { code ->
-                        FilterChip(
-                            selected = preferences.currency == code,
-                            onClick = { onSetCurrency(code) },
-                            label = { Text(if (code == CurrencyCode.INR) "INR ₹ (12,34,567)" else "USD $ (1,234,567)") },
-                            modifier = Modifier.testTag("settings_currency_${code.name.lowercase()}")
-                        )
-                    }
+                    FilterChip(
+                        selected = preferences.languageCode == "en",
+                        onClick = { onSetLanguage("en") },
+                        label = { Text("English") },
+                        modifier = Modifier.testTag("settings_lang_en")
+                    )
+                    FilterChip(
+                        selected = preferences.languageCode == "hi",
+                        onClick = { onSetLanguage("hi") },
+                        label = { Text("हिन्दी (Hindi)") },
+                        modifier = Modifier.testTag("settings_lang_hi")
+                    )
                 }
-            }
-        }
-
-        // Appearance
-        item {
-            FintechCard {
-                SectionAccentHeader("Appearance", badge = preferences.themeMode.name)
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     AppThemeMode.entries.forEach { mode ->
                         FilterChip(
@@ -155,10 +174,56 @@ fun SettingsScreen(
             }
         }
 
-        // Monthly Income (DTI)
+        // Region & Currency
         item {
             FintechCard {
-                SectionAccentHeader("Monthly Net Income", badge = "FOR DTI")
+                SectionAccentHeader("Region & Currency", badge = "${preferences.region.code} • ${preferences.currency.code}")
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    RegionCode.entries.forEach { region ->
+                        FilterChip(
+                            selected = preferences.region == region,
+                            onClick = { onSetRegion(region) },
+                            label = { Text(region.label) },
+                            modifier = Modifier.testTag("settings_region_${region.name.lowercase()}")
+                        )
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    CurrencyCode.entries.forEach { code ->
+                        val chipLabel = when (code) {
+                            CurrencyCode.INR -> "INR ₹ (12,34,567)"
+                            CurrencyCode.NPR -> "NPR Rs. (12,34,567)"
+                            CurrencyCode.USD -> "USD $ (1,234,567)"
+                        }
+                        FilterChip(
+                            selected = preferences.currency == code,
+                            onClick = { onSetCurrency(code) },
+                            label = { Text(chipLabel) },
+                            modifier = Modifier.testTag("settings_currency_${code.name.lowercase()}")
+                        )
+                    }
+                }
+            }
+        }
+
+        // Financial Profile Defaults (feeds DTI, Eligibility, Income Tax, Retirement, Rules & Where to Invest)
+        item {
+            FintechCard {
+                SectionAccentHeader("Financial Profile Defaults", badge = "PLANNER DEFAULTS")
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Used as defaults across My Loans (DTI), Loan Eligibility, Income Tax, Retirement Planner, 50/30/20 Rules, and Where to Invest.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(Modifier.height(10.dp))
                 NumericInputField(
                     label = "Monthly Take-Home Income (${preferences.currency.symbol})",
@@ -168,10 +233,58 @@ fun SettingsScreen(
                         txt.toDoubleOrNull()?.let { onSetMonthlyIncome(it) }
                     },
                     prefix = "${preferences.currency.symbol} ",
-                    trailingBadge = CurrencyFormatter.formatCompact(preferences.monthlyIncome, preferences.currency),
-                    supportingText = "Used to calculate your Debt-to-Income (DTI) ratio in My Loans.",
+                    trailingBadge = CurrencyFormatter.formatShortLabel(preferences.monthlyIncome, preferences.currency),
                     modifier = Modifier.testTag("settings_income_input")
                 )
+                Spacer(Modifier.height(10.dp))
+                NumericInputField(
+                    label = "Your Age (Years)",
+                    valueText = ageText,
+                    onValueChange = { txt ->
+                        val filtered = txt.filter { it.isDigit() }.take(2)
+                        ageText = filtered
+                        filtered.toIntOrNull()?.takeIf { it in 18..85 }?.let { onSetUserAge(it) }
+                    },
+                    supportingText = "Feeds Retirement Planner, Eligibility & Asset Allocation age bracket",
+                    modifier = Modifier.testTag("settings_age_input")
+                )
+                Spacer(Modifier.height(10.dp))
+                Text("Preferred Tax Regime", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = preferences.preferredTaxRegime == "NEW",
+                        onClick = { onSetTaxRegime("NEW") },
+                        label = { Text("New Regime (Default)") },
+                        modifier = Modifier.testTag("settings_regime_new")
+                    )
+                    FilterChip(
+                        selected = preferences.preferredTaxRegime == "OLD",
+                        onClick = { onSetTaxRegime("OLD") },
+                        label = { Text("Old Regime") },
+                        modifier = Modifier.testTag("settings_regime_old")
+                    )
+                }
+                Spacer(Modifier.height(10.dp))
+                Text("Default Risk Profile", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(
+                        "CONSERVATIVE" to "Conservative",
+                        "MODERATE" to "Moderate",
+                        "AGGRESSIVE" to "Aggressive"
+                    ).forEach { (key, label) ->
+                        FilterChip(
+                            selected = preferences.riskProfile == key,
+                            onClick = { onSetRiskProfile(key) },
+                            label = { Text(label) },
+                            modifier = Modifier.testTag("settings_risk_${key.lowercase()}")
+                        )
+                    }
+                }
             }
         }
 
@@ -181,7 +294,7 @@ fun SettingsScreen(
                 SectionAccentHeader("Loan Catalog Config", badge = "${catalog.categories.size} CATS")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Customize rate ranges, tenure limits, Nepal Rastra Bank LTV caps (EV vs Fuel), or add your own categories and variants.",
+                    "Customize Indian loan categories, variants, tenure limits, and RBI LTV caps, or edit rates centrally in Data & Rates.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -200,26 +313,20 @@ fun SettingsScreen(
             }
         }
 
-        // Offline Backup & Restore JSON
+        // Encrypted Offline Backup & Restore (AES-256-GCM)
         item {
             FintechCard {
-                SectionAccentHeader("Offline Backup & Restore", badge = "JSON")
+                SectionAccentHeader("Encrypted Backup & Restore", badge = "AES-256-GCM")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "LoanJB stores 100% of your data locally with zero login. Export a JSON backup anytime or restore from a file.",
+                    "Sensitive tables and security keys are excluded from Android cloud Auto Backup. Export a password-encrypted AES-256-GCM JSON backup anytime or restore from a file.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
-                        onClick = {
-                            scope.launch {
-                                val json = createBackupJson()
-                                val res = ScheduleExporter.exportBackupJsonAndShare(context, json)
-                                if (res.isFailure) onShowMessage("Backup export failed")
-                            }
-                        },
+                        onClick = { showEncryptExportDialog = true },
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .weight(1f)
@@ -227,7 +334,7 @@ fun SettingsScreen(
                     ) {
                         Icon(Icons.Outlined.Backup, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Backup JSON")
+                        Text("Encrypted Export")
                     }
                     OutlinedButton(
                         onClick = { restoreLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
@@ -238,7 +345,7 @@ fun SettingsScreen(
                     ) {
                         Icon(Icons.Outlined.Restore, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Restore JSON")
+                        Text("Restore")
                     }
                 }
             }
@@ -250,7 +357,7 @@ fun SettingsScreen(
                 SectionAccentHeader("Reset Local Data", accentColor = DangerRed)
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Clears saved loans, comparison scenarios, preferences, and restores the default seed catalog.",
+                    "Clears saved loans, comparison scenarios, preferences, app lock PIN, and restores the default seed catalog.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -276,11 +383,120 @@ fun SettingsScreen(
         }
     }
 
+    if (showEncryptExportDialog) {
+        var password by remember { mutableStateOf("") }
+        var confirmPassword by remember { mutableStateOf("") }
+        var errorText by remember { mutableStateOf<String?>(null) }
+
+        AlertDialog(
+            onDismissRequest = { showEncryptExportDialog = false },
+            title = { Text("Encrypt Backup with Password", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Your backup will be encrypted using PBKDF2-HMAC-SHA256 + AES-256-GCM. Remember this password — it cannot be recovered if lost.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it; errorText = null },
+                        label = { Text("Backup Password (min 6 chars)") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it; errorText = null },
+                        label = { Text("Confirm Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    errorText?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = DangerRed) }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (password.length < BackupCrypto.MIN_PASSWORD_LENGTH) {
+                            errorText = "Password must be at least ${BackupCrypto.MIN_PASSWORD_LENGTH} characters."
+                        } else if (password != confirmPassword) {
+                            errorText = "Passwords do not match."
+                        } else {
+                            showEncryptExportDialog = false
+                            scope.launch {
+                                val encrypted = createEncryptedBackupJson(password)
+                                encrypted.fold(
+                                    onSuccess = { cipherJson ->
+                                        val res = ScheduleExporter.exportBackupJsonAndShare(
+                                            context = context,
+                                            jsonContent = cipherJson,
+                                            fileName = "loanjb_encrypted_backup.json"
+                                        )
+                                        if (res.isFailure) onShowMessage("Backup export failed")
+                                    },
+                                    onFailure = { onShowMessage(it.message ?: "Encryption failed") }
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    Text("Encrypt & Share", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEncryptExportDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    pendingEncryptedRestoreJson?.let { rawEncrypted ->
+        var restorePwd by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { pendingEncryptedRestoreJson = null },
+            title = { Text("Decrypt Backup File", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Enter the password used when this AES-256-GCM backup was created.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = restorePwd,
+                        onValueChange = { restorePwd = it },
+                        label = { Text("Backup Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val pwd = restorePwd
+                        pendingEncryptedRestoreJson = null
+                        onRestoreBackupJson(rawEncrypted, pwd)
+                    },
+                    enabled = restorePwd.isNotEmpty()
+                ) {
+                    Text("Decrypt & Restore", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingEncryptedRestoreJson = null }) { Text("Cancel") }
+            }
+        )
+    }
+
     if (showResetConfirm) {
         AlertDialog(
             onDismissRequest = { showResetConfirm = false },
             title = { Text("Reset All Data?") },
-            text = { Text("This will delete all saved loans, comparison scenarios, and custom catalog edits on this device.") },
+            text = { Text("This will delete all saved loans, comparison scenarios, PIN lock, and custom catalog edits on this device.") },
             confirmButton = {
                 Button(
                     onClick = {

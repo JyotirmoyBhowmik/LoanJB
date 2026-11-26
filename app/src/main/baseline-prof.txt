@@ -1,0 +1,17 @@
+# LoanJB Art Baseline Profile Rules (Cold Start < 1.5s & 360-Row Amortization Schedule Scroll)
+HSPLcom/jyotirmoyb/loan/LoanJBApplication;-><init>()V
+HSPLcom/jyotirmoyb/loan/LoanJBApplication;->onCreate()V
+HSPLcom/jyotirmoyb/loan/MainActivity;-><init>()V
+HSPLcom/jyotirmoyb/loan/MainActivity;->onCreate(Landroid/os/Bundle;)V
+HSPLcom/jyotirmoyb/loan/MainActivityKt;->LoanJBApp(Lcom/jyotirmoyb/loan/features/profile/ProfileViewModel;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/jyotirmoyb/loan/navigation/LoanJBNavGraphKt;->LoanJBMainShell(Lcom/jyotirmoyb/loan/features/profile/ProfileViewModel;Landroidx/navigation/NavHostController;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/jyotirmoyb/loan/domain/LoanCalculationEngine;->calculate(Lcom/jyotirmoyb/loan/domain/CalculationInput;Lcom/jyotirmoyb/loan/domain/LoanCategory;)Lcom/jyotirmoyb/loan/domain/CalculationResult;
+HSPLcom/jyotirmoyb/loan/domain/LoanTrackerEngine;->evaluateTrackedLoan(Lcom/jyotirmoyb/loan/data/SavedLoanEntity;Lcom/jyotirmoyb/loan/domain/CalculationInput;Lcom/jyotirmoyb/loan/domain/LoanCategory;)Lcom/jyotirmoyb/loan/viewmodel/TrackedLoanSummary;
+HSPLcom/jyotirmoyb/loan/domain/CurrencyFormatter;->format(DLcom/jyotirmoyb/loan/domain/CurrencyCode;Z)Ljava/lang/String;
+Ljavax/crypto/Cipher;
+Lcom/jyotirmoyb/loan/domain/**;
+Lcom/jyotirmoyb/loan/data/**;
+Lcom/jyotirmoyb/loan/navigation/**;
+Lcom/jyotirmoyb/loan/features/hub/**;
+Lcom/jyotirmoyb/loan/features/emi/**;
+Lcom/jyotirmoyb/loan/ui/designsystem/**;

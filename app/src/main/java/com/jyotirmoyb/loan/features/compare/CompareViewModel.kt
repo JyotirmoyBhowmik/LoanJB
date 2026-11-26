@@ -5,10 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.jyotirmoyb.loan.data.AppContainer
 import com.jyotirmoyb.loan.data.CompareScenarioEntity
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.LoanCalculationEngine
-import com.jyotirmoyb.loan.engine.RateChangeEvent
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.LoanCalculationEngine
+import com.jyotirmoyb.loan.domain.RateChangeEvent
 import com.jyotirmoyb.loan.viewmodel.CompareItemModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

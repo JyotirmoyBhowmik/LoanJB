@@ -22,6 +22,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.CompareArrows
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
@@ -44,13 +46,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.features.emi.AmountField
 import com.jyotirmoyb.loan.features.emi.TenureField
+import com.jyotirmoyb.loan.features.loans.bankstaff.BankStaffTemplateEditorDialog
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.NumericInputField
+import com.jyotirmoyb.loan.ui.components.ResetToDefaultAction
 import com.jyotirmoyb.loan.ui.components.SectionAccentHeader
+import com.jyotirmoyb.loan.ui.components.ValueSourceBadgesRow
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.MonoLargeStyle
 import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle
@@ -72,9 +77,12 @@ fun BankStaffLoanScreen(
     onViewFullSchedule: () -> Unit,
     onSaveStaffLoan: () -> Unit,
     onCompareWithMarket: () -> Unit,
+    onSaveTemplateOverride: (StaffLoanPreset, Double, Double, Int) -> Unit = { _, _, _, _ -> },
+    onResetTemplateToDefault: (StaffLoanPreset) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var tenureInYears by remember { mutableStateOf(true) }
+    var showTemplateEditor by remember { mutableStateOf(false) }
     val activePreset = uiState.presets.firstOrNull { it.id == uiState.selectedPresetId }
     val cur = uiState.currency
 
@@ -111,6 +119,14 @@ fun BankStaffLoanScreen(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            TextButton(
+                onClick = { showTemplateEditor = true },
+                modifier = Modifier.testTag("bank_staff_edit_templates_btn")
+            ) {
+                Icon(Icons.Outlined.Tune, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(stringResource(R.string.bank_staff_edit_templates))
             }
         }
 
@@ -169,6 +185,23 @@ fun BankStaffLoanScreen(
                                 .weight(1f)
                                 .testTag("staff_market_rate_input")
                         )
+                    }
+                    uiState.staffRateSource?.let { src ->
+                        Spacer(Modifier.height(6.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            ValueSourceBadgesRow(item = src, modifier = Modifier.weight(1f))
+                            activePreset?.let { preset ->
+                                ResetToDefaultAction(
+                                    visible = kotlin.math.abs(uiState.staffRate - preset.staffRate) > 0.01,
+                                    onClick = { onUpdateStaffRate(preset.staffRate) },
+                                    testTag = "staff_rate_reset_btn"
+                                )
+                            }
+                        }
                     }
                     Spacer(Modifier.height(10.dp))
                     TenureField(
@@ -264,7 +297,7 @@ fun BankStaffLoanScreen(
                     Button(
                         onClick = onViewFullSchedule,
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = TealPrimary),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
@@ -309,5 +342,15 @@ fun BankStaffLoanScreen(
                 Spacer(Modifier.height(12.dp))
             }
         }
+    }
+
+    if (showTemplateEditor) {
+        BankStaffTemplateEditorDialog(
+            presets = uiState.presets,
+            resolvedMap = uiState.resolvedMap,
+            onSaveTemplate = onSaveTemplateOverride,
+            onResetTemplate = onResetTemplateToDefault,
+            onDismiss = { showTemplateEditor = false }
+        )
     }
 }

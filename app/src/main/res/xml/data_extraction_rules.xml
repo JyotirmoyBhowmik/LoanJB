@@ -1,19 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   LoanJB Data Extraction Rules (Android 12 / API 31+).
+   Strictly excludes sensitive Room financial databases, Android Keystore-backed
+   EncryptedSharedPreferences (PIN hash & optional API keys), DataStore financial profile,
+   and exported files from Google Cloud Backup. Use password-encrypted AES-256-GCM Backup/Restore instead.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <exclude domain="database" path="." />
+        <exclude domain="database" path="loanjb_offline.db" />
+        <exclude domain="database" path="loanjb_offline.db-wal" />
+        <exclude domain="database" path="loanjb_offline.db-shm" />
+        <exclude domain="sharedpref" path="loanjb_secure_api_keys.xml" />
+        <exclude domain="sharedpref" path="loanjb_security_prefs.xml" />
+        <exclude domain="file" path="datastore/loanjb_settings.preferences_pb" />
+        <exclude domain="file" path="exports/" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!-- EncryptedSharedPreferences keys are bound to Android Keystore and cannot transfer across devices -->
+        <exclude domain="sharedpref" path="loanjb_secure_api_keys.xml" />
+        <exclude domain="sharedpref" path="loanjb_security_prefs.xml" />
+        <exclude domain="database" path="." />
+        <exclude domain="file" path="exports/" />
     </device-transfer>
-    -->
 </data-extraction-rules>

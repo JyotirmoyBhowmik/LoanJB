@@ -16,14 +16,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -31,16 +35,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.LoanCategory
-import com.jyotirmoyb.loan.engine.LoanVariant
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.LoanCategory
+import com.jyotirmoyb.loan.domain.LoanVariant
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
+import com.jyotirmoyb.loan.ui.components.ResetToDefaultAction
+import com.jyotirmoyb.loan.ui.components.SectionAccentHeader
+import com.jyotirmoyb.loan.ui.components.ValueSourceBadgesRow
+import com.jyotirmoyb.loan.ui.theme.DangerRed
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.MonoLargeStyle
 import com.jyotirmoyb.loan.ui.theme.MonoSmallStyle
 import com.jyotirmoyb.loan.ui.theme.PrincipalEmerald
+import com.jyotirmoyb.loan.ui.theme.SavingsGreen
 import com.jyotirmoyb.loan.ui.theme.SlateNavy
 import com.jyotirmoyb.loan.ui.theme.TealPrimary
 
@@ -53,6 +62,10 @@ fun EmiInputScreen(
     onSetTenureUnit: (Boolean) -> Unit,
     onStartDateToday: () -> Unit,
     onStartDateSelected: (Int, Int, Int) -> Unit,
+    onEmiDayOfMonthChange: (Int) -> Unit,
+    onProRataToggle: (Boolean) -> Unit,
+    onResetRateDefault: () -> Unit,
+    onApplyRepoScenario: (Double) -> Unit,
     onSelectEmiMode: (String) -> Unit,
     onToggleMoratorium: (Boolean) -> Unit,
     onCalculateClick: () -> Unit,
@@ -61,6 +74,7 @@ fun EmiInputScreen(
     val input = uiState.input
     val result = uiState.result
     val currency = uiState.currency
+    val vehicleChecklistState = remember(input.categoryId) { mutableStateMapOf<Int, Boolean>() }
 
     LazyColumn(
         modifier = modifier
@@ -80,7 +94,7 @@ fun EmiInputScreen(
             )
         }
 
-        // 2. Loan Amount Field (with "28.0 Lakh" badge)
+        // 2. Loan Amount Field (with Indian Lakh / Cr short label)
         item(key = "loan_amount") {
             AmountField(
                 amount = input.principal,
@@ -96,14 +110,33 @@ fun EmiInputScreen(
             )
         }
 
-        // 3. Interest Rate Field + Slider
+        // 3. Interest Rate Field + Slider + Source Chip + Reset to Default
         item(key = "interest_rate") {
-            RateField(
-                annualRate = input.annualRate,
-                onRateChange = { rate ->
-                    onUpdateInput { it.copy(annualRate = rate) }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                RateField(
+                    annualRate = input.annualRate,
+                    onRateChange = { rate ->
+                        onUpdateInput { it.copy(annualRate = rate) }
+                    }
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    uiState.rateSourceItem?.let { rateItem ->
+                        ValueSourceBadgesRow(
+                            item = rateItem,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    ResetToDefaultAction(
+                        visible = uiState.isRateCustomized,
+                        onClick = onResetRateDefault,
+                        testTag = "emi_rate_reset_btn"
+                    )
                 }
-            )
+            }
         }
 
         // 4. Tenure Field + Year | Month Toggle
@@ -118,30 +151,150 @@ fun EmiInputScreen(
             )
         }
 
-        // 5. Loan Start Date Row (Today / Change)
+        // 5. Loan Start Date + EMI Day of Month + Pro-rata First-Month Interest
         item(key = "start_date") {
             StartDateRow(
                 year = input.startYear,
                 monthOneBased = input.startMonth,
                 day = input.startDay,
+                emiDayOfMonth = input.emiDayOfMonth,
+                proRataFirstMonthEnabled = input.proRataFirstMonthEnabled,
                 onTodayClick = onStartDateToday,
-                onDateSelected = onStartDateSelected
+                onDateSelected = onStartDateSelected,
+                onEmiDayOfMonthChange = onEmiDayOfMonthChange,
+                onProRataToggle = onProRataToggle
             )
         }
 
-        // 6. Advance Settings Expandable Card
+        // 6. Gold Loan Auction-Risk Alert Banner (when LTV exceeds configurable threshold)
+        result.insights.goldSummary?.takeIf { it.isAuctionRiskAlert }?.let { gold ->
+            item(key = "gold_auction_alert") {
+                FintechCard(
+                    containerColor = DangerRed.copy(alpha = 0.1f),
+                    borderColor = DangerRed,
+                    modifier = Modifier.testTag("gold_auction_risk_banner")
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.Warning,
+                            contentDescription = "Gold auction risk alert",
+                            tint = DangerRed
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.emi_gold_auction_alert),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = DangerRed
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Peak LTV reaches ${String.format("%.1f", gold.peakLtvPercent)}% (threshold: ${String.format("%.0f", gold.auctionRiskThresholdLtv)}%). Reduce principal, choose Monthly EMI/Interest-Only, or pledge more gold to avoid auction risk.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+
+        // 7. Advance Settings Expandable Card
         item(key = "advance_settings") {
             AdvanceSettingsCard(
                 input = input,
+                result = result,
                 category = uiState.selectedCategory,
                 currency = currency,
+                resolvedConfig = uiState.resolvedConfig,
+                gstSourceItem = uiState.gstSourceItem,
                 onUpdateInput = onUpdateInput,
                 onSelectEmiMode = onSelectEmiMode,
-                onToggleMoratorium = onToggleMoratorium
+                onToggleMoratorium = onToggleMoratorium,
+                onApplyRepoScenario = onApplyRepoScenario
             )
         }
 
-        // 7. Validation Errors OR Live EMI Preview Strip + Primary Calculate CTA
+        // 8. Vehicle Loan Hypothecation Release Checklist (Form 35, RC update, Bank NOC)
+        if (input.categoryId == "auto" && !uiState.selectedCategory?.checklistItems.isNullOrEmpty()) {
+            item(key = "vehicle_hypothecation_checklist") {
+                FintechCard(modifier = Modifier.testTag("vehicle_hypothecation_checklist")) {
+                    SectionAccentHeader(
+                        title = stringResource(R.string.emi_vehicle_checklist_title).uppercase(),
+                        badge = "FORM 35 • RC",
+                        accentColor = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    uiState.selectedCategory?.checklistItems?.forEachIndexed { idx, step ->
+                        val checked = vehicleChecklistState[idx] == true
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = checked,
+                                onCheckedChange = { vehicleChecklistState[idx] = it }
+                            )
+                            Text(
+                                text = step,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // 9. India Tax Benefit Estimate Panel (Home Loan Sec 24(b)+80C / Education Loan Sec 80E)
+        result.insights.taxBenefitSummary?.let { tax ->
+            if (tax.estimatedTotalTaxSaved > 0.0) {
+                item(key = "india_tax_benefit_panel") {
+                    FintechCard(
+                        containerColor = SavingsGreen.copy(alpha = 0.07f),
+                        borderColor = SavingsGreen.copy(alpha = 0.35f),
+                        modifier = Modifier.testTag("emi_tax_benefit_panel")
+                    ) {
+                        SectionAccentHeader(
+                            title = stringResource(R.string.emi_tax_benefit_title).uppercase(),
+                            badge = "OLD REGIME",
+                            accentColor = SavingsGreen
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text("Est. Year-1 Tax Saved", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    CurrencyFormatter.format(tax.estimatedAnnualTaxSaved, currency),
+                                    style = MonoSmallStyle,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SavingsGreen
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text("Est. Lifetime Tax Saved", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    CurrencyFormatter.format(tax.estimatedTotalTaxSaved, currency),
+                                    style = MonoSmallStyle,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SavingsGreen
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "${tax.sectionTitle} at ${String.format("%.0f", input.taxBracketPercent)}% slab. ${tax.notes}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+
+        // 10. Validation Errors OR Live EMI Preview Strip + Primary Calculate CTA
         item(key = "calculate_cta") {
             if (!result.isValid) {
                 FintechCard(
@@ -182,37 +335,68 @@ fun EmiInputScreen(
                             .fillMaxWidth()
                             .testTag("emi_live_preview_card")
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 14.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Column {
-                                Text(
-                                    text = "ESTIMATED MONTHLY EMI",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = androidx.compose.ui.graphics.Color(0xFFA7F3E8)
-                                )
-                                Text(
-                                    text = CurrencyFormatter.format(result.monthlyEmi, currency, false),
-                                    style = MonoLargeStyle,
-                                    color = androidx.compose.ui.graphics.Color.White
-                                )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = "ESTIMATED MONTHLY EMI",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = androidx.compose.ui.graphics.Color(0xFFA7F3E8)
+                                    )
+                                    Text(
+                                        text = CurrencyFormatter.format(result.monthlyEmi, currency, false),
+                                        style = MonoLargeStyle,
+                                        color = androidx.compose.ui.graphics.Color.White
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = "Interest: ${CurrencyFormatter.formatShortLabel(result.totalInterest, currency)} (${String.format("%.1f", result.interestToPrincipalPercent)}%)",
+                                        style = MonoSmallStyle,
+                                        color = InterestAmber
+                                    )
+                                    Spacer(Modifier.height(2.dp))
+                                    Text(
+                                        text = "Loan-Free: ${result.loanFreeDateLabel}",
+                                        style = MonoSmallStyle,
+                                        color = PrincipalEmerald
+                                    )
+                                }
                             }
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = "Interest: ${CurrencyFormatter.formatCompact(result.totalInterest, currency)}",
-                                    style = MonoSmallStyle,
-                                    color = InterestAmber
-                                )
-                                Spacer(Modifier.height(2.dp))
-                                Text(
-                                    text = "Total: ${CurrencyFormatter.formatCompact(result.totalPayment, currency)} (${result.actualTenureMonths}m)",
-                                    style = MonoSmallStyle,
-                                    color = PrincipalEmerald
-                                )
+                            if (result.gstOnFeeAmount > 0.0 || result.gstOnInterestAmount > 0.0 || result.brokenPeriodInterest > 0.0) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.CheckCircleOutline,
+                                        contentDescription = null,
+                                        tint = androidx.compose.ui.graphics.Color(0xFFA7F3E8),
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    val extras = buildList {
+                                        if (result.gstOnFeeAmount + result.gstOnInterestAmount > 0.0) {
+                                            add("GST ${CurrencyFormatter.format(result.gstOnFeeAmount + result.gstOnInterestAmount, currency)}")
+                                        }
+                                        if (result.brokenPeriodInterest > 0.0) {
+                                            add("Pro-rata ${CurrencyFormatter.format(result.brokenPeriodInterest, currency)}")
+                                        }
+                                    }.joinToString(" • ")
+                                    Text(
+                                        text = "Includes $extras",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = androidx.compose.ui.graphics.Color(0xFFCBD5E1)
+                                    )
+                                }
                             }
                         }
                     }
@@ -220,7 +404,7 @@ fun EmiInputScreen(
                     Button(
                         onClick = onCalculateClick,
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = TealPrimary),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp)

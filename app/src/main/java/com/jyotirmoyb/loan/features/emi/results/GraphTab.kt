@@ -23,10 +23,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CalculationResult
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CalculationResult
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.ui.components.BalanceOverTimeLineChart
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
@@ -293,13 +293,51 @@ fun GraphTab(
 
         insights.goldSummary?.let { gold ->
             item(key = "insight_gold") {
-                FintechCard {
-                    SectionAccentHeader("Gold Loan — ${gold.modeLabel}", badge = "MATURITY", accentColor = InterestAmber)
+                val badge = if (gold.isAuctionRiskAlert) "AUCTION RISK!" else "MATURITY"
+                val accent = if (gold.isAuctionRiskAlert) DangerRed else InterestAmber
+                FintechCard(
+                    containerColor = if (gold.isAuctionRiskAlert) DangerRed.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface,
+                    borderColor = if (gold.isAuctionRiskAlert) DangerRed else MaterialTheme.colorScheme.outline
+                ) {
+                    SectionAccentHeader("Gold Loan — ${gold.modeLabel}", badge = badge, accentColor = accent)
                     Spacer(Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         GraphStat("Monthly", CurrencyFormatter.format(gold.monthlyOutflow, currency), PrincipalEmerald)
                         GraphStat("At Maturity", CurrencyFormatter.format(gold.maturityLumpSum, currency), InterestAmber)
-                        GraphStat("Total", CurrencyFormatter.format(gold.totalPayable, currency), MaterialTheme.colorScheme.onSurface)
+                        GraphStat("Peak LTV", "${String.format("%.1f", gold.peakLtvPercent)}%", accent)
+                    }
+                }
+            }
+        }
+
+        if (result.gstOnFeeAmount > 0.0 || result.gstOnInterestAmount > 0.0 || result.brokenPeriodInterest > 0.0) {
+            item(key = "insight_gst_prorata") {
+                FintechCard {
+                    SectionAccentHeader("India GST & Broken-Period Interest", badge = "CHARGES", accentColor = InterestAmber)
+                    Spacer(Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        GraphStat("GST on Fees", CurrencyFormatter.format(result.gstOnFeeAmount, currency), InterestAmber)
+                        GraphStat("GST on Interest", CurrencyFormatter.format(result.gstOnInterestAmount, currency), DangerRed)
+                        GraphStat("Pro-Rata 1st Mo", CurrencyFormatter.format(result.brokenPeriodInterest, currency), MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
+        }
+
+        insights.taxBenefitSummary?.let { tax ->
+            if (tax.estimatedTotalTaxSaved > 0.0) {
+                item(key = "insight_tax_benefit") {
+                    FintechCard(
+                        containerColor = SavingsGreen.copy(alpha = 0.08f),
+                        borderColor = SavingsGreen.copy(alpha = 0.35f)
+                    ) {
+                        SectionAccentHeader(tax.sectionTitle, badge = "OLD REGIME", accentColor = SavingsGreen)
+                        Spacer(Modifier.height(8.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            GraphStat("Yr-1 Int Ded.", CurrencyFormatter.format(tax.firstYearInterestEligible, currency), PrincipalEmerald)
+                            GraphStat("Yr-1 Tax Saved", CurrencyFormatter.format(tax.estimatedAnnualTaxSaved, currency), SavingsGreen)
+                            GraphStat("Total Saved", CurrencyFormatter.format(tax.estimatedTotalTaxSaved, currency), SavingsGreen)
+                        }
                     }
                 }
             }

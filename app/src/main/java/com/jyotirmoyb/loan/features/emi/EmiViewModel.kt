@@ -6,16 +6,21 @@ import androidx.lifecycle.viewModelScope
 import com.jyotirmoyb.loan.data.AppContainer
 import com.jyotirmoyb.loan.data.CompareScenarioEntity
 import com.jyotirmoyb.loan.data.SavedLoanEntity
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CalculationResult
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.FlexiEvent
-import com.jyotirmoyb.loan.engine.LoanCalculationEngine
-import com.jyotirmoyb.loan.engine.LoanCatalog
-import com.jyotirmoyb.loan.engine.LoanCategory
-import com.jyotirmoyb.loan.engine.LoanVariant
-import com.jyotirmoyb.loan.engine.TrancheEntry
+import com.jyotirmoyb.loan.data.remote.ConfigKeys
+import com.jyotirmoyb.loan.data.remote.DataSourceResolver
+import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CalculationResult
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.FlexiEvent
+import com.jyotirmoyb.loan.domain.LoanCalculationEngine
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.LoanCategory
+import com.jyotirmoyb.loan.domain.LoanVariant
+import com.jyotirmoyb.loan.domain.RateChangeEvent
+import com.jyotirmoyb.loan.domain.STANDARD_PLANNING_DISCLAIMER
+import com.jyotirmoyb.loan.domain.TrancheEntry
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
 import com.jyotirmoyb.loan.util.EmiReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +31,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import kotlin.math.abs
 
 data class EmiUiState(
     val catalog: LoanCatalog = LoanCatalog(),
@@ -35,6 +41,11 @@ data class EmiUiState(
     val variantSummary: String = "",
     val currency: CurrencyCode = CurrencyCode.INR,
     val tenureInYears: Boolean = true,
+    val resolvedConfig: Map<String, ResolvedConfigItem> = emptyMap(),
+    val rateSourceItem: ResolvedConfigItem? = null,
+    val gstSourceItem: ResolvedConfigItem? = null,
+    val defaultSuggestedRate: Double = 8.5,
+    val isRateCustomized: Boolean = false,
     val isLoading: Boolean = false,
     val snackbarMessage: String? = null
 )
@@ -43,16 +54,21 @@ private fun defaultIndianInput(): CalculationInput {
     val cal = Calendar.getInstance()
     return CalculationInput(
         categoryId = "home",
-        ruleFlags = listOf("RATE_FLOATING", "EMI_STANDARD", "DISB_FULL", "PURPOSE_PURCHASE"),
+        ruleFlags = listOf("RATE_EBLR", "EMI_STANDARD", "DISB_FULL", "PURPOSE_PURCHASE"),
         principal = 2800000.0,
         assetValue = 3800000.0,
-        annualRate = 10.5,
+        annualRate = 8.5,
         tenureMonths = 72,
         startYear = cal.get(Calendar.YEAR),
         startMonth = cal.get(Calendar.MONTH) + 1,
         startDay = cal.get(Calendar.DAY_OF_MONTH),
+        emiDayOfMonth = 5,
+        benchmarkRatePercent = 6.5,
+        spreadPercent = 2.0,
         processingFeePercent = 0.0,
-        prepaymentFeePercent = 0.0
+        prepaymentFeePercent = 0.0,
+        gstRatePercent = 18.0,
+        goldAuctionRiskLtvPercent = 72.0
     )
 }
 
@@ -62,6 +78,7 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
     override val id: String = "loan_emi"
 
     private val repository = AppContainer.provideRepository(application)
+    private val ratesRepository = AppContainer.provideRatesRepository(application)
 
     private val _input = MutableStateFlow(defaultIndianInput())
     private val _tenureInYears = MutableStateFlow(true)
@@ -70,21 +87,46 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
 
     val uiState: StateFlow<EmiUiState> = combine(
         repository.catalogFlow,
+        ratesRepository.resolvedMapFlow,
         _input,
         repository.preferencesFlow,
         _tenureInYears,
         _snackbarMessage
-    ) { catalog, input, prefs, inYears, msg ->
-        val category = catalog.categories.firstOrNull { it.id == input.categoryId }
-        val res = LoanCalculationEngine.calculate(input, category)
+    ) { values ->
+        val rawCatalog = values[0] as LoanCatalog
+        @Suppress("UNCHECKED_CAST")
+        val resolvedMap = values[1] as Map<String, ResolvedConfigItem>
+        val rawInput = values[2] as CalculationInput
+        val prefs = values[3] as com.jyotirmoyb.loan.data.UserPreferences
+        val inYears = values[4] as Boolean
+        val msg = values[5] as String?
+
+        val catalog = DataSourceResolver.resolveCatalog(rawCatalog, resolvedMap)
+        val category = catalog.categories.firstOrNull { it.id == rawInput.categoryId }
+
+        val effectiveInput = applyDataDrivenBounds(rawInput, resolvedMap)
+        val res = LoanCalculationEngine.calculate(effectiveInput, category)
+
+        val rateSourceKey = category?.rateMinKey ?: ConfigKeys.HOME_RATE_MIN
+        val rateSourceItem = resolvedMap[rateSourceKey] ?: resolvedMap[ConfigKeys.RBI_REPO_RATE]
+        val gstSourceItem = resolvedMap[ConfigKeys.GST_BANKING_SERVICES]
+        val defaultRate = category?.let {
+            LoanCalculationEngine.roundPaisa((it.rateRangeMin + it.rateRangeMax) / 2.0)
+        } ?: 8.5
+
         EmiUiState(
             catalog = catalog,
-            input = input,
+            input = effectiveInput,
             result = res,
             selectedCategory = category,
-            variantSummary = buildVariantSummary(input, catalog),
+            variantSummary = buildVariantSummary(effectiveInput, catalog),
             currency = prefs.currency,
             tenureInYears = inYears,
+            resolvedConfig = resolvedMap,
+            rateSourceItem = rateSourceItem,
+            gstSourceItem = gstSourceItem,
+            defaultSuggestedRate = defaultRate,
+            isRateCustomized = abs(effectiveInput.annualRate - defaultRate) > 0.01,
             isLoading = catalog.categories.isEmpty(),
             snackbarMessage = msg
         )
@@ -92,13 +134,15 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
 
     init {
         viewModelScope.launch {
-            val cat = repository.catalogFlow.first { it.categories.isNotEmpty() }
+            val rawCat = repository.catalogFlow.first { it.categories.isNotEmpty() }
+            val resolvedMap = ratesRepository.resolvedMapFlow.first()
+            val cat = DataSourceResolver.resolveCatalog(rawCat, resolvedMap)
             if (!initializedFromCatalog) {
                 initializedFromCatalog = true
                 val home = cat.categories.firstOrNull { it.id == "home" } ?: cat.categories.first()
                 val selectedMap = home.variantGroups.mapNotNull { g ->
                     val preferred = if (g.id == "rate_type") {
-                        g.variants.firstOrNull { it.ruleFlag == "RATE_FLOATING" } ?: g.variants.firstOrNull()
+                        g.variants.firstOrNull { it.ruleFlag == "RATE_EBLR" } ?: g.variants.firstOrNull()
                     } else {
                         g.variants.firstOrNull()
                     }
@@ -108,10 +152,16 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
                     val vid = selectedMap[g.id]
                     g.variants.firstOrNull { it.id == vid }?.ruleFlag
                 }
+                val repo = DataSourceResolver.resolveDouble(resolvedMap, ConfigKeys.RBI_REPO_RATE, 6.5)
+                val spread = DataSourceResolver.resolveDouble(resolvedMap, ConfigKeys.HOME_EBLR_SPREAD, 2.0)
+                val defaultEblr = LoanCalculationEngine.roundPaisa(repo + spread)
                 _input.value = _input.value.copy(
                     categoryId = home.id,
                     selectedVariantsByGroup = selectedMap,
-                    ruleFlags = flags
+                    ruleFlags = flags,
+                    benchmarkRatePercent = repo,
+                    spreadPercent = spread,
+                    annualRate = defaultEblr
                 )
             }
         }
@@ -138,6 +188,44 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
         _input.value = transform(_input.value)
     }
 
+    fun resetRateToDefault() {
+        val state = uiState.value
+        val resolved = state.resolvedConfig
+        val flags = state.input.ruleFlags.toSet()
+        if (flags.contains("RATE_EBLR")) {
+            val repo = DataSourceResolver.resolveDouble(resolved, ConfigKeys.RBI_REPO_RATE, 6.5)
+            val spread = DataSourceResolver.resolveDouble(resolved, ConfigKeys.HOME_EBLR_SPREAD, 2.0)
+            _input.value = _input.value.copy(
+                benchmarkRatePercent = repo,
+                spreadPercent = spread,
+                annualRate = LoanCalculationEngine.roundPaisa(repo + spread)
+            )
+        } else {
+            _input.value = _input.value.copy(annualRate = state.defaultSuggestedRate)
+        }
+        _snackbarMessage.value = "Interest rate reset to data default"
+    }
+
+    fun applyRepoRateScenario(deltaPercent: Double) {
+        val curr = _input.value
+        val afterMonth = ((curr.rateChanges.lastOrNull()?.afterMonth ?: 6) + 6).coerceAtMost(curr.tenureMonths)
+        val baseRate = curr.rateChanges.lastOrNull()?.newAnnualRate ?: curr.annualRate
+        val newRate = LoanCalculationEngine.roundPaisa((baseRate + deltaPercent).coerceIn(1.0, 35.0))
+        _input.value = curr.copy(
+            rateChanges = curr.rateChanges + RateChangeEvent(afterMonth = afterMonth, newAnnualRate = newRate)
+        )
+        val dir = if (deltaPercent > 0) "hike" else "cut"
+        _snackbarMessage.value = "Added repo $dir (${if (deltaPercent > 0) "+" else ""}${String.format("%.2f", deltaPercent)}%) at Month $afterMonth → ${String.format("%.2f", newRate)}%"
+    }
+
+    fun updateEmiDayOfMonth(day: Int) {
+        _input.value = _input.value.copy(emiDayOfMonth = day.coerceIn(1, 31))
+    }
+
+    fun toggleProRataFirstMonth(enabled: Boolean) {
+        _input.value = _input.value.copy(proRataFirstMonthEnabled = enabled)
+    }
+
     fun setStartDateToday() {
         val cal = Calendar.getInstance()
         _input.value = _input.value.copy(
@@ -157,6 +245,7 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
 
     fun selectCategory(category: LoanCategory, preselectedVariant: LoanVariant? = null) {
         initializedFromCatalog = true
+        val resolved = uiState.value.resolvedConfig
         val selectedMap = mutableMapOf<String, String>()
         val flags = mutableListOf<String>()
 
@@ -172,18 +261,25 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
             }
         }
 
-        val midRate = if (preselectedVariant != null) {
-            LoanCalculationEngine.roundPaisa((preselectedVariant.rateRangeMin + preselectedVariant.rateRangeMax) / 2.0)
-        } else {
-            LoanCalculationEngine.roundPaisa((category.rateRangeMin + category.rateRangeMax) / 2.0)
+        val repo = DataSourceResolver.resolveDouble(resolved, ConfigKeys.RBI_REPO_RATE, 6.5)
+        val spread = DataSourceResolver.resolveDouble(resolved, ConfigKeys.HOME_EBLR_SPREAD, 2.0)
+
+        val midRate = when {
+            flags.contains("RATE_EBLR") -> LoanCalculationEngine.roundPaisa(repo + spread)
+            preselectedVariant != null -> LoanCalculationEngine.roundPaisa((preselectedVariant.rateRangeMin + preselectedVariant.rateRangeMax) / 2.0)
+            else -> LoanCalculationEngine.roundPaisa((category.rateRangeMin + category.rateRangeMax) / 2.0)
         }
 
-        val isFloating = flags.contains("RATE_FLOATING")
+        val isFloating = flags.contains("RATE_FLOATING") || flags.contains("RATE_EBLR") || flags.contains("RATE_MCLR")
         val prepayFee = if (isFloating) category.defaultPrepaymentFeeFloating else category.defaultPrepaymentFeeFixed
         val scale = if (uiState.value.currency == CurrencyCode.USD) 0.02 else 1.0
         val defaultPrincipal = LoanCalculationEngine.roundPaisa(category.defaultAmountInr * scale)
         val defaultAsset = LoanCalculationEngine.roundPaisa(category.defaultAssetValueInr * scale)
         val prev = _input.value
+
+        val gstRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.GST_BANKING_SERVICES, 18.0)
+        val pmayCap = DataSourceResolver.resolveDouble(resolved, ConfigKeys.PMAY_MAX_SUBSIDY, 180000.0)
+        val isCcEmi = category.id == "credit_card_emi" || flags.contains("CC_EMI")
 
         _input.value = CalculationInput(
             categoryId = category.id,
@@ -196,12 +292,20 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
             startYear = prev.startYear,
             startMonth = prev.startMonth,
             startDay = prev.startDay,
+            emiDayOfMonth = prev.emiDayOfMonth,
+            proRataFirstMonthEnabled = prev.proRataFirstMonthEnabled,
+            benchmarkRatePercent = repo,
+            spreadPercent = spread,
             processingFeePercent = category.defaultProcessingFeePercent,
+            gstOnFeesEnabled = isCcEmi || prev.gstOnFeesEnabled,
+            gstRatePercent = gstRate,
             prepaymentFeePercent = prepayFee,
+            pmaySubsidyEnabled = false,
+            pmaySubsidyAmount = pmayCap,
             isStepDown = flags.contains("EMI_STEP_DOWN"),
             moratoriumCompound = flags.contains("MOR_COMPOUND"),
             offsetBalance = LoanCalculationEngine.roundPaisa(defaultPrincipal * 0.15),
-            shareValue = if (defaultAsset > 0) defaultAsset else LoanCalculationEngine.roundPaisa(defaultPrincipal * 1.6),
+            shareValue = if (defaultAsset > 0) defaultAsset else LoanCalculationEngine.roundPaisa(defaultPrincipal * 2.0),
             billInvoiceAmount = defaultPrincipal,
             tranches = listOf(
                 TrancheEntry(1, LoanCalculationEngine.roundPaisa(defaultPrincipal * 0.30)),
@@ -219,6 +323,7 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
 
     fun selectVariantInGroup(category: LoanCategory, groupId: String, variant: LoanVariant) {
         val current = _input.value
+        val resolved = uiState.value.resolvedConfig
         val updatedMap = current.selectedVariantsByGroup.toMutableMap().apply {
             put(groupId, variant.id)
         }
@@ -227,21 +332,36 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
             g.variants.firstOrNull { it.id == vid }?.ruleFlag
         }
 
-        val midRate = LoanCalculationEngine.roundPaisa((variant.rateRangeMin + variant.rateRangeMax) / 2.0)
-        val isFloating = flags.contains("RATE_FLOATING")
+        val repo = DataSourceResolver.resolveDouble(resolved, ConfigKeys.RBI_REPO_RATE, current.benchmarkRatePercent)
+        val spread = DataSourceResolver.resolveDouble(resolved, ConfigKeys.HOME_EBLR_SPREAD, current.spreadPercent)
+        val midRate = if (variant.ruleFlag == "RATE_EBLR") {
+            LoanCalculationEngine.roundPaisa(repo + spread)
+        } else {
+            LoanCalculationEngine.roundPaisa((variant.rateRangeMin + variant.rateRangeMax) / 2.0)
+        }
+
+        val isFloating = flags.contains("RATE_FLOATING") || flags.contains("RATE_EBLR") || flags.contains("RATE_MCLR")
         val prepayFee = variant.prepaymentFeePercent
             ?: if (isFloating) category.defaultPrepaymentFeeFloating else category.defaultPrepaymentFeeFixed
 
         val ltvCap = variant.ltvCapOverride ?: category.ltvMaxPercent
         var adjustedAsset = current.assetValue
-        if (category.secured && adjustedAsset > 0.0 && (current.principal / adjustedAsset) * 100.0 > ltvCap) {
+        if (category.secured && ltvCap > 0.0 && adjustedAsset > 0.0 && (current.principal / adjustedAsset) * 100.0 > ltvCap) {
             adjustedAsset = LoanCalculationEngine.roundPaisa(current.principal / (ltvCap / 100.0))
         }
+
+        val shouldUpdateRate = groupId in setOf(
+            "rate_type", "vehicle_type", "study_region", "gold_repayment",
+            "lap_structure", "collateral_type", "biz_facility", "cc_emi_type",
+            "facility_type", "rate_basis"
+        )
 
         _input.value = current.copy(
             selectedVariantsByGroup = updatedMap,
             ruleFlags = flags,
-            annualRate = if (groupId == "rate_type" || groupId == "asset_type" || groupId == "product" || groupId == "facility") midRate else current.annualRate,
+            benchmarkRatePercent = repo,
+            spreadPercent = spread,
+            annualRate = if (shouldUpdateRate) midRate else current.annualRate,
             assetValue = adjustedAsset,
             prepaymentFeePercent = prepayFee,
             isStepDown = flags.contains("EMI_STEP_DOWN"),
@@ -255,9 +375,6 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
         )
     }
 
-    /**
-     * Switches the EMI structure flag directly from Advance Settings (Reducing, Flat, Step-Up, Step-Down, Balloon, Hybrid).
-     */
     fun selectEmiModeFlag(modeFlag: String) {
         val current = _input.value
         val emiFlags = setOf(
@@ -285,10 +402,18 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
         )
     }
 
-    fun saveCurrentToMyLoans(nickname: String, lender: String, enableReminder: Boolean, daysBefore: Int) {
+    fun saveCurrentToMyLoans(
+        nickname: String,
+        lender: String,
+        enableReminder: Boolean,
+        daysBefore: Int,
+        emiDayOfMonth: Int = _input.value.emiDayOfMonth,
+        autoDebitNach: Boolean = false
+    ) {
         viewModelScope.launch {
             val state = uiState.value
-            val input = state.input
+            val clampedDay = emiDayOfMonth.coerceIn(1, 28)
+            val input = state.input.copy(emiDayOfMonth = clampedDay)
             val category = state.selectedCategory
             val entity = SavedLoanEntity(
                 nickname = nickname.trim().ifBlank { "${category?.name ?: "Loan"} Plan" },
@@ -298,7 +423,9 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
                 variantSummary = state.variantSummary,
                 inputJson = repository.serializeInput(input),
                 reminderEnabled = enableReminder,
-                reminderDaysBefore = daysBefore
+                reminderDaysBefore = daysBefore,
+                autoDebitNach = autoDebitNach,
+                emiDayOfMonth = clampedDay
             )
             val id = repository.saveLoan(entity)
             if (enableReminder && state.result.schedule.isNotEmpty()) {
@@ -310,11 +437,13 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
                     emiFormatted = CurrencyFormatter.format(firstRow.emiPaid, state.currency, false),
                     dueYear = input.startYear,
                     dueMonthOneBased = input.startMonth,
-                    dueDay = input.startDay,
-                    daysBefore = daysBefore
+                    dueDay = clampedDay,
+                    daysBefore = daysBefore,
+                    autoDebitNach = autoDebitNach
                 )
             }
-            _snackbarMessage.value = "Saved \"${entity.nickname}\" to Saved Loans"
+            val nachTag = if (autoDebitNach) " (NACH Auto-Debit)" else ""
+            _snackbarMessage.value = "Saved \"${entity.nickname}\"$nachTag to Saved Loans"
         }
     }
 
@@ -347,15 +476,29 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
             if (state.variantSummary.isNotBlank()) appendLine("Plan: ${state.variantSummary}")
             appendLine("Loan Amount: ${CurrencyFormatter.format(r.totalPrincipal, cur)}")
             appendLine("Interest Rate: ${CurrencyFormatter.formatPercent(state.input.annualRate)}")
-            appendLine("Tenure: ${r.actualTenureMonths} months")
+            appendLine("Tenure: ${r.actualTenureMonths} months (Loan-Free: ${r.loanFreeDateLabel})")
             appendLine("Monthly EMI: ${CurrencyFormatter.format(r.monthlyEmi, cur, true)}")
-            appendLine("Total Interest: ${CurrencyFormatter.format(r.totalInterest, cur)}")
-            appendLine("Total Payment: ${CurrencyFormatter.format(r.totalPayment, cur)}")
+            appendLine("Total Interest: ${CurrencyFormatter.format(r.totalInterest, cur)} (${String.format("%.1f", r.interestToPrincipalPercent)}% of principal)")
+            appendLine("Total Payable: ${CurrencyFormatter.format(r.totalPayment, cur)}")
             r.insights.prepaymentImpact?.let { p ->
                 appendLine("Prepayment Savings: ${CurrencyFormatter.format(p.interestSaved, cur)} interest, ${p.monthsSaved} month(s) saved")
             }
-            appendLine("Estimates only. Actual bank terms may differ.")
+            appendLine(STANDARD_PLANNING_DISCLAIMER)
         }
+    }
+
+    private fun applyDataDrivenBounds(
+        input: CalculationInput,
+        resolved: Map<String, ResolvedConfigItem>
+    ): CalculationInput {
+        if (resolved.isEmpty()) return input
+        return input.copy(
+            gstRatePercent = DataSourceResolver.resolveDouble(resolved, ConfigKeys.GST_BANKING_SERVICES, input.gstRatePercent),
+            goldAuctionRiskLtvPercent = DataSourceResolver.resolveDouble(resolved, ConfigKeys.GOLD_AUCTION_RISK_LTV, input.goldAuctionRiskLtvPercent),
+            section24bCap = DataSourceResolver.resolveDouble(resolved, ConfigKeys.SEC_24B_CAP, input.section24bCap),
+            section80cCap = DataSourceResolver.resolveDouble(resolved, ConfigKeys.SEC_80C_CAP, input.section80cCap),
+            section80eMaxYears = DataSourceResolver.resolveInt(resolved, ConfigKeys.SEC_80E_MAX_YEARS, input.section80eMaxYears)
+        )
     }
 
     private fun buildVariantSummary(input: CalculationInput, cat: LoanCatalog): String {

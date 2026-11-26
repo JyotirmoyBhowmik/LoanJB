@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.jyotirmoyb.loan.data.AppContainer
 import com.jyotirmoyb.loan.data.CompareScenarioEntity
 import com.jyotirmoyb.loan.data.SavedLoanEntity
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CalculationResult
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.LoanCalculationEngine
+import com.jyotirmoyb.loan.data.remote.ConfigKeys
+import com.jyotirmoyb.loan.data.remote.DataSourceResolver
+import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CalculationResult
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.LoanCalculationEngine
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,16 +28,21 @@ data class StaffLoanPreset(
     val defaultAmount: Double,
     val staffRate: Double,
     val marketRate: Double,
-    val tenureMonths: Int
+    val tenureMonths: Int,
+    val staffRateKey: String? = null,
+    val defaultAmountKey: String? = null,
+    val tenureMonthsKey: String? = null
 )
 
 data class BankStaffUiState(
     val presets: List<StaffLoanPreset> = defaultStaffPresets(),
+    val resolvedMap: Map<String, ResolvedConfigItem> = emptyMap(),
     val selectedPresetId: String = "staff_housing",
     val amount: Double = 4000000.0,
     val staffRate: Double = 6.5,
     val marketRate: Double = 9.0,
     val tenureMonths: Int = 240,
+    val staffRateSource: ResolvedConfigItem? = null,
     val staffResult: CalculationResult = LoanCalculationEngine.calculate(
         CalculationInput(principal = 4000000.0, annualRate = 6.5, tenureMonths = 240, processingFeePercent = 0.0)
     ),
@@ -51,42 +59,60 @@ data class BankStaffUiState(
         get() = maxOf(0.0, LoanCalculationEngine.roundPaisa(marketResult.monthlyEmi - staffResult.monthlyEmi))
 }
 
-private fun defaultStaffPresets(): List<StaffLoanPreset> = listOf(
+fun resolveStaffPresets(
+    resolved: Map<String, ResolvedConfigItem> = emptyMap()
+): List<StaffLoanPreset> = defaultStaffPresets(resolved)
+
+private fun defaultStaffPresets(
+    resolved: Map<String, ResolvedConfigItem> = emptyMap()
+): List<StaffLoanPreset> = listOf(
     StaffLoanPreset(
         id = "staff_housing",
         title = "Staff Housing Loan",
         description = "Concessional PSU / private bank staff home loan (0% processing fee)",
-        defaultAmount = 4000000.0,
-        staffRate = 6.5,
-        marketRate = 9.0,
-        tenureMonths = 240
+        defaultAmount = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_HOUSING_AMOUNT, 4000000.0),
+        staffRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_HOUSING, 6.5),
+        marketRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.HOME_RATE_MIN, 8.5),
+        tenureMonths = DataSourceResolver.resolveInt(resolved, ConfigKeys.BANK_STAFF_HOUSING_TENURE, 240),
+        staffRateKey = ConfigKeys.BANK_STAFF_HOUSING,
+        defaultAmountKey = ConfigKeys.BANK_STAFF_HOUSING_AMOUNT,
+        tenureMonthsKey = ConfigKeys.BANK_STAFF_HOUSING_TENURE
     ),
     StaffLoanPreset(
         id = "staff_vehicle",
         title = "Staff Car / 2W Loan",
         description = "Subsidized employee conveyance loan",
-        defaultAmount = 1000000.0,
-        staffRate = 7.0,
-        marketRate = 9.5,
-        tenureMonths = 84
+        defaultAmount = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_VEHICLE_AMOUNT, 1000000.0),
+        staffRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_VEHICLE, 7.0),
+        marketRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.VEHICLE_CAR_MIN, 9.0),
+        tenureMonths = DataSourceResolver.resolveInt(resolved, ConfigKeys.BANK_STAFF_VEHICLE_TENURE, 84),
+        staffRateKey = ConfigKeys.BANK_STAFF_VEHICLE,
+        defaultAmountKey = ConfigKeys.BANK_STAFF_VEHICLE_AMOUNT,
+        tenureMonthsKey = ConfigKeys.BANK_STAFF_VEHICLE_TENURE
     ),
     StaffLoanPreset(
         id = "staff_personal",
         title = "Staff Clean OD / Personal",
         description = "Low-rate staff personal / festival facility",
-        defaultAmount = 500000.0,
-        staffRate = 7.5,
-        marketRate = 12.0,
-        tenureMonths = 60
+        defaultAmount = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_PERSONAL_AMOUNT, 500000.0),
+        staffRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_PERSONAL, 7.5),
+        marketRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.PERSONAL_RATE_MIN, 11.0),
+        tenureMonths = DataSourceResolver.resolveInt(resolved, ConfigKeys.BANK_STAFF_PERSONAL_TENURE, 60),
+        staffRateKey = ConfigKeys.BANK_STAFF_PERSONAL,
+        defaultAmountKey = ConfigKeys.BANK_STAFF_PERSONAL_AMOUNT,
+        tenureMonthsKey = ConfigKeys.BANK_STAFF_PERSONAL_TENURE
     ),
     StaffLoanPreset(
         id = "staff_education",
         title = "Staff Child Education",
         description = "Concessional rate for staff dependents' higher studies",
-        defaultAmount = 1500000.0,
-        staffRate = 6.0,
-        marketRate = 10.0,
-        tenureMonths = 120
+        defaultAmount = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_EDUCATION_AMOUNT, 1500000.0),
+        staffRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.BANK_STAFF_EDUCATION, 6.0),
+        marketRate = DataSourceResolver.resolveDouble(resolved, ConfigKeys.EDUCATION_INDIA_MIN, 9.5),
+        tenureMonths = DataSourceResolver.resolveInt(resolved, ConfigKeys.BANK_STAFF_EDUCATION_TENURE, 120),
+        staffRateKey = ConfigKeys.BANK_STAFF_EDUCATION,
+        defaultAmountKey = ConfigKeys.BANK_STAFF_EDUCATION_AMOUNT,
+        tenureMonthsKey = ConfigKeys.BANK_STAFF_EDUCATION_TENURE
     )
 )
 
@@ -96,13 +122,13 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
     override val id: String = "bank_staff_loan"
 
     private val repository = AppContainer.provideRepository(application)
-    private val presets = defaultStaffPresets()
+    private val ratesRepository = AppContainer.provideRatesRepository(application)
 
-    private val _selectedId = MutableStateFlow(presets.first().id)
-    private val _amount = MutableStateFlow(presets.first().defaultAmount)
-    private val _staffRate = MutableStateFlow(presets.first().staffRate)
-    private val _marketRate = MutableStateFlow(presets.first().marketRate)
-    private val _tenureMonths = MutableStateFlow(presets.first().tenureMonths)
+    private val _selectedId = MutableStateFlow("staff_housing")
+    private val _amount = MutableStateFlow(4000000.0)
+    private val _staffRate = MutableStateFlow(6.5)
+    private val _marketRate = MutableStateFlow(8.5)
+    private val _tenureMonths = MutableStateFlow(240)
     private val _snackbar = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<BankStaffUiState> = combine(
@@ -112,6 +138,7 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         _marketRate,
         _tenureMonths,
         repository.preferencesFlow,
+        ratesRepository.resolvedMapFlow,
         _snackbar
     ) { values ->
         val selId = values[0] as String
@@ -120,7 +147,13 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         val mRate = values[3] as Double
         val months = values[4] as Int
         val prefs = values[5] as com.jyotirmoyb.loan.data.UserPreferences
-        val msg = values[6] as String?
+        @Suppress("UNCHECKED_CAST")
+        val resolvedMap = values[6] as Map<String, ResolvedConfigItem>
+        val msg = values[7] as String?
+
+        val presets = defaultStaffPresets(resolvedMap)
+        val activePreset = presets.firstOrNull { it.id == selId }
+        val staffRateSource = activePreset?.staffRateKey?.let { resolvedMap[it] }
 
         val staffInput = buildStaffCalculationInput(amt, sRate, months)
         val marketInput = CalculationInput(
@@ -134,11 +167,13 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         )
         BankStaffUiState(
             presets = presets,
+            resolvedMap = resolvedMap,
             selectedPresetId = selId,
             amount = amt,
             staffRate = sRate,
             marketRate = mRate,
             tenureMonths = months,
+            staffRateSource = staffRateSource,
             staffResult = compute(staffInput),
             marketResult = compute(marketInput),
             currency = prefs.currency,
@@ -175,6 +210,34 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun clearSnackbar() {
         _snackbar.value = null
+    }
+
+    fun saveTemplateOverride(
+        preset: StaffLoanPreset,
+        newRate: Double,
+        newAmount: Double,
+        newTenureMonths: Int
+    ) {
+        viewModelScope.launch {
+            preset.staffRateKey?.let { ratesRepository.setManualOverrideByKey(it, newRate) }
+            preset.defaultAmountKey?.let { ratesRepository.setManualOverrideByKey(it, newAmount) }
+            preset.tenureMonthsKey?.let { ratesRepository.setManualOverrideByKey(it, newTenureMonths.toDouble()) }
+            if (_selectedId.value == preset.id) {
+                _staffRate.value = newRate
+                _amount.value = newAmount
+                _tenureMonths.value = newTenureMonths
+            }
+            _snackbar.value = "Saved template override for \"${preset.title}\""
+        }
+    }
+
+    fun resetTemplateToDefault(preset: StaffLoanPreset) {
+        viewModelScope.launch {
+            preset.staffRateKey?.let { ratesRepository.resetToDefault(it) }
+            preset.defaultAmountKey?.let { ratesRepository.resetToDefault(it) }
+            preset.tenureMonthsKey?.let { ratesRepository.resetToDefault(it) }
+            _snackbar.value = "Reset \"${preset.title}\" template to default"
+        }
     }
 
     fun buildCurrentStaffInput(): CalculationInput =

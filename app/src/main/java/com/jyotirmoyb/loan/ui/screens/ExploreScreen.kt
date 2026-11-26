@@ -58,9 +58,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.LoanCatalog
-import com.jyotirmoyb.loan.engine.LoanCategory
-import com.jyotirmoyb.loan.engine.LoanVariant
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.LoanCategory
+import com.jyotirmoyb.loan.domain.LoanVariant
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.SectionAccentHeader

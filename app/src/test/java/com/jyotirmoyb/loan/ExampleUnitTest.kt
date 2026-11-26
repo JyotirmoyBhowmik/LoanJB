@@ -1,6 +1,6 @@
 package com.jyotirmoyb.loan
 
-import com.jyotirmoyb.loan.engine.LoanCalculationEngine
+import com.jyotirmoyb.loan.domain.LoanCalculationEngine
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

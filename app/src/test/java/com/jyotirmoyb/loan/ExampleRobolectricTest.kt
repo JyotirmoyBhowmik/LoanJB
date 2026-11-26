@@ -1,7 +1,7 @@
 package com.jyotirmoyb.loan
 
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

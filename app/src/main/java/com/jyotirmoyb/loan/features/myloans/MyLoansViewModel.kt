@@ -6,14 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.jyotirmoyb.loan.data.AppContainer
 import com.jyotirmoyb.loan.data.CompareScenarioEntity
 import com.jyotirmoyb.loan.data.SavedLoanEntity
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
-import com.jyotirmoyb.loan.engine.LoanCalculationEngine
-import com.jyotirmoyb.loan.engine.LoanCatalog
-import com.jyotirmoyb.loan.engine.PrepaymentMode
-import com.jyotirmoyb.loan.engine.PrepaymentRule
-import com.jyotirmoyb.loan.engine.RateChangeEvent
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.LoanTrackerEngine
 import com.jyotirmoyb.loan.util.EmiReminderScheduler
+import com.jyotirmoyb.loan.util.ReminderScheduleMode
 import com.jyotirmoyb.loan.viewmodel.PortfolioMetrics
 import com.jyotirmoyb.loan.viewmodel.TrackedLoanSummary
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,17 +42,10 @@ class MyLoansViewModel(application: Application) : AndroidViewModel(application)
         _snackbar
     ) { entities, catalog, prefs, msg ->
         val loans = entities.map { buildTrackedSummary(it, catalog) }
-        val totalDebt = loans.sumOf { it.outstandingPrincipal }
-        val activeEmi = loans.filter { it.outstandingPrincipal > 0.01 }.sumOf { it.result.monthlyEmi }
-        val dti = if (prefs.monthlyIncome > 0.0) (activeEmi / prefs.monthlyIncome) * 100.0 else 0.0
+        val metrics = LoanTrackerEngine.computePortfolioMetrics(loans, prefs.monthlyIncome)
         MyLoansUiState(
             loans = loans,
-            portfolioMetrics = PortfolioMetrics(
-                totalOutstandingDebt = LoanCalculationEngine.roundPaisa(totalDebt),
-                totalMonthlyEmiBurden = LoanCalculationEngine.roundPaisa(activeEmi),
-                dtiPercent = LoanCalculationEngine.roundPaisa(dti),
-                activeLoanCount = loans.count { it.outstandingPrincipal > 0.01 }
-            ),
+            portfolioMetrics = metrics,
             currency = prefs.currency,
             monthlyIncome = prefs.monthlyIncome,
             snackbarMessage = msg
@@ -86,38 +77,58 @@ class MyLoansViewModel(application: Application) : AndroidViewModel(application)
     fun logActualPrepayment(summary: TrackedLoanSummary, monthNumber: Int, amount: Double, reduceTenure: Boolean) {
         if (amount <= 0.0) return
         viewModelScope.launch {
-            val newRule = PrepaymentRule(
-                startMonth = monthNumber,
+            val updatedInput = LoanTrackerEngine.applyPrepayment(
+                input = summary.input,
+                monthNumber = monthNumber,
                 amount = amount,
-                isRecurring = false,
-                mode = if (reduceTenure) PrepaymentMode.REDUCE_TENURE.name else PrepaymentMode.REDUCE_EMI.name
-            )
-            val updatedInput = summary.input.copy(
-                prepaymentEnabled = true,
-                prepayments = summary.input.prepayments + newRule
+                reduceTenure = reduceTenure
             )
             val updatedEntity = summary.entity.copy(inputJson = repository.serializeInput(updatedInput))
             repository.updateLoan(updatedEntity)
-            _snackbar.value = "Logged prepayment — schedule recalculated"
+            val recomputed = buildTrackedSummary(updatedEntity, repository.catalogFlow.first())
+            val savedStr = CurrencyFormatter.format(recomputed.interestSaved, uiState.value.currency, false)
+            _snackbar.value = "Prepayment logged — schedule recalculated (Interest saved: $savedStr)"
         }
     }
 
     fun logActualRateChange(summary: TrackedLoanSummary, afterMonth: Int, newAnnualRate: Double) {
         if (newAnnualRate !in 0.0..40.0) return
         viewModelScope.launch {
-            val flags = summary.input.ruleFlags.toMutableList()
-            if (!flags.contains("RATE_FLOATING") && !flags.contains("RATE_HYBRID")) {
-                flags.add("RATE_FLOATING")
-            }
-            val updatedEvents = (summary.input.rateChanges.filterNot { it.afterMonth == afterMonth } +
-                RateChangeEvent(afterMonth = afterMonth, newAnnualRate = newAnnualRate)).sortedBy { it.afterMonth }
-            val updatedInput = summary.input.copy(
-                ruleFlags = flags,
-                rateChanges = updatedEvents
+            val updatedInput = LoanTrackerEngine.applyRateChange(
+                input = summary.input,
+                afterMonth = afterMonth,
+                newAnnualRate = newAnnualRate
             )
             val updatedEntity = summary.entity.copy(inputJson = repository.serializeInput(updatedInput))
             repository.updateLoan(updatedEntity)
-            _snackbar.value = "Updated rate to ${String.format("%.2f", newAnnualRate)}% from month ${afterMonth + 1}"
+            _snackbar.value = "Floating rate reset to ${String.format("%.2f", newAnnualRate)}% after month $afterMonth — schedule recomputed"
+        }
+    }
+
+    fun toggleAutoDebitNach(summary: TrackedLoanSummary, enabled: Boolean) {
+        viewModelScope.launch {
+            val updated = summary.entity.copy(autoDebitNach = enabled)
+            repository.updateLoan(updated)
+            if (updated.reminderEnabled) {
+                scheduleReminderForSummary(buildTrackedSummary(updated, repository.catalogFlow.first()))
+            }
+            _snackbar.value = if (enabled) "NACH Auto-Debit marked active" else "Switched to manual EMI payment"
+        }
+    }
+
+    fun updateEmiDayOfMonth(summary: TrackedLoanSummary, emiDay: Int) {
+        val clamped = emiDay.coerceIn(1, 28)
+        viewModelScope.launch {
+            val updatedInput = summary.input.copy(emiDayOfMonth = clamped)
+            val updated = summary.entity.copy(
+                emiDayOfMonth = clamped,
+                inputJson = repository.serializeInput(updatedInput)
+            )
+            repository.updateLoan(updated)
+            if (updated.reminderEnabled) {
+                scheduleReminderForSummary(buildTrackedSummary(updated, repository.catalogFlow.first()))
+            }
+            _snackbar.value = "EMI due date updated to day $clamped of every month"
         }
     }
 
@@ -135,8 +146,14 @@ class MyLoansViewModel(application: Application) : AndroidViewModel(application)
             val updated = summary.entity.copy(reminderEnabled = enabled, reminderDaysBefore = daysBefore)
             repository.updateLoan(updated)
             if (enabled) {
-                scheduleReminderForSummary(buildTrackedSummary(updated, repository.catalogFlow.first()))
-                _snackbar.value = "Reminder scheduled $daysBefore day(s) before next EMI"
+                val mode = scheduleReminderForSummary(buildTrackedSummary(updated, repository.catalogFlow.first()))
+                _snackbar.value = when (mode) {
+                    ReminderScheduleMode.EXACT_ALARM ->
+                        "Exact reminder set $daysBefore day(s) before next EMI"
+                    ReminderScheduleMode.INEXACT_FALLBACK ->
+                        "Reminder set $daysBefore day(s) before next EMI (battery-friendly fallback mode)"
+                    null -> "No unpaid EMIs left to remind"
+                }
             } else {
                 EmiReminderScheduler.cancelReminder(getApplication(), updated.id)
                 _snackbar.value = "EMI reminder turned off"
@@ -166,61 +183,25 @@ class MyLoansViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun scheduleReminderForSummary(summary: TrackedLoanSummary) {
-        val nextRow = summary.result.schedule.firstOrNull { it.monthNumber == summary.nextDueMonthNumber } ?: return
+    private fun scheduleReminderForSummary(summary: TrackedLoanSummary): ReminderScheduleMode? {
+        val nextRow = summary.result.schedule.firstOrNull { it.monthNumber == summary.nextDueMonthNumber } ?: return null
         val emiStr = CurrencyFormatter.format(nextRow.emiPaid, uiState.value.currency, false)
-        EmiReminderScheduler.scheduleNextReminder(
+        return EmiReminderScheduler.scheduleNextReminder(
             context = getApplication(),
             loanId = summary.entity.id,
             nickname = summary.entity.nickname,
             emiFormatted = emiStr,
             dueYear = summary.nextDueYear,
             dueMonthOneBased = summary.nextDueMonth,
-            dueDay = summary.input.startDay,
-            daysBefore = summary.entity.reminderDaysBefore
+            dueDay = summary.emiDayOfMonth,
+            daysBefore = summary.entity.reminderDaysBefore,
+            autoDebitNach = summary.autoDebitNach
         )
     }
 
     private fun buildTrackedSummary(entity: SavedLoanEntity, cat: LoanCatalog): TrackedLoanSummary {
         val input = repository.parseInput(entity.inputJson)
         val category = cat.categories.firstOrNull { it.id == entity.categoryId }
-        val result = LoanCalculationEngine.calculate(input, category)
-        val paidSet = entity.paidMonthsCsv.split(",")
-            .mapNotNull { it.trim().toIntOrNull() }
-            .toSet()
-        val checklistSet = entity.completedChecklistCsv.split(",")
-            .mapNotNull { it.trim().toIntOrNull() }
-            .toSet()
-
-        val paidPrincipal = result.schedule.filter { paidSet.contains(it.monthNumber) }.sumOf { it.principalPaid }
-        val totalPaidSoFar = result.schedule.filter { paidSet.contains(it.monthNumber) }.sumOf { it.emiPaid }
-        val outstanding = LoanCalculationEngine.roundPaisa(maxOf(0.0, result.totalPrincipal - paidPrincipal))
-        val progress = if (result.schedule.isNotEmpty()) {
-            (paidSet.size.toFloat() / result.schedule.size.toFloat()).coerceIn(0f, 1f)
-        } else 0f
-
-        val nextRow = result.schedule.firstOrNull { !paidSet.contains(it.monthNumber) }
-        val nextNum = nextRow?.monthNumber
-        val nextOffset = (nextNum ?: 1) - 1
-        val totalM = (input.startMonth - 1) + nextOffset
-        val nextYear = input.startYear + (totalM / 12)
-        val nextMonth = ((totalM % 12) + 12) % 12 + 1
-        val nextLabel = if (nextRow != null) "${input.startDay} ${nextRow.monthLabel}" else "Fully Paid"
-
-        return TrackedLoanSummary(
-            entity = entity,
-            input = input,
-            result = result,
-            paidMonthNumbers = paidSet,
-            completedChecklist = checklistSet,
-            nextDueMonthNumber = nextNum,
-            nextDueDateLabel = nextLabel,
-            nextDueYear = nextYear,
-            nextDueMonth = nextMonth,
-            outstandingPrincipal = outstanding,
-            totalPaidSoFar = LoanCalculationEngine.roundPaisa(totalPaidSoFar),
-            progressFraction = progress,
-            checklistItems = category?.checklistItems.orEmpty()
-        )
+        return LoanTrackerEngine.evaluateTrackedLoan(entity, input, category)
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Monochrome adaptive icon silhouette within 66dp safe zone (21..87) -->
+    <!-- Stylized Indian Temple / Bank Pillar Roof -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24L27,38v5h54v-5L54,24z" />
+    <!-- Base Foundation Plinth -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M27,76h54v6H27z" />
+    <!-- Left & Right Bank Pillars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,46h7v26h-7zM69,46h7v26h-7z" />
+    <!-- Central Indian Rupee Symbol (₹) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,46h18v3.6H58.2c1.1,1.1 1.8,2.5 2.1,4.2H63v3.4h-2.8c-0.6,4.2 -3.9,7.1 -8.7,7.5l8.8,8.3h-5.2l-8.8,-8.4v-3.1h5.1c2.8,0 4.7,-1.5 5.2,-4.3H45v-3.4h11.4c-0.6,-2.4 -2.5,-3.8 -5.4,-3.8H45V46z" />
+</vector>

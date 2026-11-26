@@ -35,8 +35,11 @@ import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Stars
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.TrackChanges
+import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,9 +69,11 @@ import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.theme.InfoBlue
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
+import com.jyotirmoyb.loan.ui.theme.LocalIsDarkTheme
 import com.jyotirmoyb.loan.ui.theme.PurpleAccent
 import com.jyotirmoyb.loan.ui.theme.SageGreen
-import com.jyotirmoyb.loan.ui.theme.TealPrimary
+import com.jyotirmoyb.loan.ui.theme.SageGreenDark
+import com.jyotirmoyb.loan.ui.theme.SoftMintTile
 import com.jyotirmoyb.loan.ui.theme.TealPrimaryDark
 
 @Composable
@@ -218,7 +223,7 @@ private fun HubSectionCard(
                 Icon(
                     imageVector = sectionHeaderIcon(section.iconKey),
                     contentDescription = null,
-                    tint = TealPrimary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -285,6 +290,7 @@ private fun HubModuleTile(
         "${module.title}. Coming soon."
     }
 
+    val isDark = LocalIsDarkTheme.current
     Surface(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
@@ -292,15 +298,15 @@ private fun HubModuleTile(
             .semantics { contentDescription = contentDesc }
             .testTag("hub_tile_${module.id}"),
         shape = RoundedCornerShape(14.dp),
-        color = if (module.enabled) {
-            MaterialTheme.colorScheme.surface
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        color = when {
+            module.enabled && !isDark -> SoftMintTile
+            module.enabled -> MaterialTheme.colorScheme.surface
+            else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.45f else 0.90f)
         },
         border = BorderStroke(
             width = 1.dp,
             color = if (module.enabled) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.32f)
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.30f)
             } else {
                 MaterialTheme.colorScheme.outlineVariant
             }
@@ -391,7 +397,7 @@ private fun HubWorkspaceCard(
                 Icon(
                     imageVector = Icons.Outlined.AccountBalanceWallet,
                     contentDescription = null,
-                    tint = TealPrimary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -424,7 +430,7 @@ private fun HubWorkspaceCard(
         ) {
             WorkspaceTile(
                 icon = Icons.Outlined.AccountBalanceWallet,
-                tint = TealPrimaryDark,
+                tint = SageGreenDark,
                 title = stringResource(R.string.hub_saved_loans_title),
                 subtitle = if (savedLoansCount > 0) "$savedLoansCount saved • DTI" else stringResource(R.string.hub_saved_loans_sub),
                 onClick = onOpenSavedLoans,
@@ -512,7 +518,13 @@ private fun moduleIcon(icon: String): ImageVector = when (icon) {
     "sparkles" -> Icons.Outlined.AutoAwesome
     "lightbulb" -> Icons.Outlined.Lightbulb
     "compare" -> Icons.Outlined.CompareArrows
+    "eligibility" -> Icons.Outlined.Speed
+    "balance_transfer" -> Icons.Outlined.SwapHoriz
+    "tax_benefit" -> Icons.Outlined.ReceiptLong
+    "part_payment" -> Icons.Outlined.EventAvailable
     "staff" -> Icons.Outlined.Badge
+    "small_savings" -> Icons.Outlined.AccountBalance
+    "deposit_compare" -> Icons.Outlined.CompareArrows
     "lumpsum" -> Icons.Outlined.Savings
     "pension" -> Icons.Outlined.Elderly
     else -> Icons.Outlined.AccountBalance
@@ -524,7 +536,22 @@ private fun moduleTintColor(module: CalculatorModule): Color = when (module.icon
     "sparkles" -> InfoBlue
     "lightbulb" -> InterestAmber
     "compare" -> InfoBlue
+    "eligibility" -> SageGreenDark
+    "balance_transfer" -> TealPrimaryDark
+    "tax_benefit" -> InterestAmber
+    "part_payment" -> SageGreen
+    "small_savings" -> SageGreenDark
+    "deposit_compare" -> InfoBlue
+    "xirr" -> PurpleAccent
+    "live_nav" -> SageGreen
     "lumpsum" -> InterestAmber
+    "tax" -> InterestAmber
+    "hra" -> SageGreenDark
+    "gst" -> InfoBlue
+    "advance_tax" -> PurpleAccent
+    "rp" -> PurpleAccent
+    "nps" -> InfoBlue
+    "epf" -> SageGreenDark
     "pension" -> PurpleAccent
     else -> TealPrimaryDark
 }

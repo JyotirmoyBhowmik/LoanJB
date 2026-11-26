@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LoanJB Remote Config Document",
+  "type": "object",
+  "required": ["schemaVersion", "dataVersion", "publishedOn", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "dataVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publishedOn": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value",
+          "unit",
+          "effectiveFrom",
+          "sourceName",
+          "sourceUrl",
+          "lastVerified"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+          },
+          "value": {
+            "type": ["number", "string"]
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+          },
+          "sourceName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceUrl": {
+            "type": "string",
+            "pattern": "^(https://.*)?$"
+          },
+          "lastVerified": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "previousValue": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "taxYears": {
+      "type": "array",
+      "description": "Optional Financial-Year versioned Indian Income Tax slab, rebate, surcharge, and deduction rules.",
+      "items": {
+        "type": "object",
+        "required": ["fyCode", "ayCode", "lawReference", "effectiveFrom", "cessPercent", "newRegime", "oldRegime", "deductions"]
+      }
+    },
+    "gstSlabs": {
+      "type": "array",
+      "description": "Optional list of GST slab percentages.",
+      "items": { "type": "number", "minimum": 0, "maximum": 100 }
+    },
+    "advanceTaxThreshold": {
+      "type": "number",
+      "minimum": 0
+    },
+    "advanceTaxSchedule": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["dueDateLabel", "calendarMonth", "calendarDay", "cumulativePercent", "label"]
+      }
+    },
+    "apyTable": {
+      "type": "array",
+      "description": "Optional PFRDA Atal Pension Yojana monthly contribution schedule by entry age (18-40).",
+      "items": {
+        "type": "object",
+        "required": ["entryAge", "pension1000", "pension2000", "pension3000", "pension4000", "pension5000"]
+      }
+    },
+    "pmsymTable": {
+      "type": "array",
+      "description": "Optional PM Shram Yogi Maan-Dhan monthly contribution table by entry age (18-40).",
+      "items": {
+        "type": "object",
+        "required": ["entryAge", "monthlyContribution"]
+      }
+    },
+    "seniorPensionSchemes": {
+      "type": "array",
+      "description": "Optional senior citizen pension schemes with open/closed subscription status.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "shortName", "status", "statusLabel", "statusNote", "ratePercent", "payoutFrequency", "tenureYears", "minAge", "sovereignIssuer"]
+      }
+    },
+    "assetAllocationMatrix": {
+      "type": "array",
+      "description": "Optional educational asset-allocation table by age band and risk profile.",
+      "items": {
+        "type": "object",
+        "required": ["ageMin", "ageMax", "ageBandLabel", "riskProfile", "equityPercent", "debtPercent", "goldPercent", "cashLiquidPercent", "horizonHint", "rebalanceNote"]
+      }
+    },
+    "bankFdRates": {
+      "type": "array",
+      "description": "Optional seed table of top Indian bank Fixed Deposit rates (general & senior citizen).",
+      "items": {
+        "type": "object",
+        "required": ["bankId", "bankName", "generalRate", "seniorRate", "tenureLabel"]
+      }
+    },
+    "articles": {
+      "type": "array",
+      "description": "Optional list of Markdown educational articles with lastReviewed dates and bundled assetPath or remote markdownBody.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "summary", "category", "lastReviewed"]
+      }
+    }
+  }
+}

@@ -22,6 +22,8 @@ import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.CompareArrows
 import androidx.compose.material.icons.outlined.PlayCircleOutline
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,30 +40,39 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.LoanCatalog
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.RegionCode
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.SectionAccentHeader
 import com.jyotirmoyb.loan.ui.screens.SettingsScreen
 import com.jyotirmoyb.loan.ui.theme.AppThemeMode
 import com.jyotirmoyb.loan.ui.theme.InfoBlue
 import com.jyotirmoyb.loan.ui.theme.SageGreen
+import com.jyotirmoyb.loan.ui.theme.SavingsGreen
 import com.jyotirmoyb.loan.ui.theme.TealPrimaryDark
 
 @Composable
 fun ProfileScreen(
     uiState: ProfileUiState,
     serializeCatalog: (LoanCatalog) -> String,
-    createBackupJson: suspend () -> String,
+    createEncryptedBackupJson: suspend (String) -> Result<String>,
+    onSetLanguage: (String) -> Unit,
+    onSetRegion: (RegionCode) -> Unit,
     onSetCurrency: (CurrencyCode) -> Unit,
     onSetThemeMode: (AppThemeMode) -> Unit,
     onSetMonthlyIncome: (Double) -> Unit,
+    onSetTaxRegime: (String) -> Unit,
+    onSetUserAge: (Int) -> Unit,
+    onSetRiskProfile: (String) -> Unit,
     onSaveCatalogObject: (LoanCatalog) -> Unit,
     onSaveCatalogRawJson: (String) -> Unit,
     onResetCatalogDefault: () -> Unit,
-    onRestoreBackupJson: (String) -> Unit,
+    onRestoreBackupJson: (String, String?) -> Unit,
     onResetAllData: () -> Unit,
     onShowMessage: (String) -> Unit,
+    onOpenDataAndRates: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     onOpenSavedLoans: () -> Unit,
     onOpenLoanGuide: () -> Unit,
     onOpenCompare: () -> Unit,
@@ -91,6 +102,33 @@ fun ProfileScreen(
                     )
                 }
                 Spacer(Modifier.height(10.dp))
+                ProfileQuickRow(
+                    icon = Icons.Outlined.Tune,
+                    tint = TealPrimaryDark,
+                    title = stringResource(R.string.data_rates_title),
+                    subtitle = if (uiState.activeOverridesCount > 0) {
+                        "${uiState.activeOverridesCount} manual override(s) • Repo, GST, slabs & sync"
+                    } else {
+                        stringResource(R.string.data_rates_subtitle)
+                    },
+                    onClick = onOpenDataAndRates,
+                    testTag = "profile_data_rates_row"
+                )
+                Spacer(Modifier.height(8.dp))
+                val securitySummary = buildList {
+                    if (uiState.preferences.appLockEnabled) add("App Lock On")
+                    if (uiState.preferences.flagSecureEnabled) add("Screenshots Blocked")
+                    if (isEmpty()) add("Biometric/PIN lock, FLAG_SECURE & zero-analytics policy")
+                }.joinToString(" • ")
+                ProfileQuickRow(
+                    icon = Icons.Outlined.Security,
+                    tint = SavingsGreen,
+                    title = stringResource(R.string.privacy_security_title),
+                    subtitle = securitySummary,
+                    onClick = onOpenPrivacy,
+                    testTag = "profile_privacy_security_row"
+                )
+                Spacer(Modifier.height(8.dp))
                 ProfileQuickRow(
                     icon = Icons.Outlined.AccountBalanceWallet,
                     tint = TealPrimaryDark,
@@ -138,15 +176,20 @@ fun ProfileScreen(
             }
         }
 
-        // Reuse existing untouched SettingsScreen (Currency, Theme, Income, Catalog Editor, Backup/Restore, Reset)
+        // SettingsScreen (Language, Theme, Region, Currency, Financial Defaults, Catalog, Encrypted Backup/Restore, Reset)
         SettingsScreen(
             preferences = uiState.preferences,
             catalog = uiState.catalog,
             serializeCatalog = serializeCatalog,
-            createBackupJson = createBackupJson,
+            createEncryptedBackupJson = createEncryptedBackupJson,
+            onSetLanguage = onSetLanguage,
+            onSetRegion = onSetRegion,
             onSetCurrency = onSetCurrency,
             onSetThemeMode = onSetThemeMode,
             onSetMonthlyIncome = onSetMonthlyIncome,
+            onSetTaxRegime = onSetTaxRegime,
+            onSetUserAge = onSetUserAge,
+            onSetRiskProfile = onSetRiskProfile,
             onSaveCatalogObject = onSaveCatalogObject,
             onSaveCatalogRawJson = onSaveCatalogRawJson,
             onResetCatalogDefault = onResetCatalogDefault,

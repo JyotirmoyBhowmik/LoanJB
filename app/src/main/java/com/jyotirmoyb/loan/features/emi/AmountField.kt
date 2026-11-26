@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.CurrencyFormatter
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle
 import kotlin.math.abs
 import kotlin.math.roundToLong
@@ -46,7 +46,7 @@ fun AmountField(
     }
 
     val compactLabel = remember(amount, currency) {
-        formatAmountCompactBadge(amount, currency)
+        CurrencyFormatter.formatShortLabel(amount, currency)
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -58,7 +58,7 @@ fun AmountField(
                     val numeric = digitsOnly.toLongOrNull()
                     if (numeric != null) {
                         textValue = when (currency) {
-                            CurrencyCode.INR -> CurrencyFormatter.formatIndianGrouping(numeric)
+                            CurrencyCode.INR, CurrencyCode.NPR -> CurrencyFormatter.formatIndianGrouping(numeric)
                             CurrencyCode.USD -> CurrencyFormatter.formatWesternGrouping(numeric)
                         }
                         onAmountChange(numeric.toDouble())
@@ -71,7 +71,7 @@ fun AmountField(
             label = { Text(label) },
             prefix = {
                 Text(
-                    text = if (currency == CurrencyCode.INR) "Rs." else "$",
+                    text = "${currency.symbol} ",
                     style = MonoMediumStyle,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -106,20 +106,7 @@ private fun formatInputDigits(amount: Double, currency: CurrencyCode): String {
     val whole = amount.roundToLong().coerceAtLeast(0L)
     if (whole == 0L) return ""
     return when (currency) {
-        CurrencyCode.INR -> CurrencyFormatter.formatIndianGrouping(whole)
+        CurrencyCode.INR, CurrencyCode.NPR -> CurrencyFormatter.formatIndianGrouping(whole)
         CurrencyCode.USD -> CurrencyFormatter.formatWesternGrouping(whole)
-    }
-}
-
-private fun formatAmountCompactBadge(amount: Double, currency: CurrencyCode): String {
-    val absVal = abs(amount)
-    return when (currency) {
-        CurrencyCode.INR -> when {
-            absVal >= 1_00_00_000.0 -> "${String.format("%.2f", absVal / 1_00_00_000.0)} Cr"
-            absVal >= 1_00_000.0 -> "${String.format("%.1f", absVal / 1_00_000.0)} Lakh"
-            absVal >= 1_000.0 -> "${String.format("%.1f", absVal / 1_000.0)} K"
-            else -> "₹${absVal.roundToLong()}"
-        }
-        CurrencyCode.USD -> CurrencyFormatter.formatCompact(amount, currency)
     }
 }

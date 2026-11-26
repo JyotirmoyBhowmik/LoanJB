@@ -47,10 +47,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jyotirmoyb.loan.engine.LoanCatalog
-import com.jyotirmoyb.loan.engine.LoanCategory
-import com.jyotirmoyb.loan.engine.LoanVariant
-import com.jyotirmoyb.loan.engine.VariantGroup
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.LoanCategory
+import com.jyotirmoyb.loan.domain.LoanVariant
+import com.jyotirmoyb.loan.domain.VariantGroup
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.NumericInputField
 import com.jyotirmoyb.loan.ui.components.SectionAccentHeader

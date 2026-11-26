@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
-import com.jyotirmoyb.loan.engine.LoanCalculationEngine
+import com.jyotirmoyb.loan.domain.LoanCalculationEngine
 import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle
 import kotlin.math.abs
 

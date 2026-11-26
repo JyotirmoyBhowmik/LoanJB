@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "2026.11.2",
+  "publishedOn": "2026-11-26",
+  "items": [
+    {
+      "key": "article.eblr_vs_mclr",
+      "label": "EBLR vs MCLR: Why Repo Rate Cuts Reach You Faster",
+      "category": "MARKET_DATA",
+      "value": "External Benchmark Linked Rates (EBLR) reset at least once every 3 months per RBI rules, unlike legacy MCLR resets.",
+      "unit": "guide",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "LoanJB Editorial (Seed)",
+      "sourceUrl": "https://www.rbi.org.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "article.reduce_tenure_vs_emi",
+      "label": "Prepayment Strategy: Reduce Tenure vs Reduce EMI",
+      "category": "MARKET_DATA",
+      "value": "Keeping your EMI unchanged after a part-payment slashes months off your loan and saves far more total interest than lowering EMI.",
+      "unit": "guide",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "LoanJB Editorial (Seed)",
+      "sourceUrl": "https://www.rbi.org.in",
+      "lastVerified": "UNVERIFIED"
+    },
+    {
+      "key": "article.rc_hypothecation_form35",
+      "label": "Closing a Vehicle Loan: Form 35, Bank NOC & RTO RC Update",
+      "category": "MARKET_DATA",
+      "value": "After the final EMI, collect 2 signed copies of Form 35 and the bank NOC within 30 days to remove hypothecation on Parivahan.",
+      "unit": "guide",
+      "effectiveFrom": "2026-04-01",
+      "sourceName": "MoRTH Parivahan (Seed)",
+      "sourceUrl": "https://parivahan.gov.in",
+      "lastVerified": "UNVERIFIED"
+    }
+  ],
+  "articles": [
+    {
+      "id": "eblr_vs_mclr",
+      "title": "EBLR vs MCLR: Why RBI Repo Rate Cuts Reach You Faster",
+      "summary": "Understand how External Benchmark Linked Rates (EBLR) pass through RBI repo changes every quarter compared to slower MCLR resets.",
+      "category": "LOANS_EMI",
+      "lastReviewed": "2026-11-20",
+      "tags": ["eblr", "mclr", "repo rate", "home loan", "rbi"],
+      "assetPath": "articles/eblr_vs_mclr.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "how_emi_is_calculated",
+      "title": "How EMI Is Calculated: Reducing Balance vs Flat Rate",
+      "summary": "Learn the monthly reducing-balance EMI formula, why early EMIs are interest-heavy, and why a 10% flat rate actually costs ~18%.",
+      "category": "LOANS_EMI",
+      "lastReviewed": "2026-11-20",
+      "tags": ["emi", "reducing balance", "flat rate", "apr", "kfs"],
+      "assetPath": "articles/how_emi_is_calculated.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "home_loan_ltv_and_costs",
+      "title": "Home Loan LTV Caps, Stamp Duty & Hidden Fees in India",
+      "summary": "Break down RBI's 75%–90% Loan-to-Value slabs, stamp duty, MODT charges, and ancillary processing fees before signing a home loan.",
+      "category": "LOANS_EMI",
+      "lastReviewed": "2026-11-18",
+      "tags": ["home loan", "ltv", "stamp duty", "modt", "processing fee"],
+      "assetPath": "articles/home_loan_ltv_and_costs.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "foir_and_loan_eligibility",
+      "title": "FOIR Explained: How Banks Decide Your Maximum Loan",
+      "summary": "How Indian lenders calculate Fixed Obligation to Income Ratio (40%–55%) and practical steps to boost eligibility without over-stretching.",
+      "category": "LOANS_EMI",
+      "lastReviewed": "2026-11-18",
+      "tags": ["foir", "eligibility", "affordability", "emi", "salary"],
+      "assetPath": "articles/foir_and_loan_eligibility.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "floating_vs_fixed_rate",
+      "title": "Floating vs Fixed Interest Rates: Which Suits Your Loan?",
+      "summary": "Compare floating EBLR loans, fixed-rate loans, and hybrid teaser rates across cost, reset risk, and prepayment penalties.",
+      "category": "LOANS_EMI",
+      "lastReviewed": "2026-11-15",
+      "tags": ["floating", "fixed", "interest rate", "hybrid", "home loan"],
+      "assetPath": "articles/floating_vs_fixed_rate.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "gold_car_education_loan_basics",
+      "title": "Gold, Vehicle & Education Loans: Key Rules Compared",
+      "summary": "Essential rules for gold loan 75% LTV and auction risk, EV car discounts, and education loan moratorium interest capitalization.",
+      "category": "LOANS_EMI",
+      "lastReviewed": "2026-11-15",
+      "tags": ["gold loan", "car loan", "education loan", "moratorium", "ltv"],
+      "assetPath": "articles/gold_car_education_loan_basics.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "prepayment_tenure_vs_emi",
+      "title": "Prepayment Strategy: Reduce Tenure vs Reduce EMI",
+      "summary": "See the real math behind why keeping your EMI unchanged after a lump-sum part-payment saves more than double the interest.",
+      "category": "PREPAYMENT",
+      "lastReviewed": "2026-11-22",
+      "tags": ["prepayment", "part payment", "tenure", "emi", "interest savings"],
+      "assetPath": "articles/prepayment_tenure_vs_emi.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "home_loan_balance_transfer_math",
+      "title": "Balance Transfer Math: Calculating True Break-Even Month",
+      "summary": "Factor in processing fee, 18% GST, MODT, and legal fees to verify if refinancing your home loan genuinely saves money.",
+      "category": "PREPAYMENT",
+      "lastReviewed": "2026-11-22",
+      "tags": ["balance transfer", "refinance", "break-even", "gst", "home loan"],
+      "assetPath": "articles/home_loan_balance_transfer_math.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "one_extra_emi_per_year",
+      "title": "The 1-Extra-EMI Rule: Cutting Years Off a 20-Year Loan",
+      "summary": "How paying one extra EMI each year or stepping up your EMI by 5% annually can shave 3 to 7+ years off a home loan.",
+      "category": "PREPAYMENT",
+      "lastReviewed": "2026-11-21",
+      "tags": ["extra emi", "step-up", "debt free", "prepayment", "overdraft"],
+      "assetPath": "articles/one_extra_emi_per_year.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "rbi_foreclosure_and_noc_rules",
+      "title": "RBI Foreclosure Rules, Zero Penalty & RC/Property NOC",
+      "summary": "Know your zero-penalty rights on floating loans, RBI's 30-day document return mandate (₹5,000/day penalty), and Form 35 RC update.",
+      "category": "PREPAYMENT",
+      "lastReviewed": "2026-11-21",
+      "tags": ["foreclosure", "noc", "form 35", "rbi", "closure"],
+      "assetPath": "articles/rbi_foreclosure_and_noc_rules.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "cibil_score_bands_explained",
+      "title": "CIBIL & Credit Score Bands: What 750+ Unlocks",
+      "summary": "Understand how 300–900 bureau bands affect interest spreads, how fortnightly reporting works, and your free annual credit report right.",
+      "category": "CREDIT_SCORE",
+      "lastReviewed": "2026-11-19",
+      "tags": ["cibil", "credit score", "experian", "interest spread", "rbi"],
+      "assetPath": "articles/cibil_score_bands_explained.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "five_factors_affecting_credit_score",
+      "title": "The 5 Factors That Drive Your Credit Score",
+      "summary": "Payment history, utilization, credit age, credit mix, and inquiries—plus why paying only the credit card minimum due hurts twice.",
+      "category": "CREDIT_SCORE",
+      "lastReviewed": "2026-11-19",
+      "tags": ["credit score", "dpd", "credit card", "minimum due", "history"],
+      "assetPath": "articles/five_factors_affecting_credit_score.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "credit_utilization_and_inquiries",
+      "title": "Credit Utilization Ratio & Hard Inquiries Explained",
+      "summary": "Why statement-date balances matter more than due-date payments, and how to avoid loan-aggregator hard inquiry spikes.",
+      "category": "CREDIT_SCORE",
+      "lastReviewed": "2026-11-17",
+      "tags": ["utilization", "hard inquiry", "soft inquiry", "credit card", "cibil"],
+      "assetPath": "articles/credit_utilization_and_inquiries.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "fixing_credit_report_errors",
+      "title": "How to Dispute Errors & Rebuild a Low Credit Score",
+      "summary": "Use RBI's 30-day dispute resolution compensation rule to clear wrong overdue flags and rebuild from below 680 with secured cards.",
+      "category": "CREDIT_SCORE",
+      "lastReviewed": "2026-11-17",
+      "tags": ["dispute", "settled", "rebuild score", "secured card", "rbi"],
+      "assetPath": "articles/fixing_credit_report_errors.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "new_vs_old_tax_regime",
+      "title": "New vs Old Tax Regime: Finding Your Break-Even Deductions",
+      "summary": "Compare India's default New Tax Regime against the Old Regime and identify the exact deduction level where Old Regime wins.",
+      "category": "TAX_SAVING",
+      "lastReviewed": "2026-11-24",
+      "tags": ["income tax", "new regime", "old regime", "87a rebate", "deductions"],
+      "assetPath": "articles/new_vs_old_tax_regime.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "home_loan_tax_benefits_24b_80c",
+      "title": "Home Loan Tax Benefits: Section 24(b), 80C & Joint Loans",
+      "summary": "Maximize self-occupied and let-out property interest deductions, understand the 5-year 80C lock-in, and double limits via joint ownership.",
+      "category": "TAX_SAVING",
+      "lastReviewed": "2026-11-24",
+      "tags": ["section 24b", "80c", "home loan tax", "joint loan", "old regime"],
+      "assetPath": "articles/home_loan_tax_benefits_24b_80c.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "hra_exemption_and_rent_receipts",
+      "title": "HRA Exemption Rules, Metro vs Non-Metro & Landlord PAN",
+      "summary": "Master the least-of-three HRA formula, landlord PAN rules above ₹1 Lakh rent, Section 194-IB TDS, and claiming HRA with home loans.",
+      "category": "TAX_SAVING",
+      "lastReviewed": "2026-11-23",
+      "tags": ["hra", "rent receipt", "landlord pan", "metro", "194-ib"],
+      "assetPath": "articles/hra_exemption_and_rent_receipts.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "education_loan_section_80e",
+      "title": "Education Loan Interest Deduction Under Section 80E",
+      "summary": "How to claim uncapped interest deduction for up to 8 years under Section 80E and save tax by paying simple interest during study.",
+      "category": "TAX_SAVING",
+      "lastReviewed": "2026-11-23",
+      "tags": ["80e", "education loan", "tax deduction", "moratorium", "old regime"],
+      "assetPath": "articles/education_loan_section_80e.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "advance_tax_and_tds_guide",
+      "title": "Advance Tax Due Dates, FD TDS Thresholds & Form 15G/15H",
+      "summary": "Avoid Sections 234B/234C interest with the 4 advance tax instalments, understand bank FD TDS limits, and use Form 15G/15H properly.",
+      "category": "TAX_SAVING",
+      "lastReviewed": "2026-11-23",
+      "tags": ["advance tax", "tds", "form 15g", "form 15h", "ais"],
+      "assetPath": "articles/advance_tax_and_tds_guide.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "sip_rupee_cost_averaging",
+      "title": "How SIP Works: Rupee Cost Averaging & Compounding",
+      "summary": "See with a worked NAV table why continuing monthly SIPs through market dips lowers unit cost and drives long-term wealth.",
+      "category": "MUTUAL_FUNDS_SIP",
+      "lastReviewed": "2026-11-21",
+      "tags": ["sip", "mutual fund", "rupee cost averaging", "compounding", "nav"],
+      "assetPath": "articles/sip_rupee_cost_averaging.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "step_up_sip_wealth_effect",
+      "title": "Step-Up SIP: Why a 10% Annual Hike Multiplies Corpus",
+      "summary": "Compare flat SIP vs 5% and 10% annual step-ups over 15 years and see how to align hikes with annual appraisals and inflation.",
+      "category": "MUTUAL_FUNDS_SIP",
+      "lastReviewed": "2026-11-21",
+      "tags": ["step-up sip", "inflation", "goal planning", "wealth", "sip"],
+      "assetPath": "articles/step_up_sip_wealth_effect.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "direct_vs_regular_mutual_funds",
+      "title": "Direct vs Regular Plans & Why Expense Ratios Matter",
+      "summary": "Understand how a 0.80% annual trail commission gap compounds into lakhs over 20 years and when to check your CAS statement.",
+      "category": "MUTUAL_FUNDS_SIP",
+      "lastReviewed": "2026-11-20",
+      "tags": ["direct plan", "regular plan", "expense ratio", "ter", "mutual fund"],
+      "assetPath": "articles/direct_vs_regular_mutual_funds.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "swp_retirement_income_strategy",
+      "title": "Systematic Withdrawal Plan (SWP) for Monthly Cash Flow",
+      "summary": "How SWP generates tax-efficient monthly retirement cash flow compared to FDs, plus the bucket approach to manage sequence risk.",
+      "category": "MUTUAL_FUNDS_SIP",
+      "lastReviewed": "2026-11-20",
+      "tags": ["swp", "retirement income", "bucket strategy", "mutual fund", "tax"],
+      "assetPath": "articles/swp_retirement_income_strategy.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "xirr_vs_cagr_and_mf_taxation",
+      "title": "XIRR vs CAGR & Mutual Fund Capital Gains Tax Rules",
+      "summary": "Why XIRR is essential for irregular SIP cash flows and how FIFO holding periods separate equity STCG, LTCG, and debt fund taxation.",
+      "category": "MUTUAL_FUNDS_SIP",
+      "lastReviewed": "2026-11-22",
+      "tags": ["xirr", "cagr", "ltcg", "stcg", "capital gains"],
+      "assetPath": "articles/xirr_vs_cagr_and_mf_taxation.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "fd_vs_rd_vs_debt_funds",
+      "title": "FD vs RD vs Debt Funds: Post-Tax Return Comparison",
+      "summary": "Compare quarterly compounding, annual accrual taxation vs redemption tax deferral, and PPF's EEE edge for 30%-slab investors.",
+      "category": "DEPOSITS_SCHEMES",
+      "lastReviewed": "2026-11-22",
+      "tags": ["fd", "rd", "debt fund", "ppf", "post-tax return"],
+      "assetPath": "articles/fd_vs_rd_vs_debt_funds.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "ppf_rules_and_extension_strategy",
+      "title": "PPF Complete Guide: 5th-of-Month Rule & 5-Year Extensions",
+      "summary": "Maximize sovereign EEE tax-free compounding by depositing before the 5th of the month and using 5-year post-maturity extensions.",
+      "category": "DEPOSITS_SCHEMES",
+      "lastReviewed": "2026-11-22",
+      "tags": ["ppf", "small savings", "5th of month", "extension", "eee"],
+      "assetPath": "articles/ppf_rules_and_extension_strategy.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "sukanya_samriddhi_and_scss_guide",
+      "title": "Sukanya Samriddhi (SSY) & Senior Citizens' Savings (SCSS)",
+      "summary": "Eligibility, ₹1.5L/₹30L caps, quarterly payouts, maturity timelines, and tax treatment of India's highest-rate sovereign schemes.",
+      "category": "DEPOSITS_SCHEMES",
+      "lastReviewed": "2026-11-22",
+      "tags": ["ssy", "sukanya samriddhi", "scss", "senior citizen", "post office"],
+      "assetPath": "articles/sukanya_samriddhi_and_scss_guide.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "fd_laddering_and_dicgc_safety",
+      "title": "FD Laddering & DICGC ₹5 Lakh Deposit Insurance Explained",
+      "summary": "Avoid premature withdrawal penalties with a 1–5 year FD ladder and stay safely within RBI DICGC's ₹5 Lakh per-bank insurance cap.",
+      "category": "DEPOSITS_SCHEMES",
+      "lastReviewed": "2026-11-20",
+      "tags": ["fd laddering", "dicgc", "bank safety", "fixed deposit", "liquidity"],
+      "assetPath": "articles/fd_laddering_and_dicgc_safety.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "term_life_insurance_checklist",
+      "title": "Pure Term Life Insurance: Choosing Cover & Tenure",
+      "summary": "Size your term cover (12x–15x income + loans), separate insurance from investment, and protect dependents via the MWP Act addendum.",
+      "category": "INSURANCE_PLANNING",
+      "lastReviewed": "2026-11-21",
+      "tags": ["term insurance", "life cover", "mwp act", "home loan", "protection"],
+      "assetPath": "articles/term_life_insurance_checklist.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "health_insurance_and_section_80d",
+      "title": "Family Floater Health Insurance, Super Top-Ups & 80D",
+      "summary": "Check room-rent sub-limits, co-pay clauses, waiting periods, super top-ups, and Section 80D deductions for self and senior parents.",
+      "category": "INSURANCE_PLANNING",
+      "lastReviewed": "2026-11-21",
+      "tags": ["health insurance", "super top-up", "80d", "room rent", "family floater"],
+      "assetPath": "articles/health_insurance_and_section_80d.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "emergency_fund_and_50_30_20_rule",
+      "title": "Emergency Fund & 50/30/20 Budget Blueprint",
+      "summary": "Build a 6–12 month liquid emergency buffer across sweep FDs and liquid funds while balancing needs, wants, and investments.",
+      "category": "INSURANCE_PLANNING",
+      "lastReviewed": "2026-11-20",
+      "tags": ["emergency fund", "50/30/20", "budget", "liquid fund", "cash flow"],
+      "assetPath": "articles/emergency_fund_and_50_30_20_rule.md",
+      "sourceName": "LoanJB Editorial"
+    },
+    {
+      "id": "nps_vs_epf_retirement_planning",
+      "title": "EPF, NPS & Inflation-Adjusted Retirement Planning",
+      "summary": "Understand how 6% inflation doubles expenses every 12 years and how EPF and NPS work together for long-term retirement security.",
+      "category": "INSURANCE_PLANNING",
+      "lastReviewed": "2026-11-24",
+      "tags": ["epf", "nps", "retirement", "inflation", "80ccd2"],
+      "assetPath": "articles/nps_vs_epf_retirement_planning.md",
+      "sourceName": "LoanJB Editorial"
+    }
+  ]
+}

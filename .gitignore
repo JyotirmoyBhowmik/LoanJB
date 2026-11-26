@@ -1,7 +1,10 @@
+# IDE & Gradle
 *.iml
-.gradle
-.kotlin
+.gradle/
+.kotlin/
+.build-outputs/
 /local.properties
+local.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -13,6 +16,31 @@
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+
+# Environment Variables, Secrets & API Keys (never commit real keys; keep .env.example)
 .env
-debug.keystore
+.env.*
+!.env.example
+secrets.properties
+local.defaults.properties
+*api_key*
+*apikey*
+*secret*.json
+service-account*.json
+
+# Keystores, Signing & Certificates (keep debug.keystore.base64 template if used by CI)
+*.jks
+*.keystore
+!debug.keystore.base64
+*.p12
+*.pfx
+*.pem
+*.key
+keystore.properties
+signing.properties
+
+# Local Room / User Exported Backups
+*.enc
+*.db
+*.db-shm
+*.db-wal

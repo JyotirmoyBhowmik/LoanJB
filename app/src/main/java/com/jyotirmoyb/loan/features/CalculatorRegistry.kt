@@ -22,8 +22,8 @@ enum class CalculatorSection(
     WEALTH_PLANNERS(
         title = "WEALTH & LIFE PLANNERS",
         tag = "FEATURED",
-        tagBgColor = Color(0xFFDDF6F2),
-        tagTextColor = Color(0xFF138D7B),
+        tagBgColor = Color(0xFFE3EFE2),
+        tagTextColor = Color(0xFF3E6A3E),
         iconKey = "featured"
     ),
     LOANS_EMI(
@@ -36,29 +36,29 @@ enum class CalculatorSection(
     BANK_DEPOSITS(
         title = "BANK DEPOSITS",
         tag = "DEPOSITS",
-        tagBgColor = Color(0xFFE0F2FE),
-        tagTextColor = Color(0xFF0369A1),
+        tagBgColor = Color(0xFFE3EFE2),
+        tagTextColor = Color(0xFF3E6A3E),
         iconKey = "deposits"
     ),
     MUTUAL_FUND(
         title = "MUTUAL FUND",
         tag = "WEALTH",
-        tagBgColor = Color(0xFFE0F7F4),
-        tagTextColor = Color(0xFF0F766E),
+        tagBgColor = Color(0xFFDDF6F2),
+        tagTextColor = Color(0xFF138D7B),
         iconKey = "mutual"
     ),
     TAXATION(
         title = "TAXATION",
         tag = "TAX",
-        tagBgColor = Color(0xFFFEF3C7),
+        tagBgColor = Color(0xFFFFF3E0),
         tagTextColor = Color(0xFFB45309),
         iconKey = "tax"
     ),
     RETIREMENT_PENSION(
         title = "RETIREMENT & PENSION",
         tag = "PENSION",
-        tagBgColor = Color(0xFFEDE9FE),
-        tagTextColor = Color(0xFF6D28D9),
+        tagBgColor = Color(0xFFE8ECF5),
+        tagTextColor = Color(0xFF1E2A4A),
         iconKey = "pension"
     )
 }
@@ -84,42 +84,42 @@ data class CalculatorModule(
 object CalculatorRegistry {
 
     val modules: List<CalculatorModule> = listOf(
-        // 1. WEALTH & LIFE PLANNERS (FEATURED)
+        // 1. WEALTH & LIFE PLANNERS (FEATURED) — Fully Active!
         CalculatorModule(
             id = "goal_planner",
             section = CalculatorSection.WEALTH_PLANNERS,
             title = "Goal Planner",
-            subtitle = "Target savings for dreams",
+            subtitle = "Multi-goal SIP & inflation",
             icon = "target",
-            route = AppRoute.ComingSoon.createRoute("goal_planner"),
-            enabled = false
+            route = AppRoute.GoalPlanner.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "retirement_plan",
             section = CalculatorSection.WEALTH_PLANNERS,
             title = "Retirement Plan",
-            subtitle = "Build pension & corpus",
+            subtitle = "Corpus, SIP & shortfall",
             icon = "umbrella",
-            route = AppRoute.ComingSoon.createRoute("retirement_plan"),
-            enabled = false
+            route = AppRoute.RetirementPlanner.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "financial_rules",
             section = CalculatorSection.WEALTH_PLANNERS,
             title = "Financial Rules",
-            subtitle = "50/30/20 & budget limits",
+            subtitle = "50/30/20, emergency & cover",
             icon = "sparkles",
-            route = AppRoute.ComingSoon.createRoute("financial_rules"),
-            enabled = false
+            route = AppRoute.FinancialRules.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "where_to_invest",
             section = CalculatorSection.WEALTH_PLANNERS,
             title = "Where to Invest",
-            subtitle = "Asset allocation guide",
+            subtitle = "Educational asset mix",
             icon = "lightbulb",
-            route = AppRoute.ComingSoon.createRoute("where_to_invest"),
-            enabled = false
+            route = AppRoute.WhereToInvest.route,
+            enabled = true
         ),
 
         // 2. LOANS & EMI (LOANS) — Fully Active!
@@ -137,32 +137,68 @@ object CalculatorRegistry {
             id = "loan_comparison",
             section = CalculatorSection.LOANS_EMI,
             title = "Loan Comparison",
-            subtitle = "Compare 2-3 bank offers",
+            subtitle = "Compare up to 3 offers",
             icon = "compare",
             route = AppRoute.LoanComparison.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "loan_eligibility",
+            section = CalculatorSection.LOANS_EMI,
+            title = "Eligibility & FOIR",
+            subtitle = "Max loan & reverse EMI",
+            icon = "eligibility",
+            route = AppRoute.LoanEligibility.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "balance_transfer",
+            section = CalculatorSection.LOANS_EMI,
+            title = "Balance Transfer",
+            subtitle = "Break-even & Top-Up",
+            icon = "balance_transfer",
+            route = AppRoute.BalanceTransfer.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "loan_tax_benefit",
+            section = CalculatorSection.LOANS_EMI,
+            title = "Loan Tax Benefit",
+            subtitle = "Old vs New Regime 24b/80E",
+            icon = "tax_benefit",
+            route = AppRoute.LoanTaxBenefit.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "part_payment_planner",
+            section = CalculatorSection.LOANS_EMI,
+            title = "Part-Payment Plan",
+            subtitle = "Target loan-free date",
+            icon = "part_payment",
+            route = AppRoute.PartPaymentPlanner.route,
             enabled = true
         ),
         CalculatorModule(
             id = "bank_staff_loan",
             section = CalculatorSection.LOANS_EMI,
             title = "Bank Staff Loan",
-            subtitle = "Subsidized staff presets",
+            subtitle = "Editable staff presets",
             badgeText = "EMI",
             icon = "staff",
             route = AppRoute.BankStaffLoan.route,
             enabled = true
         ),
 
-        // 3. BANK DEPOSITS (DEPOSITS)
+        // 3. BANK DEPOSITS (DEPOSITS) — Fully Active!
         CalculatorModule(
             id = "fixed_deposit",
             section = CalculatorSection.BANK_DEPOSITS,
             title = "Fixed Deposit",
-            subtitle = "Cumulative maturity value",
+            subtitle = "Cumulative, senior & TDS",
             badgeText = "FD",
             icon = "fd",
-            route = AppRoute.ComingSoon.createRoute("fixed_deposit"),
-            enabled = false
+            route = AppRoute.FixedDeposit.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "fd_interest_payout",
@@ -171,40 +207,48 @@ object CalculatorRegistry {
             subtitle = "Monthly & quarterly income",
             badgeText = "FD",
             icon = "fd",
-            route = AppRoute.ComingSoon.createRoute("fd_interest_payout"),
-            enabled = false
+            route = AppRoute.FdInterestPayout.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "recurring_deposit",
             section = CalculatorSection.BANK_DEPOSITS,
             title = "Recurring Deposit",
-            subtitle = "Monthly savings maturity",
+            subtitle = "Monthly savings & TDS",
             badgeText = "RD",
             icon = "rd",
-            route = AppRoute.ComingSoon.createRoute("recurring_deposit"),
-            enabled = false
+            route = AppRoute.RecurringDeposit.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "small_savings",
+            section = CalculatorSection.BANK_DEPOSITS,
+            title = "Small Savings",
+            subtitle = "PPF, SSY, NSC, SCSS, PO",
+            icon = "small_savings",
+            route = AppRoute.SmallSavings.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "deposit_comparison",
+            section = CalculatorSection.BANK_DEPOSITS,
+            title = "FD vs RD vs PPF",
+            subtitle = "Post-tax vs Debt Fund",
+            icon = "deposit_compare",
+            route = AppRoute.DepositComparison.route,
+            enabled = true
         ),
 
-        // 4. MUTUAL FUND (WEALTH)
+        // 4. MUTUAL FUND (WEALTH) — Fully Active!
         CalculatorModule(
             id = "sip",
             section = CalculatorSection.MUTUAL_FUND,
-            title = "Systematic Investment Plan",
-            subtitle = "Monthly mutual fund SIP",
+            title = "SIP Calculator",
+            subtitle = "Step-up & inflation-adj.",
             badgeText = "SIP",
             icon = "sip",
-            route = AppRoute.ComingSoon.createRoute("sip"),
-            enabled = false
-        ),
-        CalculatorModule(
-            id = "swp",
-            section = CalculatorSection.MUTUAL_FUND,
-            title = "Systematic Withdrawal Plan",
-            subtitle = "Regular corpus payout",
-            badgeText = "SWP",
-            icon = "swp",
-            route = AppRoute.ComingSoon.createRoute("swp"),
-            enabled = false
+            route = AppRoute.MfSip.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "lumpsum",
@@ -212,20 +256,59 @@ object CalculatorRegistry {
             title = "Lumpsum Calculator",
             subtitle = "One-time compounding",
             icon = "lumpsum",
-            route = AppRoute.ComingSoon.createRoute("lumpsum"),
-            enabled = false
+            route = AppRoute.MfLumpsum.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "swp",
+            section = CalculatorSection.MUTUAL_FUND,
+            title = "SWP Calculator",
+            subtitle = "Longevity & safe payout",
+            badgeText = "SWP",
+            icon = "swp",
+            route = AppRoute.MfSwp.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "mf_goal",
             section = CalculatorSection.MUTUAL_FUND,
             title = "Goal Calculator",
-            subtitle = "Reverse SIP for target",
+            subtitle = "Monthly SIP for target",
             icon = "target",
-            route = AppRoute.ComingSoon.createRoute("mf_goal"),
-            enabled = false
+            route = AppRoute.MfGoal.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "mf_xirr",
+            section = CalculatorSection.MUTUAL_FUND,
+            title = "XIRR Calculator",
+            subtitle = "Irregular dated flows",
+            badgeText = "XIRR",
+            icon = "xirr",
+            route = AppRoute.MfXirr.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "mf_tax_gains",
+            section = CalculatorSection.MUTUAL_FUND,
+            title = "MF Tax on Gains",
+            subtitle = "Equity vs Debt LTCG/STCG",
+            icon = "tax_benefit",
+            route = AppRoute.MfTaxGains.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "mf_live_nav",
+            section = CalculatorSection.MUTUAL_FUND,
+            title = "Live NAV & Funds",
+            subtitle = "AMFI search & favourites",
+            badgeText = "NAV",
+            icon = "live_nav",
+            route = AppRoute.MfLiveNav.route,
+            enabled = true
         ),
 
-        // 5. TAXATION (TAX)
+        // 5. TAXATION (TAX) — Fully Active!
         CalculatorModule(
             id = "income_tax",
             section = CalculatorSection.TAXATION,
@@ -233,8 +316,8 @@ object CalculatorRegistry {
             subtitle = "New vs Old regime slabs",
             badgeText = "IT",
             icon = "tax",
-            route = AppRoute.ComingSoon.createRoute("income_tax"),
-            enabled = false
+            route = AppRoute.IncomeTax.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "hra",
@@ -243,21 +326,31 @@ object CalculatorRegistry {
             subtitle = "Section 10(13A) exemption",
             badgeText = "HRA",
             icon = "hra",
-            route = AppRoute.ComingSoon.createRoute("hra"),
-            enabled = false
+            route = AppRoute.HraCalculator.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "gst",
             section = CalculatorSection.TAXATION,
             title = "GST Calculator",
-            subtitle = "Inclusive & exclusive GST",
+            subtitle = "CGST, SGST, IGST & reverse",
             badgeText = "GST",
             icon = "gst",
-            route = AppRoute.ComingSoon.createRoute("gst"),
-            enabled = false
+            route = AppRoute.GstCalculator.route,
+            enabled = true
+        ),
+        CalculatorModule(
+            id = "advance_tax_tds",
+            section = CalculatorSection.TAXATION,
+            title = "Advance Tax & TDS",
+            subtitle = "Due dates, FD/Salary TDS & CG",
+            badgeText = "TDS",
+            icon = "advance_tax",
+            route = AppRoute.AdvanceTaxTds.route,
+            enabled = true
         ),
 
-        // 6. RETIREMENT & PENSION (PENSION)
+        // 6. RETIREMENT & PENSION (PENSION) — Fully Active!
         CalculatorModule(
             id = "retirement_planner",
             section = CalculatorSection.RETIREMENT_PENSION,
@@ -265,55 +358,55 @@ object CalculatorRegistry {
             subtitle = "Inflation-adjusted corpus",
             badgeText = "RP",
             icon = "rp",
-            route = AppRoute.ComingSoon.createRoute("retirement_planner"),
-            enabled = false
+            route = AppRoute.RetirementPlanner.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "nps",
             section = CalculatorSection.RETIREMENT_PENSION,
             title = "National Pension Scheme",
-            subtitle = "80CCD(1B) & annuity split",
+            subtitle = "Annuity split & pension",
             badgeText = "NPS",
             icon = "nps",
-            route = AppRoute.ComingSoon.createRoute("nps"),
-            enabled = false
+            route = AppRoute.NpsCalculator.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "epf",
             section = CalculatorSection.RETIREMENT_PENSION,
             title = "Employees Provident Fund",
-            subtitle = "PF corpus at retirement",
+            subtitle = "PF corpus, ceiling & EPS",
             badgeText = "EPF",
             icon = "epf",
-            route = AppRoute.ComingSoon.createRoute("epf"),
-            enabled = false
+            route = AppRoute.EpfCalculator.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "apy",
             section = CalculatorSection.RETIREMENT_PENSION,
             title = "Atal Pension Yojana",
-            subtitle = "Guaranteed monthly pension",
+            subtitle = "Age & pension slab chart",
             icon = "pension",
-            route = AppRoute.ComingSoon.createRoute("apy"),
-            enabled = false
+            route = AppRoute.ApyCalculator.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "pmsym",
             section = CalculatorSection.RETIREMENT_PENSION,
             title = "PM Shram Yogi Maan-Dhan",
-            subtitle = "Unorganized worker pension",
+            subtitle = "1:1 Govt match & ₹3k pension",
             icon = "pension",
-            route = AppRoute.ComingSoon.createRoute("pmsym"),
-            enabled = false
+            route = AppRoute.PmsymCalculator.route,
+            enabled = true
         ),
         CalculatorModule(
             id = "pmvvy",
             section = CalculatorSection.RETIREMENT_PENSION,
-            title = "PM Vaya Vandhana",
-            subtitle = "Senior citizen pension plan",
+            title = "PMVVY & Senior Schemes",
+            subtitle = "Open/closed status & payout",
             icon = "pension",
-            route = AppRoute.ComingSoon.createRoute("pmvvy"),
-            enabled = false
+            route = AppRoute.PmvvyCalculator.route,
+            enabled = true
         )
     )
 

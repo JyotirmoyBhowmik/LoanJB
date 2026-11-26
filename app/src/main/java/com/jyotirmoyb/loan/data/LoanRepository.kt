@@ -1,10 +1,13 @@
 package com.jyotirmoyb.loan.data
 
 import android.content.Context
-import com.jyotirmoyb.loan.engine.CalculationInput
-import com.jyotirmoyb.loan.engine.CurrencyCode
-import com.jyotirmoyb.loan.engine.LoanCatalog
+import com.jyotirmoyb.loan.data.security.BackupCrypto
+import com.jyotirmoyb.loan.domain.CalculationInput
+import com.jyotirmoyb.loan.domain.CurrencyCode
+import com.jyotirmoyb.loan.domain.LoanCatalog
+import com.jyotirmoyb.loan.domain.RegionCode
 import com.jyotirmoyb.loan.ui.theme.AppThemeMode
+import com.jyotirmoyb.loan.widget.NextEmiWidgetUpdater
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -14,11 +17,16 @@ import kotlinx.coroutines.flow.map
 
 @JsonClass(generateAdapter = true)
 data class AppBackupPayload(
-    val version: Int = 1,
+    val version: Int = 2,
     val exportedAtMillis: Long = System.currentTimeMillis(),
+    val region: String = RegionCode.IN.name,
     val currency: String = CurrencyCode.INR.name,
     val themeMode: String = AppThemeMode.SYSTEM.name,
+    val languageCode: String = "en",
     val monthlyIncome: Double = 150000.0,
+    val preferredTaxRegime: String = "NEW",
+    val userAge: Int = 32,
+    val riskProfile: String = "MODERATE",
     val catalog: LoanCatalog,
     val savedLoans: List<SavedLoanEntity> = emptyList(),
     val compareScenarios: List<CompareScenarioEntity> = emptyList()
@@ -85,17 +93,37 @@ class LoanRepository(
         dao.clearCatalogOverride()
     }
 
-    suspend fun saveLoan(entity: SavedLoanEntity): Long = dao.insertSavedLoan(entity)
-    suspend fun updateLoan(entity: SavedLoanEntity) = dao.updateSavedLoan(entity)
-    suspend fun deleteLoan(id: Long) = dao.deleteSavedLoanById(id)
+    suspend fun saveLoan(entity: SavedLoanEntity): Long {
+        val id = dao.insertSavedLoan(entity)
+        NextEmiWidgetUpdater.refreshAll(context)
+        return id
+    }
+
+    suspend fun updateLoan(entity: SavedLoanEntity) {
+        dao.updateSavedLoan(entity)
+        NextEmiWidgetUpdater.refreshAll(context)
+    }
+
+    suspend fun deleteLoan(id: Long) {
+        dao.deleteSavedLoanById(id)
+        NextEmiWidgetUpdater.refreshAll(context)
+    }
 
     suspend fun saveCompareScenario(entity: CompareScenarioEntity): Long = dao.insertCompareScenario(entity)
     suspend fun deleteCompareScenario(id: Long) = dao.deleteCompareScenarioById(id)
 
+    suspend fun setRegion(region: RegionCode) = prefsRepo.setRegion(region)
     suspend fun setCurrency(currency: CurrencyCode) = prefsRepo.setCurrency(currency)
     suspend fun setThemeMode(mode: AppThemeMode) = prefsRepo.setThemeMode(mode)
+    suspend fun setLanguageCode(languageCode: String) = prefsRepo.setLanguageCode(languageCode)
     suspend fun setMonthlyIncome(income: Double) = prefsRepo.setMonthlyIncome(income)
+    suspend fun setPreferredTaxRegime(regime: String) = prefsRepo.setPreferredTaxRegime(regime)
+    suspend fun setUserAge(age: Int) = prefsRepo.setUserAge(age)
+    suspend fun setRiskProfile(profile: String) = prefsRepo.setRiskProfile(profile)
+    suspend fun setAppLockEnabled(enabled: Boolean) = prefsRepo.setAppLockEnabled(enabled)
+    suspend fun setFlagSecureEnabled(enabled: Boolean) = prefsRepo.setFlagSecureEnabled(enabled)
     suspend fun setOnboardingCompleted(completed: Boolean) = prefsRepo.setOnboardingCompleted(completed)
+    suspend fun setUseOnlineData(enabled: Boolean) = prefsRepo.setUseOnlineData(enabled)
 
     suspend fun createBackupJson(): String {
         val prefs = prefsRepo.preferencesFlow.first()
@@ -103,9 +131,15 @@ class LoanRepository(
         val loans = dao.getAllSavedLoansOnce()
         val scenarios = dao.getAllCompareScenariosOnce()
         val payload = AppBackupPayload(
+            version = 2,
+            region = prefs.region.name,
             currency = prefs.currency.name,
             themeMode = prefs.themeMode.name,
+            languageCode = prefs.languageCode,
             monthlyIncome = prefs.monthlyIncome,
+            preferredTaxRegime = prefs.preferredTaxRegime,
+            userAge = prefs.userAge,
+            riskProfile = prefs.riskProfile,
             catalog = catalog,
             savedLoans = loans,
             compareScenarios = scenarios
@@ -113,13 +147,32 @@ class LoanRepository(
         return backupAdapter.toJson(payload)
     }
 
-    suspend fun restoreFromBackupJson(rawJson: String): Result<String> {
-        val payload = runCatching { backupAdapter.fromJson(rawJson) }.getOrNull()
+    suspend fun createEncryptedBackupJson(password: String): Result<String> {
+        val plain = createBackupJson()
+        return BackupCrypto.encryptJson(plain, password)
+    }
+
+    suspend fun restoreFromBackupJson(rawJson: String, password: String? = null): Result<String> {
+        val plainJson = if (BackupCrypto.isEncryptedEnvelope(rawJson)) {
+            val pwd = password ?: return Result.failure(
+                IllegalArgumentException("This backup is encrypted. Please enter your backup password.")
+            )
+            BackupCrypto.decryptJson(rawJson, pwd).getOrElse { return Result.failure(it) }
+        } else {
+            rawJson
+        }
+
+        val payload = runCatching { backupAdapter.fromJson(plainJson) }.getOrNull()
             ?: return Result.failure(IllegalArgumentException("Could not parse backup JSON file."))
 
+        runCatching { RegionCode.valueOf(payload.region) }.getOrNull()?.let { prefsRepo.setRegion(it) }
         runCatching { CurrencyCode.valueOf(payload.currency) }.getOrNull()?.let { prefsRepo.setCurrency(it) }
         runCatching { AppThemeMode.valueOf(payload.themeMode) }.getOrNull()?.let { prefsRepo.setThemeMode(it) }
+        prefsRepo.setLanguageCode(payload.languageCode)
         prefsRepo.setMonthlyIncome(payload.monthlyIncome)
+        prefsRepo.setPreferredTaxRegime(payload.preferredTaxRegime)
+        prefsRepo.setUserAge(payload.userAge)
+        prefsRepo.setRiskProfile(payload.riskProfile)
 
         if (payload.catalog.categories.isNotEmpty()) {
             saveCatalog(payload.catalog)
@@ -130,6 +183,7 @@ class LoanRepository(
         dao.clearAllCompareScenarios()
         payload.compareScenarios.forEach { dao.insertCompareScenario(it.copy(id = 0)) }
 
+        NextEmiWidgetUpdater.refreshAll(context)
         return Result.success("Restored ${payload.savedLoans.size} loans & ${payload.compareScenarios.size} scenarios.")
     }
 
@@ -138,5 +192,6 @@ class LoanRepository(
         dao.clearAllCompareScenarios()
         dao.clearCatalogOverride()
         prefsRepo.resetPreferences()
+        NextEmiWidgetUpdater.refreshAll(context)
     }
 }

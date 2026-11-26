@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LoanJB</string>
     <string name="app_bar_title">EMI Calculator</string>
-    <string name="app_bar_subtitle">Powered by LoanJB</string>
+    <string name="app_bar_subtitle">India Offline Loan Planner</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_calculator">Calculator</string>
@@ -13,6 +13,7 @@
     <string name="nav_my_loans">Saved Loans</string>
     <string name="nav_compare">Compare</string>
     <string name="nav_settings">Settings</string>
+    <string name="nav_data_rates">Data &amp; Rates</string>
 
     <!-- Onboarding -->
     <string name="onboarding_title_1">Know Your EMI, Own Your Plan</string>
@@ -38,6 +39,29 @@
     <string name="hub_no_results">No matching calculators found.</string>
     <string name="hub_clear_search">Clear Search</string>
 
+    <!-- Data & Rates / Source Chips -->
+    <string name="data_rates_title">Data &amp; Rates</string>
+    <string name="data_rates_subtitle">Manage India benchmarks, slabs &amp; manual overrides</string>
+    <string name="source_manual">Manual</string>
+    <string name="source_online">Online</string>
+    <string name="source_built_in">Built-in</string>
+    <string name="badge_unverified">UNVERIFIED</string>
+    <string name="as_of_date">As of %1$s</string>
+    <string name="reset_to_default">Reset to default</string>
+    <string name="reset_all_overrides">Reset all overrides</string>
+    <string name="use_online_data">Use online data</string>
+    <string name="use_online_data_sub">Fetch updated India rates &amp; slabs over HTTPS when online</string>
+    <string name="refresh_now">Refresh now</string>
+    <string name="syncing_now">Syncing…</string>
+    <string name="last_sync_label">Last sync</string>
+    <string name="last_sync_never">Not synced yet (using built-in seed)</string>
+    <string name="export_overrides">Export overrides</string>
+    <string name="import_overrides">Import overrides</string>
+    <string name="edit_value">Edit value</string>
+    <string name="save_override">Save override</string>
+    <string name="cancel">Cancel</string>
+    <string name="region_label">Region &amp; Number Format</string>
+
     <!-- EMI Calculator -->
     <string name="emi_screen_title">Loan (EMI)</string>
     <string name="emi_loan_type_label">Loan Category</string>
@@ -47,29 +71,42 @@
     <string name="emi_tenure_year">Year</string>
     <string name="emi_tenure_month">Month</string>
     <string name="emi_start_date_label">Loan Start Date</string>
+    <string name="emi_day_of_month_label">EMI Date of Month</string>
+    <string name="emi_pro_rata_label">Pro-rata first-month interest</string>
+    <string name="emi_pro_rata_sub">Add broken-period daily interest before 1st EMI</string>
     <string name="emi_today">Today</string>
     <string name="emi_change">Change</string>
     <string name="emi_advance_settings">Advance Settings</string>
     <string name="emi_calculate_cta">Calculate EMI &amp; Schedule</string>
     <string name="emi_type_row">EMI Type</string>
     <string name="emi_processing_fee_row">Processing Fee</string>
+    <string name="emi_gst_on_fees_label">Add GST on fees</string>
     <string name="emi_prepayment_row">Prepayment / Part Payment</string>
     <string name="emi_moratorium_row">Moratorium Period</string>
     <string name="emi_ltv_row">Asset Value &amp; LTV</string>
     <string name="emi_insurance_row">Loan Protection Insurance</string>
-    <string name="emi_rate_timeline_row">Floating Rate Timeline</string>
+    <string name="emi_rate_timeline_row">Floating Rate Timeline (Repo / MCLR)</string>
     <string name="emi_offset_row">Offset / Overdraft Balance</string>
     <string name="emi_tranche_row">Tranche + Pre-EMI Schedule</string>
+    <string name="emi_pmay_row">PMAY-style Interest Subsidy</string>
     <string name="emi_bt_row">Balance Transfer Evaluator</string>
     <string name="emi_topup_row">Top-Up Blended EMI</string>
+    <string name="emi_repo_scenario_label">One-tap Repo Cut / Hike</string>
+    <string name="emi_gold_auction_alert">Auction-Risk Alert: Gold LTV crossed safe threshold</string>
+    <string name="emi_vehicle_checklist_title">Hypothecation Release Checklist (RTO)</string>
+    <string name="emi_tax_benefit_title">India Tax Benefit Estimate (Old Regime)</string>
+    <string name="emi_total_saved_banner">Total Saved with Prepayments</string>
 
     <!-- Results -->
     <string name="results_tab_yearly">Yearly</string>
     <string name="results_tab_monthly">Monthly</string>
     <string name="results_tab_graph">Graph</string>
+    <string name="results_monthly_emi">MONTHLY EMI</string>
     <string name="results_principal">PRINCIPAL</string>
     <string name="results_total_interest">TOTAL INTEREST</string>
-    <string name="results_total_payment">TOTAL PAYMENT</string>
+    <string name="results_total_payment">TOTAL PAYABLE</string>
+    <string name="results_interest_ratio">INTEREST / PRINCIPAL</string>
+    <string name="results_loan_free_date">LOAN-FREE DATE</string>
     <string name="results_col_month">MONTH</string>
     <string name="results_col_principal">PRINCIPAL PAID</string>
     <string name="results_col_interest">INTEREST PAID</string>
@@ -102,6 +139,463 @@
     <string name="cd_back">Navigate back</string>
     <string name="cd_close">Close</string>
 
-    <!-- Disclaimer -->
-    <string name="disclaimer_text">Estimates only. Actual bank terms, rates and rules (including Indian RBI guidelines) may differ.</string>
+    <!-- Loans Suite Tools -->
+    <string name="compare_title">Loan Comparison</string>
+    <string name="compare_subtitle">Compare up to 3 offers side by side</string>
+    <string name="compare_cheapest_badge">CHEAPEST</string>
+    <string name="compare_seed_saved">From Saved Loan</string>
+    <string name="compare_seed_catalog">From Catalog</string>
+    <string name="compare_share_image">Share Image</string>
+    <string name="compare_share_pdf">Share PDF</string>
+    <string name="compare_bar_chart_title">Total Cost Breakdown</string>
+    <string name="compare_line_chart_title">Balance Payoff Curve</string>
+    <string name="compare_metric_emi">Monthly EMI</string>
+    <string name="compare_metric_interest">Total Interest</string>
+    <string name="compare_metric_fees_gst">Fees + GST</string>
+    <string name="compare_metric_total_cost">Total Cost (incl. GST)</string>
+    <string name="compare_metric_tenure">Tenure</string>
+    <string name="compare_metric_loan_free">Loan-Free Date</string>
+    <string name="compare_empty_title">Compare up to 3 loan offers</string>
+    <string name="compare_empty_body">Seed offers from your Saved Loans, pick a Catalog variant, or load quick Indian bank presets.</string>
+    <string name="compare_select_saved_title">Seed From Saved Loan</string>
+    <string name="compare_select_catalog_title">Seed From Catalog Variant</string>
+    <string name="compare_no_saved_loans">No saved loans yet. Save one from the EMI Calculator first.</string>
+
+    <string name="eligibility_title">Eligibility &amp; Affordability</string>
+    <string name="eligibility_subtitle">FOIR, CIBIL &amp; reverse EMI budget check</string>
+    <string name="eligibility_mode_forward">Check Eligibility</string>
+    <string name="eligibility_mode_reverse">Reverse EMI Budget</string>
+    <string name="eligibility_monthly_income">Monthly Net Income</string>
+    <string name="eligibility_existing_emis">Existing Monthly EMIs</string>
+    <string name="eligibility_age">Current Age (yrs)</string>
+    <string name="eligibility_retirement_age">Retirement Age (yrs)</string>
+    <string name="eligibility_rate">Interest Rate (%)</string>
+    <string name="eligibility_tenure_years">Desired Tenure (yrs)</string>
+    <string name="eligibility_foir_label">FOIR Limit (%)</string>
+    <string name="eligibility_cibil_label">CIBIL Score Band</string>
+    <string name="eligibility_reverse_prompt">I can pay per month</string>
+    <string name="eligibility_max_loan">MAX ELIGIBLE LOAN</string>
+    <string name="eligibility_max_emi">MAX NEW EMI</string>
+    <string name="eligibility_meter_title">Affordability Meter</string>
+    <string name="eligibility_zone_comfortable">Comfortable</string>
+    <string name="eligibility_zone_stretch">Stretch</string>
+    <string name="eligibility_zone_risky">Risky</string>
+
+    <string name="bt_title">Balance Transfer &amp; Top-Up</string>
+    <string name="bt_subtitle">Break-even month &amp; net switching savings</string>
+    <string name="bt_current_loan_section">Current Loan</string>
+    <string name="bt_new_offer_section">New Bank Offer &amp; Costs</string>
+    <string name="bt_outstanding">Current Outstanding</string>
+    <string name="bt_current_rate">Current Rate (%)</string>
+    <string name="bt_remaining_months">Remaining Months</string>
+    <string name="bt_new_rate">New Bank Rate (%)</string>
+    <string name="bt_proc_fee_pct">Processing Fee (%)</string>
+    <string name="bt_proc_fee_flat">Flat Fee</string>
+    <string name="bt_gst_toggle">Apply GST on Fees</string>
+    <string name="bt_legal_charges">Legal &amp; Valuation Charges</string>
+    <string name="bt_foreclosure_pct">Foreclosure Fee (%)</string>
+    <string name="bt_topup_toggle">Add Top-Up Loan</string>
+    <string name="bt_topup_amount">Top-Up Amount</string>
+    <string name="bt_topup_rate">Top-Up Rate (%)</string>
+    <string name="bt_topup_tenure">Top-Up Tenure (mos)</string>
+    <string name="bt_net_savings">NET LIFETIME SAVINGS</string>
+    <string name="bt_breakeven">BREAK-EVEN MONTH</string>
+    <string name="bt_monthly_savings">Monthly EMI Saved</string>
+    <string name="bt_switching_cost">Total Switching Cost</string>
+    <string name="bt_blended_emi">Blended EMI (with Top-Up)</string>
+
+    <string name="tax_title">Loan Tax Benefit</string>
+    <string name="tax_subtitle">Old vs New Regime • Data-driven slabs</string>
+    <string name="tax_income_section">Income &amp; Loan Deductions</string>
+    <string name="tax_gross_income">Gross Annual Income</string>
+    <string name="tax_salaried_toggle">Salaried (Standard Deduction)</string>
+    <string name="tax_occupancy_self">Self-Occupied</string>
+    <string name="tax_occupancy_letout">Let-Out Property</string>
+    <string name="tax_home_interest">Annual Home Loan Interest (Sec 24b)</string>
+    <string name="tax_rental_income">Annual Rental Income</string>
+    <string name="tax_home_principal">Annual Home Loan Principal (Sec 80C)</string>
+    <string name="tax_other_80c">Other 80C Investments (EPF/PPF/ELSS)</string>
+    <string name="tax_edu_interest">Education Loan Interest (Sec 80E)</string>
+    <string name="tax_old_regime">Old Regime</string>
+    <string name="tax_new_regime">New Regime</string>
+    <string name="tax_saved_label">Tax Saved by Loans</string>
+    <string name="tax_before_loans">Tax Before Loans</string>
+    <string name="tax_after_loans">Tax After Loans</string>
+    <string name="tax_caps_section">Data-Driven Caps &amp; Slabs</string>
+
+    <string name="partpay_title">Part-Payment Planner</string>
+    <string name="partpay_subtitle">Target your loan-free date</string>
+    <string name="partpay_inputs_section">Current Loan &amp; Target Date</string>
+    <string name="partpay_target_date_label">Target Loan-Free Date</string>
+    <string name="partpay_extra_monthly">EXTRA MONTHLY NEEDED</string>
+    <string name="partpay_new_outlay">Total Monthly Outlay</string>
+    <string name="partpay_interest_saved">Total Interest Saved</string>
+    <string name="partpay_months_saved">Tenure Shaved Off</string>
+    <string name="partpay_curve_title">Baseline vs Accelerated Payoff</string>
+
+    <string name="bank_staff_edit_templates">Edit Templates</string>
+    <string name="bank_staff_template_editor_title">Edit Staff Loan Templates</string>
+    <string name="bank_staff_template_editor_sub">Customize preset rates, default amounts, and tenures. Stored locally as manual overrides.</string>
+    <string name="bank_staff_save_template">Save Template</string>
+
+    <!-- Bank Deposits Suite -->
+    <string name="fd_title">Fixed Deposit</string>
+    <string name="fd_payout_title">FD Interest Payout</string>
+    <string name="fd_mode_cumulative">Cumulative</string>
+    <string name="fd_mode_payout">Interest Payout</string>
+    <string name="fd_deposit_amount">Deposit Amount</string>
+    <string name="fd_interest_rate">Annual Interest Rate (%)</string>
+    <string name="fd_senior_citizen">Senior Citizen (+%1$s%% extra)</string>
+    <string name="fd_senior_desc">Extra rate bonus &amp; higher TDS exemption limit</string>
+    <string name="fd_compounding_label">Compounding Frequency</string>
+    <string name="fd_payout_freq_label">Payout Frequency</string>
+    <string name="fd_tenure_label">Deposit Tenure</string>
+    <string name="fd_tenure_months">Tenure (Months)</string>
+    <string name="fd_maturity_amount">MATURITY AMOUNT</string>
+    <string name="fd_periodic_payout">PERIODIC INTEREST PAYOUT</string>
+    <string name="fd_total_payouts">Total Interest Received (%1$d payouts)</string>
+    <string name="fd_total_interest">Total Interest</string>
+    <string name="fd_post_tax_maturity">Post-Tax Value</string>
+    <string name="fd_pre_tax_yield">Pre-Tax Yield</string>
+    <string name="fd_post_tax_yield">Post-Tax Yield</string>
+    <string name="fd_maturity_date">Maturity Date</string>
+    <string name="fd_tds_section">TDS &amp; Post-Tax Estimate</string>
+    <string name="fd_pan_toggle">PAN Linked (Sec 194A / 206AA)</string>
+    <string name="fd_pan_yes">PAN Available — %1$s%% TDS above limit</string>
+    <string name="fd_pan_no">No PAN — %1$s%% TDS above limit</string>
+    <string name="fd_tax_slab_label">Your Income Tax Slab</string>
+    <string name="fd_tds_threshold_label">FY TDS Exemption Limit</string>
+    <string name="fd_estimated_tds">Estimated TDS Deducted</string>
+    <string name="fd_total_slab_tax">Estimated Slab Tax (incl. Cess)</string>
+    <string name="fd_yearwise_title">Year-Wise Breakdown</string>
+    <string name="fd_col_fy">FY</string>
+    <string name="fd_col_opening">Opening</string>
+    <string name="fd_col_interest">Interest</string>
+    <string name="fd_col_tds">TDS</string>
+    <string name="fd_col_closing">Closing</string>
+    <string name="fd_col_deposit">Deposit</string>
+
+    <string name="rd_title">Recurring Deposit</string>
+    <string name="rd_monthly_deposit">Monthly Instalment</string>
+    <string name="rd_compounding_note">Quarterly compounding (Indian IBA standard)</string>
+    <string name="rd_total_deposited">Total Deposited</string>
+    <string name="rd_effective_yield">Effective Annual Rate</string>
+
+    <string name="ss_title">Small Savings Schemes</string>
+    <string name="ss_quarterly_note">Rates change quarterly — Government-notified small savings interest rates are reviewed every quarter by the Ministry of Finance.</string>
+    <string name="ss_as_of_quarter">Notified %1$s</string>
+    <string name="ss_yearly_deposit">Yearly Deposit</string>
+    <string name="ss_monthly_deposit">Monthly Deposit</string>
+    <string name="ss_lumpsum_deposit">Lump-Sum Deposit</string>
+    <string name="ss_ppf_extension">5-Year Extension Blocks</string>
+    <string name="ss_ppf_contribute_ext">Continue contributing during extension</string>
+    <string name="ss_pomis_single">Single Account</string>
+    <string name="ss_pomis_joint">Joint Account</string>
+    <string name="ss_potd_tenure">Time Deposit Tenure</string>
+    <string name="ss_rate_override_label">Scheme Rate (% p.a.)</string>
+    <string name="ss_total_invested">Total Invested</string>
+
+    <string name="dep_cmp_title">FD vs RD vs PPF vs Debt</string>
+    <string name="dep_cmp_subtitle">Post-tax return comparison for your slab</string>
+    <string name="dep_cmp_monthly_label">Monthly Investment</string>
+    <string name="dep_cmp_horizon_label">Investment Horizon</string>
+    <string name="dep_cmp_rates_section">Assumed Annual Returns (Editable)</string>
+    <string name="dep_cmp_winner_badge">HIGHEST POST-TAX YIELD</string>
+    <string name="dep_cmp_extra_vs_fd">Extra post-tax gain vs FD</string>
+    <string name="dep_cmp_pre_tax">Pre-Tax</string>
+    <string name="dep_cmp_tax_paid">Est. Tax</string>
+    <string name="dep_cmp_post_tax">Post-Tax Value</string>
+    <string name="dep_cmp_post_tax_yield">Post-Tax Yield</string>
+
+    <!-- Mutual Fund Suite -->
+    <string name="mf_market_risk_note">Returns are not guaranteed, past performance does not indicate future results; mutual fund investments are subject to market risks.</string>
+    <string name="mf_sip_title">SIP Calculator</string>
+    <string name="mf_lumpsum_title">Lumpsum Calculator</string>
+    <string name="mf_swp_title">SWP Calculator</string>
+    <string name="mf_goal_title">Goal Calculator</string>
+    <string name="mf_xirr_title">XIRR Calculator</string>
+    <string name="mf_tax_title">MF Tax on Gains</string>
+    <string name="mf_nav_title">Live NAV &amp; Funds</string>
+
+    <string name="mf_monthly_sip">Monthly SIP</string>
+    <string name="mf_expected_return">Expected Annual Return (%)</string>
+    <string name="mf_horizon_years">Investment Horizon (Years)</string>
+    <string name="mf_annual_step_up">Annual Step-Up (%)</string>
+    <string name="mf_inflation_rate">Expected Inflation (%)</string>
+    <string name="mf_projected_value">PROJECTED CORPUS</string>
+    <string name="mf_total_invested">Total Invested</string>
+    <string name="mf_est_returns">Est. Gains</string>
+    <string name="mf_inflation_adjusted">Today\'s Value (Inflation-Adj.)</string>
+    <string name="mf_growth_chart_title">Invested vs Wealth Growth</string>
+    <string name="mf_yearwise_title">Year-Wise Wealth Schedule</string>
+    <string name="mf_lumpsum_amount">One-Time Investment</string>
+
+    <string name="mf_swp_corpus">Initial Corpus</string>
+    <string name="mf_swp_withdrawal">Monthly Withdrawal</string>
+    <string name="mf_swp_stepup">Annual Withdrawal Increase (%)</string>
+    <string name="mf_swp_total_withdrawn">Total Withdrawn</string>
+    <string name="mf_swp_final_balance">Remaining Corpus</string>
+    <string name="mf_swp_sustainable">Sustainable Monthly Payout (%1$d yrs)</string>
+    <string name="mf_swp_perpetuity">Corpus-Preserving Monthly Payout</string>
+
+    <string name="mf_goal_target">Target Corpus (Today\'s Value)</string>
+    <string name="mf_goal_adjust_inflation">Adjust target for inflation</string>
+    <string name="mf_goal_required_sip">REQUIRED MONTHLY SIP</string>
+    <string name="mf_goal_future_target">Inflation-Adjusted Target</string>
+
+    <string name="mf_xirr_annualized">ANNUALIZED XIRR</string>
+    <string name="mf_xirr_add_row">Add Cash Flow</string>
+    <string name="mf_xirr_bulk_paste">Bulk Paste</string>
+    <string name="mf_xirr_load_sample">Load Sample</string>
+    <string name="mf_xirr_date_hint">Date (YYYY-MM-DD)</string>
+    <string name="mf_xirr_amount_hint">Amount (-outflow / +inflow)</string>
+    <string name="mf_xirr_paste_hint">One per line: YYYY-MM-DD, amount (negative for SIP/buy, positive for redemption/current value)</string>
+    <string name="mf_xirr_net_profit">Net Profit / Loss</string>
+    <string name="mf_xirr_abs_return">Absolute Return</string>
+
+    <string name="mf_tax_invested">Purchase / Invested Value</string>
+    <string name="mf_tax_redemption">Redemption / Current Value</string>
+    <string name="mf_tax_holding_months">Holding Period (Months)</string>
+    <string name="mf_tax_total_gain">Total Capital Gain</string>
+    <string name="mf_tax_exemption">LTCG Exemption Applied</string>
+    <string name="mf_tax_taxable_gain">Taxable Gain</string>
+    <string name="mf_tax_estimated_tax">ESTIMATED CAPITAL GAINS TAX</string>
+    <string name="mf_tax_post_tax_proceeds">Net Post-Tax Proceeds</string>
+
+    <string name="mf_nav_search_hint">Search scheme name, AMC, code or ISIN</string>
+    <string name="mf_nav_sync_now">Sync AMFI NAV</string>
+    <string name="mf_nav_syncing">Streaming AMFI NAVAll.txt…</string>
+    <string name="mf_nav_tab_all">All Schemes</string>
+    <string name="mf_nav_tab_favs">Favourites</string>
+    <string name="mf_nav_empty_title">No cached AMFI schemes yet</string>
+    <string name="mf_nav_empty_sub">Tap Sync AMFI NAV when online to stream and cache official AMFI daily NAVs on your device for offline search.</string>
+    <string name="mf_nav_calc_cta">Calculate SIP with this fund</string>
+    <string name="mf_nav_cagr_label">Historical / Expected CAGR (% p.a.)</string>
+
+    <!-- Taxation Suite (India) -->
+    <string name="tax_suite_income_title">Income Tax Calculator</string>
+    <string name="tax_suite_hra_title">HRA Exemption</string>
+    <string name="tax_suite_gst_title">GST Calculator</string>
+    <string name="tax_suite_advance_title">Advance Tax &amp; TDS</string>
+
+    <string name="tax_select_fy">Financial Year</string>
+    <string name="tax_age_group">Taxpayer Age</string>
+    <string name="tax_salaried_label">Salaried / Pensioner</string>
+    <string name="tax_salaried_hint">Auto-applies Standard Deduction per regime</string>
+    <string name="tax_gross_salary">Annual Gross Salary (₹)</string>
+    <string name="tax_other_income">Other Income — FD, Rent, Interest (₹)</string>
+    <string name="tax_deductions_title">Deductions &amp; Exemptions (Data-Driven)</string>
+    <string name="tax_filter_all">All Applicable</string>
+    <string name="tax_filter_new">New Regime Only</string>
+    <string name="tax_filter_old">Old Regime Only</string>
+    <string name="tax_parents_senior">Parents are Senior Citizens (60+)</string>
+    <string name="tax_better_regime_label">BETTER REGIME FOR %1$s</string>
+    <string name="tax_saves_per_year">Saves %1$s / yr (%2$s / mo)</string>
+    <string name="tax_payable">Tax Payable</string>
+    <string name="tax_monthly_tds">Est. Monthly TDS</string>
+    <string name="tax_taxable_income">Taxable Income</string>
+    <string name="tax_slab_tax">Slab Tax</string>
+    <string name="tax_rebate_87a">Sec 87A Rebate</string>
+    <string name="tax_marginal_relief">Marginal Relief</string>
+    <string name="tax_surcharge">Surcharge</string>
+    <string name="tax_cess">Health &amp; Ed. Cess</string>
+    <string name="tax_why_title">Why This Regime Wins</string>
+    <string name="tax_slab_breakdown_title">Slab-by-Slab Breakdown</string>
+    <string name="tax_rules_footer_title">Tax Rules Metadata</string>
+    <string name="tax_rules_as_of">Tax rules as of %1$s (published %2$s) • Source: %3$s • Last verified: %4$s</string>
+    <string name="tax_check_updates_btn">Check for updated tax rules</string>
+    <string name="tax_checking_updates">Checking remote tax rules…</string>
+
+    <string name="hra_basic_da">Basic Salary + DA (₹)</string>
+    <string name="hra_received">HRA Received (₹)</string>
+    <string name="hra_rent_paid">Actual Rent Paid (₹)</string>
+    <string name="hra_input_annual">Annual</string>
+    <string name="hra_input_monthly">Monthly</string>
+    <string name="hra_city_metro">Metro City (%1$d%%)</string>
+    <string name="hra_city_non_metro">Non-Metro (%1$d%%)</string>
+    <string name="hra_exempt_hero">EXEMPT HRA (ANNUAL)</string>
+    <string name="hra_taxable_label">Taxable HRA</string>
+    <string name="hra_three_rules_title">Least of Three Rules (Sec 10(13A))</string>
+    <string name="hra_least_badge">LEAST (APPLIED)</string>
+    <string name="hra_rent_receipt_title">Rent Receipts &amp; Landlord PAN Note</string>
+    <string name="hra_rent_receipt_note">Retain signed monthly rent receipts and your rental agreement for employer/ITR verification. If annual rent exceeds ₹1,00,000 (₹8,333/month), quoting your landlord\'s PAN is mandatory. HRA exemption is available under the Old Tax Regime only.</string>
+    <string name="hra_landlord_pan_required">Annual rent exceeds ₹1,00,000 — Landlord PAN is mandatory.</string>
+
+    <string name="gst_amount_label">Amount (₹)</string>
+    <string name="gst_slab_label">GST Slab (from taxslabs.json)</string>
+    <string name="gst_custom_rate">Custom GST Rate (%)</string>
+    <string name="gst_base_amount">Base Amount (Excl. GST)</string>
+    <string name="gst_total_gst">Total GST</string>
+    <string name="gst_gross_amount">Final Amount (Incl. GST)</string>
+    <string name="gst_cgst_label">CGST (%1$s%%)</string>
+    <string name="gst_sgst_label">SGST (%1$s%%)</string>
+    <string name="gst_igst_label">IGST (%1$s%%)</string>
+
+    <string name="adv_tab_advance">Advance Tax</string>
+    <string name="adv_tab_tds">TDS Helper</string>
+    <string name="adv_tab_cg">Capital Gains</string>
+    <string name="adv_est_annual_tax">Estimated Annual Tax Liability (₹)</string>
+    <string name="adv_tds_deducted">TDS / TCS Already Deducted (₹)</string>
+    <string name="adv_presumptive_toggle">Presumptive Tax (Sec 44AD / 44ADA)</string>
+    <string name="adv_presumptive_hint">Single 100% instalment due by 15 Mar</string>
+    <string name="adv_senior_exempt_toggle">Resident Senior (60+) with No Business Income</string>
+    <string name="adv_senior_exempt_hint">Exempt from Advance Tax under Sec 207</string>
+    <string name="adv_net_payable">NET ADVANCE TAX PAYABLE</string>
+    <string name="adv_schedule_title">Statutory Instalment Schedule (Sec 211)</string>
+    <string name="tds_fd_section_title">FD Interest TDS Helper (Sec 194A)</string>
+    <string name="tds_fd_annual_interest">Annual Bank FD Interest (₹)</string>
+    <string name="tds_salary_section_title">Salary Monthly TDS Helper (Sec 192)</string>
+    <string name="tds_remaining_months">Remaining Months in FY</string>
+    <string name="tds_open_income_tax">Compute exact tax in Income Tax Calculator</string>
+    <string name="cg_helper_title">Capital Gains Tax Helper (Data-Driven)</string>
+    <string name="cg_open_mf_tax_btn">Open Mutual Fund Capital Gains Calculator</string>
+
+    <!-- Retirement & Pension Suite -->
+    <string name="ret_planner_title">Retirement Planner</string>
+    <string name="ret_nps_title">NPS Calculator</string>
+    <string name="ret_epf_title">EPF Calculator</string>
+    <string name="ret_apy_title">Atal Pension Yojana</string>
+    <string name="ret_pmsym_title">PM Shram Yogi Maan-Dhan</string>
+    <string name="ret_pmvvy_title">PMVVY &amp; Senior Schemes</string>
+
+    <string name="ret_corpus_needed_hero">TARGET RETIREMENT CORPUS</string>
+    <string name="ret_current_age">Current Age</string>
+    <string name="ret_retire_age">Retirement Age</string>
+    <string name="ret_life_exp">Life Expectancy</string>
+    <string name="ret_monthly_expenses">Current Monthly Expenses (₹)</string>
+    <string name="ret_existing_savings">Existing Retirement Savings (₹)</string>
+    <string name="ret_current_sip">Current Monthly SIP (₹)</string>
+    <string name="ret_inflation_label">Expected Inflation (% p.a.)</string>
+    <string name="ret_pre_return_label">Pre-Retirement Return (% p.a.)</string>
+    <string name="ret_post_return_label">Post-Retirement Return (% p.a.)</string>
+    <string name="ret_shortfall_chart_title">Projected Corpus vs Target Trajectory</string>
+
+    <string name="nps_corpus_hero">PROJECTED NPS CORPUS</string>
+    <string name="nps_monthly_contrib">Monthly NPS Contribution (₹)</string>
+    <string name="nps_existing_corpus">Existing NPS Balance (₹)</string>
+    <string name="nps_step_up">Annual Step-Up (%)</string>
+    <string name="nps_expected_return">Expected Return (% p.a.)</string>
+    <string name="nps_annuity_split">Annuity Allocation (%)</string>
+    <string name="nps_annuity_rate">Expected Annuity Yield (% p.a.)</string>
+    <string name="nps_lumpsum_label">Tax-Free Lump Sum</string>
+    <string name="nps_annuity_label">Annuity Corpus</string>
+    <string name="nps_est_pension">Est. Monthly Pension</string>
+
+    <string name="epf_corpus_hero">PROJECTED EPF CORPUS</string>
+    <string name="epf_basic_da">Monthly Basic + DA Salary (₹)</string>
+    <string name="epf_existing_bal">Existing EPF Balance (₹)</string>
+    <string name="epf_vpf_extra">Optional Monthly VPF (₹)</string>
+    <string name="epf_salary_growth">Annual Salary Growth (%)</string>
+    <string name="epf_interest_rate">EPF Interest Rate (% p.a.)</string>
+    <string name="epf_wage_ceiling_toggle">Apply ₹15,000 Statutory Wage Ceiling</string>
+    <string name="epf_wage_ceiling_hint">Caps both employee &amp; employer PF at statutory ceiling</string>
+    <string name="epf_eps_note_title">EPS-95 Pension Account Note</string>
+
+    <string name="apy_monthly_hero">REQUIRED MONTHLY CONTRIBUTION</string>
+    <string name="apy_entry_age">Entry Age (18–40 yrs)</string>
+    <string name="apy_desired_pension">Desired Monthly Pension at 60</string>
+    <string name="apy_table_title">Official APY Monthly Contribution Chart</string>
+
+    <string name="pmsym_monthly_hero">YOUR MONTHLY CONTRIBUTION</string>
+    <string name="pmsym_monthly_income">Monthly Income (₹)</string>
+    <string name="pmsym_govt_match_note">Government of India contributes an equal 1:1 matching amount every month until age 60 for eligible unorganised workers (income ≤ ₹15,000/mo).</string>
+    <string name="pmsym_table_title">PM-SYM Contribution Schedule (Ages 18–40)</string>
+
+    <string name="pmvvy_closed_banner_title">Closed to New Subscriptions</string>
+    <string name="pmvvy_open_banner_title">Open to New Subscriptions</string>
+    <string name="pmvvy_investment_amount">Lump-Sum Investment Amount (₹)</string>
+    <string name="pmvvy_scheme_selector">Select Senior Pension / Income Scheme</string>
+
+    <!-- Wealth & Life Planners Suite -->
+    <string name="planner_goals_title">Goal Planner</string>
+    <string name="planner_rules_title">Financial Rules</string>
+    <string name="planner_where_title">Where to Invest</string>
+
+    <string name="goal_combined_sip_hero">COMBINED MONTHLY SIP NEEDED</string>
+    <string name="goal_add_btn">Add Goal</string>
+    <string name="goal_name_label">Goal Name</string>
+    <string name="goal_cost_today">Cost Today (₹)</string>
+    <string name="goal_current_saved">Already Saved (₹)</string>
+    <string name="goal_years_label">Years to Goal</string>
+    <string name="goal_inflation_label">Goal Inflation (%)</string>
+    <string name="goal_return_label">Expected Return (%)</string>
+
+    <string name="rules_tab_budget">50/30/20 Budget</string>
+    <string name="rules_tab_emergency">Emergency Fund</string>
+    <string name="rules_tab_insurance">Insurance Cover</string>
+    <string name="rules_monthly_income">Monthly Take-Home Income (₹)</string>
+    <string name="rules_needs">Needs</string>
+    <string name="rules_wants">Wants</string>
+    <string name="rules_savings">Savings &amp; Investing</string>
+    <string name="rules_essential_exp">Monthly Essential Expenses (₹)</string>
+    <string name="rules_liquid_saved">Current Liquid Savings (₹)</string>
+    <string name="rules_monthly_alloc">Monthly Emergency Allocation (₹)</string>
+    <string name="rules_annual_income">Annual Gross Income (₹)</string>
+    <string name="rules_liabilities">Total Outstanding Loans (₹)</string>
+    <string name="rules_existing_term">Existing Term Life Cover (₹)</string>
+    <string name="rules_existing_health">Existing Health Cover (₹)</string>
+
+    <string name="wti_edu_disclaimer_title">Educational Guide Only — Not Investment Advice</string>
+    <string name="wti_edu_disclaimer_body">Educational only, not SEBI-registered investment advice. This guide illustrates textbook asset-class mixes by age and risk tolerance and makes no mutual fund, stock, bond, or product recommendations. Consult a SEBI-registered Investment Adviser (RIA) before investing.</string>
+    <string name="wti_age_label">Your Age</string>
+    <string name="wti_questionnaire_title">Risk Profile Questionnaire</string>
+    <string name="wti_investable_surplus">Optional Monthly/Lump-Sum Amount to Split (₹)</string>
+    <string name="wti_matrix_title">Data-Driven Asset Allocation Table</string>
+
+    <!-- Market Watch & Optional Live API Providers -->
+    <string name="save">Save</string>
+    <string name="reset_default">Reset Default</string>
+    <string name="market_stale_badge">Stale</string>
+    <string name="market_no_history_yet">No cached history points yet. Refresh or record a manual entry to track changes.</string>
+    <string name="market_as_of">As of</string>
+    <string name="market_cached_history">Cached History</string>
+    <string name="market_manual_entry">Manual Entry Override</string>
+    <string name="market_add_bank_fd">Add Bank</string>
+    <string name="market_edit_bank_fd">Edit Bank FD Rate</string>
+    <string name="market_api_providers_short">API &amp; Limits</string>
+    <string name="market_api_providers_title">Optional Live Market APIs &amp; Staleness</string>
+    <string name="market_api_providers_desc">Primary rates come from your RemoteConfig (rates.json) and Manual overrides. Optionally add your own public API keys below—stored strictly in Android EncryptedSharedPreferences (never in source code).</string>
+    <string name="market_stale_limit_label">Market Staleness Warning Threshold</string>
+    <string name="market_stale_limit_desc">Show an amber Stale badge on Market cards older than this duration.</string>
+    <string name="market_small_savings_quarterly_note">Government-notified Small Savings rates are reviewed quarterly by the Ministry of Finance.</string>
+    <string name="market_top_fd_rates_title">Top FD Rates by Bank</string>
+    <string name="market_top_fd_rates_sub">Indicative retail peak rates (below ₹3 Cr). Tap edit to customize or add your bank.</string>
+
+    <!-- Financial Articles & Guides Library -->
+    <string name="articles_library_subtitle">32+ offline Indian personal finance guides rendered natively — plus optional remote updates.</string>
+    <string name="articles_search_hint">Search loans, EMI, CIBIL, SIP, tax, FD, insurance…</string>
+    <string name="articles_saved">Saved</string>
+    <string name="articles_no_results">No matching articles</string>
+    <string name="articles_no_results_hint">Try a different keyword, clear category filter, or toggle Saved.</string>
+    <string name="articles_min_read">min read</string>
+    <string name="articles_last_reviewed">Last reviewed</string>
+    <string name="articles_all_guides">All Guides</string>
+
+    <!-- Security, Privacy & Home-Screen Widget -->
+    <string name="privacy_security_title">Privacy &amp; Security</string>
+    <string name="security_controls_title">App Lock &amp; Screen Protection</string>
+    <string name="security_applock_title">Biometric / PIN App Lock</string>
+    <string name="security_applock_bio_available">Unlock with fingerprint, face, device PIN, or optional App PIN</string>
+    <string name="security_applock_pin_only">Protected by your local App PIN</string>
+    <string name="security_applock_setup_hint">Tap to set a 4–6 digit App PIN to lock LoanJB</string>
+    <string name="security_flag_secure_title">Block Screenshots (FLAG_SECURE)</string>
+    <string name="security_flag_secure_desc">Prevents screenshots, screen recording, and recent-apps preview thumbnails</string>
+    <string name="security_lock_title">LoanJB is Locked</string>
+    <string name="security_lock_subtitle">Authenticate locally to access your saved loans and financial planners.</string>
+    <string name="security_lock_prompt_title">Unlock LoanJB</string>
+    <string name="security_lock_prompt_sub">Verify with biometrics or device credentials</string>
+    <string name="security_enter_pin">Enter App PIN</string>
+    <string name="security_unlock_with_pin">Unlock with PIN</string>
+    <string name="security_unlock_biometric">Use Biometrics / Device Lock</string>
+    <string name="privacy_architecture_title">Privacy-First Architecture</string>
+    <string name="privacy_network_title">Transparent Network Activity</string>
+
+    <string name="widget_next_emi_label">LoanJB Next EMI</string>
+    <string name="widget_next_emi_desc">Shows your next upcoming EMI amount, due date, and NACH status</string>
+    <string name="widget_next_emi_header">LOANJB • NEXT EMI DUE</string>
+    <string name="widget_no_loans_title">No Active Loans</string>
+    <string name="widget_no_loans_sub">Save a loan in LoanJB to track next EMI</string>
+
+    <!-- Disclaimer (Rule 8 verbatim) -->
+    <string name="disclaimer_text">Estimates for planning only. Not financial, tax or investment advice. Verify with your bank or a qualified professional.</string>
 </resources>
