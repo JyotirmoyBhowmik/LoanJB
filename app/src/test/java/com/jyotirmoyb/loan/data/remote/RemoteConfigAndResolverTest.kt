@@ -451,4 +451,44 @@ class RemoteConfigAndResolverTest {
         repo.resetToDefault(ConfigKeys.RBI_REPO_RATE)
         assertEquals(ConfigValueSource.BUILT_IN, repo.resolvedMapFlow.first()[ConfigKeys.RBI_REPO_RATE]!!.source)
     }
+
+    @Test
+    fun importUpdateBundle_mergesBundleItemsBankFdsAndConfirmedUnchangedDates() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = UserPreferencesRepository(context)
+        prefs.setUseOnlineData(true)
+
+        val dao = FakeRemoteConfigDao()
+        val seedProvider = AssetSeedConfigProvider(context)
+        val api = FakeRemoteConfigApi { _, _ -> notModifiedResponse("\"none\"") }
+        val repo = RatesRepository(dao, prefs, seedProvider, api)
+
+        val bundleFile = File("../loanjb-update-bundle.json").let { f ->
+            if (f.exists()) f else File("loanjb-update-bundle.json")
+        }
+        assertTrue("Root loanjb-update-bundle.json must exist", bundleFile.exists())
+        val rawBundle = bundleFile.readText()
+
+        val result = repo.importOverridesJson(rawBundle)
+        assertTrue("Bundle import should succeed: ${result.exceptionOrNull()}", result.isSuccess)
+        assertTrue("Should apply multiple items from bundle", result.getOrThrow() >= 7)
+
+        val resolved = repo.resolvedMapFlow.first()
+        assertEquals(5.50, resolved[ConfigKeys.RBI_REPO_RATE]!!.numericValue!!, 0.001)
+        assertEquals(5.25, resolved[ConfigKeys.MARKET_RBI_SDF_RATE]!!.numericValue!!, 0.001)
+        assertEquals(5.75, resolved[ConfigKeys.MARKET_RBI_MSF_RATE]!!.numericValue!!, 0.001)
+        assertEquals(3.00, resolved[ConfigKeys.MARKET_RBI_CRR]!!.numericValue!!, 0.001)
+        assertEquals(7.50, resolved[ConfigKeys.HOME_RATE_MIN]!!.numericValue!!, 0.001)
+        assertEquals(2.65, resolved[ConfigKeys.HOME_EBLR_SPREAD]!!.numericValue!!, 0.001)
+        assertEquals(6.80, resolved[ConfigKeys.DEPOSIT_FD_GENERAL]!!.numericValue!!, 0.001)
+
+        // Confirmed unchanged keys in cache should now carry lastVerified = 2026-11-27
+        assertEquals("2026-11-27", resolved[ConfigKeys.SCHEME_PPF_RATE]!!.lastVerified)
+        assertEquals("2026-11-27", resolved[ConfigKeys.TAX_NEW_REBATE_LIMIT]!!.lastVerified)
+
+        val bankFds = repo.bankFdSeedFlow.first()
+        val sbi = bankFds.first { it.bankId == "sbi" }
+        assertEquals(6.80, sbi.generalRate, 0.001)
+        assertEquals(7.30, sbi.seniorRate, 0.001)
+    }
 }

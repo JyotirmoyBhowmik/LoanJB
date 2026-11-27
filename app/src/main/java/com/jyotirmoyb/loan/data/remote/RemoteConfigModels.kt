@@ -351,6 +351,37 @@ data class ManualOverridesExport(
     val overrides: List<ManualOverrideRecord> = emptyList()
 )
 
+@JsonClass(generateAdapter = true)
+data class UpdateBundleSection(
+    val items: List<RemoteConfigItem>? = null,
+    val bankFdRates: List<BankFdRateSeed>? = null,
+    val taxYears: List<TaxYearRules>? = null,
+    val seniorPensionSchemes: List<SeniorSchemeStatusRule>? = null,
+    val apyTable: List<ApyContributionRow>? = null,
+    val pmsymTable: List<PmsymContributionRow>? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class UnresolvedItemNote(
+    val key: String,
+    val reason: String
+)
+
+@JsonClass(generateAdapter = true)
+data class LoanJbUpdateBundle(
+    val bundleVersion: Int = 1,
+    val generatedOn: String = "",
+    val generatedBy: String = "",
+    val dataVersion: String = "",
+    val rates: UpdateBundleSection? = null,
+    val taxslabs: UpdateBundleSection? = null,
+    val schemes: UpdateBundleSection? = null,
+    val confirmedUnchanged: List<String> = emptyList(),
+    val unresolved: List<UnresolvedItemNote> = emptyList(),
+    val suggestedNewKeys: List<RemoteConfigItem> = emptyList(),
+    val notes: List<String> = emptyList()
+)
+
 data class SyncStatus(
     val lastSyncAttemptMillis: Long = 0L,
     val lastSyncSuccessMillis: Long = 0L,

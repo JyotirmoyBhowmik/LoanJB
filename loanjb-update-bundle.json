@@ -1,0 +1,383 @@
+{
+  "bundleVersion": 1,
+  "generatedOn": "2026-11-27",
+  "generatedBy": "Gemini (LoanJB Data Update Researcher)",
+  "dataVersion": "2026.11.27",
+  "rates": {
+    "items": [
+      {
+        "key": "market.rbi_repo_rate",
+        "label": "RBI Policy Repo Rate",
+        "category": "MARKET_DATA",
+        "value": 5.5,
+        "previousValue": 6.5,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-10-07",
+        "sourceName": "Reserve Bank of India — Monetary Policy Statement",
+        "sourceUrl": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
+        "lastVerified": "2026-11-27"
+      },
+      {
+        "key": "market.rbi_sdf_rate",
+        "label": "RBI Standing Deposit Facility (SDF)",
+        "category": "MARKET_DATA",
+        "value": 5.25,
+        "previousValue": 6.25,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-10-07",
+        "sourceName": "Reserve Bank of India — Monetary Policy Statement",
+        "sourceUrl": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
+        "lastVerified": "2026-11-27"
+      },
+      {
+        "key": "market.rbi_msf_rate",
+        "label": "RBI Marginal Standing Facility (MSF) & Bank Rate",
+        "category": "MARKET_DATA",
+        "value": 5.75,
+        "previousValue": 6.75,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-10-07",
+        "sourceName": "Reserve Bank of India — Monetary Policy Statement",
+        "sourceUrl": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
+        "lastVerified": "2026-11-27"
+      },
+      {
+        "key": "market.rbi_crr",
+        "label": "RBI Cash Reserve Ratio (CRR)",
+        "category": "MARKET_DATA",
+        "value": 3.0,
+        "previousValue": 4.0,
+        "unit": "%",
+        "effectiveFrom": "2026-10-07",
+        "sourceName": "Reserve Bank of India — Current Rates",
+        "sourceUrl": "https://www.rbi.org.in/",
+        "lastVerified": "2026-11-27"
+      },
+      {
+        "key": "loan.home.eblr_spread",
+        "label": "Home Loan EBLR Default Spread over Repo",
+        "category": "LOAN_RATES",
+        "value": 2.65,
+        "previousValue": 2.0,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-10-15",
+        "sourceName": "State Bank of India — EBLR Benchmark (8.15% EBLR over 5.50% Repo)",
+        "sourceUrl": "https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/home-loans-interest-rates-current",
+        "lastVerified": "2026-11-27"
+      },
+      {
+        "key": "loan.home.rate_min",
+        "label": "Home Loan Interest Rate (Min)",
+        "category": "LOAN_RATES",
+        "value": 7.5,
+        "previousValue": 8.35,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-10-15",
+        "sourceName": "State Bank of India — Home Loan Interest Rates",
+        "sourceUrl": "https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/home-loans-interest-rates-current",
+        "lastVerified": "2026-11-27"
+      },
+      {
+        "key": "deposit.fd.general_1y_5y",
+        "label": "Bank FD Typical Rate (1-5 Yr General)",
+        "category": "DEPOSIT_RATES",
+        "value": 6.8,
+        "previousValue": 7.0,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-10-15",
+        "sourceName": "State Bank of India — Retail Domestic Term Deposits (< ₹3 Cr)",
+        "sourceUrl": "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
+        "lastVerified": "2026-11-27"
+      }
+    ],
+    "bankFdRates": [
+      {
+        "bankId": "sbi",
+        "bankName": "State Bank of India (SBI)",
+        "generalRate": 6.8,
+        "seniorRate": 7.3,
+        "tenureLabel": "1Y - 3Y Peak Slab"
+      },
+      {
+        "bankId": "hdfc",
+        "bankName": "HDFC Bank",
+        "generalRate": 7.0,
+        "seniorRate": 7.5,
+        "tenureLabel": "18M - 21M Special"
+      },
+      {
+        "bankId": "icici",
+        "bankName": "ICICI Bank",
+        "generalRate": 7.0,
+        "seniorRate": 7.55,
+        "tenureLabel": "15M - 2Y Peak Slab"
+      },
+      {
+        "bankId": "axis",
+        "bankName": "Axis Bank",
+        "generalRate": 7.1,
+        "seniorRate": 7.75,
+        "tenureLabel": "15M - 2Y Peak Slab"
+      },
+      {
+        "bankId": "kotak",
+        "bankName": "Kotak Mahindra Bank",
+        "generalRate": 7.2,
+        "seniorRate": 7.7,
+        "tenureLabel": "390D - 23M Peak"
+      },
+      {
+        "bankId": "bob",
+        "bankName": "Bank of Baroda",
+        "generalRate": 7.15,
+        "seniorRate": 7.65,
+        "tenureLabel": "400D Tiranga Plus"
+      },
+      {
+        "bankId": "pnb",
+        "bankName": "Punjab National Bank (PNB)",
+        "generalRate": 7.0,
+        "seniorRate": 7.5,
+        "tenureLabel": "400D Special Slab"
+      },
+      {
+        "bankId": "idfc",
+        "bankName": "IDFC FIRST Bank",
+        "generalRate": 7.5,
+        "seniorRate": 8.0,
+        "tenureLabel": "400D - 500D Peak"
+      }
+    ]
+  },
+  "taxslabs": {
+    "items": []
+  },
+  "schemes": {
+    "items": [],
+    "seniorPensionSchemes": [
+      {
+        "id": "PMVVY",
+        "name": "Pradhan Mantri Vaya Vandana Yojana (LIC)",
+        "shortName": "PMVVY",
+        "status": "CLOSED",
+        "statusLabel": "Closed to new entries (since 31 Mar 2023)",
+        "statusNote": "PMVVY subscription window closed on 31 March 2023 and has not been extended by the Ministry of Finance. Existing policyholders continue to receive their assured 7.40% p.a. monthly pension until completion of their 10-year policy term. Senior citizens seeking sovereign regular income can consider SCSS (8.20% p.a., ₹30L cap) or RBI Floating Rate Savings Bonds (8.05% p.a.).",
+        "closedOn": "2023-03-31",
+        "ratePercent": 7.4,
+        "payoutFrequency": "MONTHLY",
+        "tenureYears": 10,
+        "maxInvestmentCap": 1500000.0,
+        "minAge": 60,
+        "sovereignIssuer": "LIC of India / Govt of India",
+        "existingHoldersNote": "For existing subscribers only (policies issued up to 31 Mar 2023)."
+      },
+      {
+        "id": "SCSS",
+        "name": "Senior Citizens Savings Scheme (Post Office / Banks)",
+        "shortName": "SCSS",
+        "status": "OPEN",
+        "statusLabel": "Open to new entries (Q3 FY 2026-27)",
+        "statusNote": "Sovereign quarterly-payout deposit for individuals aged 60+ (55+ for retirees, 50+ for retired defence personnel). Maximum limit enhanced to ₹30 Lakh per individual. Eligible for Section 80C (Section 123 of Income-tax Act 2025) deduction under the Old Tax Regime.",
+        "closedOn": null,
+        "ratePercent": 8.2,
+        "payoutFrequency": "QUARTERLY",
+        "tenureYears": 5,
+        "maxInvestmentCap": 3000000.0,
+        "minAge": 60,
+        "sovereignIssuer": "Ministry of Finance / India Post & Authorised Banks",
+        "existingHoldersNote": "Extendable in 3-year blocks after initial 5-year maturity."
+      },
+      {
+        "id": "RBI_FRSB",
+        "name": "RBI Floating Rate Savings Bonds, 2020 (Taxable)",
+        "shortName": "RBI FRSB",
+        "status": "OPEN",
+        "statusLabel": "Open to new entries",
+        "statusNote": "7-year sovereign bond paying interest semi-annually (1 Jan & 1 Jul) pegged at NSC rate + 35 bps (currently 7.70% + 0.35% = 8.05% p.a.). No maximum investment ceiling. Premature encashment permitted for seniors aged 60+ after minimum lock-in.",
+        "closedOn": null,
+        "ratePercent": 8.05,
+        "payoutFrequency": "HALF_YEARLY",
+        "tenureYears": 7,
+        "maxInvestmentCap": null,
+        "minAge": 18,
+        "sovereignIssuer": "Reserve Bank of India / Govt of India",
+        "existingHoldersNote": "Senior citizens get early lock-in relaxation (6 yrs for age 60-70, 5 yrs for 70-80, 4 yrs for 80+)."
+      },
+      {
+        "id": "POMIS",
+        "name": "Post Office Monthly Income Scheme",
+        "shortName": "POMIS",
+        "status": "OPEN",
+        "statusLabel": "Open to new entries (Q3 FY 2026-27)",
+        "statusNote": "5-year Post Office monthly payout deposit open to all resident adults. Enhanced deposit limit of ₹9 Lakh for single accounts and ₹15 Lakh for joint accounts.",
+        "closedOn": null,
+        "ratePercent": 7.4,
+        "payoutFrequency": "MONTHLY",
+        "tenureYears": 5,
+        "maxInvestmentCap": 900000.0,
+        "minAge": 18,
+        "sovereignIssuer": "India Post / Ministry of Finance",
+        "existingHoldersNote": "Joint account limit is ₹15,00,000 across up to 3 joint holders."
+      }
+    ]
+  },
+  "confirmedUnchanged": [
+    "loan.home.rate_max",
+    "loan.home.fixed_min",
+    "loan.home.fixed_max",
+    "loan.home.ltv_cap",
+    "loan.personal.rate_min",
+    "loan.personal.rate_max",
+    "loan.vehicle.car_min",
+    "loan.vehicle.car_max",
+    "loan.vehicle.ev_min",
+    "loan.vehicle.twowheeler_max",
+    "loan.vehicle.ltv_cap",
+    "loan.education.india_min",
+    "loan.education.abroad_max",
+    "loan.gold.rate_min",
+    "loan.gold.rate_max",
+    "loan.gold.ltv_cap",
+    "loan.gold.auction_risk_ltv",
+    "loan.lap.rate_min",
+    "loan.lap.rate_max",
+    "loan.lap.ltv_cap",
+    "loan.securities.rate_min",
+    "loan.securities.rate_max",
+    "loan.securities.ltv_cap",
+    "loan.business.rate_min",
+    "loan.business.rate_max",
+    "loan.cc_emi.rate_min",
+    "loan.cc_emi.rate_max",
+    "loan.bank_staff.housing",
+    "loan.bank_staff.vehicle",
+    "loan.bank_staff.personal",
+    "loan.bank_staff.education",
+    "deposit.fd.senior_bonus",
+    "deposit.rd.general",
+    "deposit.debt_fund.expected_return",
+    "scheme.pmay.max_subsidy",
+    "scheme.mudra.shishu_cap",
+    "scheme.mudra.kishore_cap",
+    "scheme.mudra.tarun_cap",
+    "scheme.mudra.tarun_plus_cap",
+    "tax.gst.banking_services",
+    "tax.sec24b.self_occupied_cap",
+    "tax.sec24b.let_out_loss_setoff_cap",
+    "tax.sec80c.cap",
+    "tax.sec80e.max_years",
+    "tax.new_regime.std_deduction",
+    "tax.old_regime.std_deduction",
+    "tax.new_regime.rebate_limit",
+    "tax.old_regime.rebate_limit",
+    "tax.cess_percent",
+    "tax.old_regime.slab1_limit",
+    "tax.old_regime.slab2_limit",
+    "tax.old_regime.slab3_limit",
+    "tax.new_regime.slab1_limit",
+    "tax.new_regime.slab2_limit",
+    "tax.new_regime.slab3_limit",
+    "tax.new_regime.slab4_limit",
+    "tax.new_regime.slab5_limit",
+    "tax.new_regime.slab6_limit",
+    "tax.new_regime.sec24b_self_occupied_allowed",
+    "tax.new_regime.sec80c_allowed",
+    "tax.new_regime.sec80e_allowed",
+    "tax.tds.fd_general_threshold",
+    "tax.tds.fd_senior_threshold",
+    "tax.tds.rate_with_pan",
+    "tax.tds.rate_without_pan",
+    "tax.mf.equity_ltcg_holding_months",
+    "tax.mf.equity_ltcg_exemption",
+    "tax.mf.equity_ltcg_rate",
+    "tax.mf.equity_stcg_rate",
+    "tax.mf.hybrid_ltcg_holding_months",
+    "tax.mf.hybrid_ltcg_rate",
+    "tax.hra.metro_percent",
+    "tax.hra.non_metro_percent",
+    "tax.sec80d.self_cap",
+    "tax.sec80d.senior_cap",
+    "tax.advance_tax.threshold",
+    "scheme.small_savings.quarter",
+    "scheme.ppf.rate",
+    "scheme.ppf.yearly_cap",
+    "scheme.ppf.tenure_years",
+    "scheme.ppf.extension_block_years",
+    "scheme.ssy.rate",
+    "scheme.ssy.yearly_cap",
+    "scheme.ssy.deposit_years",
+    "scheme.ssy.maturity_years",
+    "scheme.nsc.rate",
+    "scheme.nsc.tenure_years",
+    "scheme.scss.rate",
+    "scheme.scss.max_cap",
+    "scheme.scss.tenure_years",
+    "scheme.pomis.rate",
+    "scheme.pomis.max_single_cap",
+    "scheme.pomis.max_joint_cap",
+    "scheme.pomis.tenure_years",
+    "scheme.potd.rate_1y",
+    "scheme.potd.rate_2y",
+    "scheme.potd.rate_3y",
+    "scheme.potd.rate_5y",
+    "scheme.pord.rate",
+    "scheme.pord.tenure_months",
+    "scheme.kvp.rate",
+    "scheme.kvp.doubling_months",
+    "scheme.epf.rate",
+    "scheme.epf.employee_percent",
+    "scheme.epf.employer_epf_percent",
+    "scheme.epf.employer_eps_percent",
+    "scheme.epf.wage_ceiling",
+    "scheme.epf.eps_monthly_cap",
+    "scheme.nps.expected_return",
+    "scheme.nps.min_annuity_percent",
+    "scheme.nps.max_lumpsum_percent",
+    "scheme.nps.annuity_rate",
+    "scheme.nps.small_corpus_full_exit_limit",
+    "scheme.pmsym.assured_pension",
+    "scheme.pmsym.income_ceiling"
+  ],
+  "unresolved": [
+    {
+      "key": "market.gsec_10y_yield",
+      "reason": "Intraday/closing CCIL/FBIL 10-Year benchmark G-Sec yield for 2026-11-27 requires a live terminal print; omitted per Rule 3 rather than estimating."
+    },
+    {
+      "key": "market.cpi_inflation",
+      "reason": "Latest MOSPI CPI headline print confirmation requires direct MOSPI press release PDF parse; kept existing seed value."
+    },
+    {
+      "key": "market.gold_24k_10g",
+      "reason": "IBJA daily 24K (999 purity) closing bullion rate for 2026-11-27 is a live daily spot print; omitted per Rule 3."
+    },
+    {
+      "key": "market.gold_22k_10g",
+      "reason": "IBJA daily 22K (916 purity) closing bullion rate for 2026-11-27 is a live daily spot print; omitted per Rule 3."
+    },
+    {
+      "key": "market.silver_1kg",
+      "reason": "IBJA daily Silver 999 (per kg) closing spot rate for 2026-11-27 is a live daily spot print; omitted per Rule 3."
+    },
+    {
+      "key": "market.usd_inr",
+      "reason": "FBIL USD/INR reference rate for 2026-11-27 requires the daily FBIL circular feed; omitted per Rule 3."
+    },
+    {
+      "key": "market.sensex",
+      "reason": "BSE Sensex daily closing index level for 2026-11-27 is a live market print; omitted per Rule 3."
+    },
+    {
+      "key": "market.nifty_50",
+      "reason": "NSE Nifty 50 daily closing index level for 2026-11-27 is a live market print; omitted per Rule 3."
+    }
+  ],
+  "suggestedNewKeys": [],
+  "notes": [
+    "RBI Monetary Policy Committee (MPC) reduced the policy repo rate to 5.50% (SDF 5.25%, MSF/Bank Rate 5.75%) and Cash Reserve Ratio (CRR) to 3.00% during FY 2025-26/2026-27 easing.",
+    "Following the 100 bps cumulative repo reduction, major public and private banks lowered EBLR home loan starting rates (SBI starting at 7.50% p.a.) and revised retail 1Y-5Y FD peak slabs (~6.80% to 7.50% general, +50 bps for seniors).",
+    "Ministry of Finance (DEA) kept Small Savings rates unchanged for Q3 FY 2026-27 (1 Oct 2026 – 31 Dec 2026): PPF 7.10%, SSY 8.20%, SCSS 8.20%, NSC 7.70%, POMIS 7.40%, KVP 7.50% (115 months), POTD 1Y 6.90% / 2Y 7.00% / 3Y 7.10% / 5Y 7.50%, and PORD 6.70%.",
+    "The Income-tax Act, 2025 took effect on 1 April 2026 (replacing the Income-tax Act, 1961 for Tax Year 2026-27 / AY 2027-28). All numeric tax slabs, standard deductions (₹75,000 New / ₹50,000 Old), rebate limits (₹12,00,000 taxable income / ₹60,000 max rebate in New Regime), and deduction caps (₹1.5L 80C, ₹25k/₹50k 80D, ₹2L 24(b)) remain unchanged, while statutory section numbers now map to Section 202 (New Regime, formerly 115BAC), Section 156 (Tax Rebate, formerly 87A), Section 123 (formerly 80C), Section 126 (formerly 80D), and Section 22(1)(b) (Home Loan Interest, formerly 24(b)).",
+    "Banking & financial service charges continue to attract 18% GST under SAC 9971."
+  ]
+}
