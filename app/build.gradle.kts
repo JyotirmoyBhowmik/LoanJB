@@ -151,7 +151,9 @@ dependencies {
   androidTestImplementation(libs.androidx.runner)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.tooling)
-  debugImplementation(libs.leakcanary.android)
+  // Opt-in only for local Android Studio memory profiling; disabled by default so LeakCanary's
+  // secondary launcher activity does not intercept the AI Studio streaming emulator launcher.
+  // debugImplementation(libs.leakcanary.android)
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
 }
