@@ -51,12 +51,7 @@ private val APY_SLABS = listOf(1000, 2000, 3000, 4000, 5000)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ApyScreen(
-    uiState: GovPensionUiState,
-    onUpdateAge: (Int) -> Unit,
-    onSelectSlab: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ApyScreen(uiState: GovPensionUiState, onUpdateAge: (Int) -> Unit, onSelectSlab: (Int) -> Unit, modifier: Modifier = Modifier) {
     val result = uiState.apyResult
     val currency = uiState.currency
     val catalog = uiState.catalog
@@ -88,12 +83,16 @@ fun ApyScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${CurrencyFormatter.format(result.monthlyContribution, currency)}/mo",
+                        text = stringResource(R.string.ui_txt_mo, CurrencyFormatter.format(result.monthlyContribution, currency)),
                         style = MonoLargeStyle,
                         color = PrincipalEmerald
                     )
                     Text(
-                        text = "Guaranteed pension of ${CurrencyFormatter.format(result.desiredMonthlyPension.toDouble(), currency)}/month from age 60 • Contribute for ${result.contributionYears} years",
+                        text = stringResource(
+                            R.string.ui_txt_guaranteed_pension_of_month_from_a,
+                            CurrencyFormatter.format(result.desiredMonthlyPension.toDouble(), currency),
+                            result.contributionYears
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.88f)
                     )
@@ -134,7 +133,10 @@ fun ApyScreen(
                 ValueSourceBadgesRow(
                     source = catalog.source,
                     asOfDate = catalog.asOfDateFormatted,
-                    isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true)
+                    isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true),
+                    sourceName = catalog.sourceName,
+                    effectiveFrom = catalog.publishedOn,
+                    lastVerified = catalog.lastVerified
                 )
                 Spacer(Modifier.height(12.dp))
 
@@ -161,14 +163,14 @@ fun ApyScreen(
                         FilterChip(
                             selected = uiState.apyPensionSlab == slab,
                             onClick = { onSelectSlab(slab) },
-                            label = { Text("₹$slab/mo", fontWeight = FontWeight.SemiBold) },
+                            label = { Text(stringResource(R.string.ui_txt_mo_94b864, slab), fontWeight = FontWeight.SemiBold) },
                             modifier = Modifier.testTag("apy_slab_$slab")
                         )
                     }
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Eligibility: Indian citizens aged 18–40 with a savings bank account (income tax payers are ineligible for fresh APY enrolment since Oct 2022).",
+                    text = stringResource(R.string.ui_txt_eligibility_indian_citizens_aged_1),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -191,12 +193,47 @@ fun ApyScreen(
                         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                         .padding(horizontal = 6.dp, vertical = 6.dp)
                 ) {
-                    Text("Age", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.7f))
-                    Text("₹1k", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                    Text("₹2k", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                    Text("₹3k", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                    Text("₹4k", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                    Text("₹5k", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                    Text(
+                        stringResource(R.string.ui_txt_age),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(0.7f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_1k),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_2k),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_3k),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_4k),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_5k),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
                 Spacer(Modifier.height(4.dp))
 
@@ -213,7 +250,7 @@ fun ApyScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${row.entryAge}",
+                            text = stringResource(R.string.ui_txt_fmt_986d4f, row.entryAge),
                             style = MonoSmallStyle,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             color = if (isSelected) SavingsGreen else MaterialTheme.colorScheme.onSurface,
@@ -221,7 +258,7 @@ fun ApyScreen(
                         )
                         listOf(row.pension1000, row.pension2000, row.pension3000, row.pension4000, row.pension5000).forEach { amt ->
                             Text(
-                                text = "₹${amt.toInt()}",
+                                text = stringResource(R.string.ui_txt_fmt_82d0a2, amt.toInt()),
                                 style = MonoSmallStyle,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 textAlign = TextAlign.End,

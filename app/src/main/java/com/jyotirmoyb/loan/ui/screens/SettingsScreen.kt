@@ -40,9 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.data.UserPreferences
 import com.jyotirmoyb.loan.data.security.BackupCrypto
 import com.jyotirmoyb.loan.domain.CurrencyCode
@@ -150,13 +152,13 @@ fun SettingsScreen(
                     FilterChip(
                         selected = preferences.languageCode == "en",
                         onClick = { onSetLanguage("en") },
-                        label = { Text("English") },
+                        label = { Text(stringResource(R.string.ui_txt_english)) },
                         modifier = Modifier.testTag("settings_lang_en")
                     )
                     FilterChip(
                         selected = preferences.languageCode == "hi",
                         onClick = { onSetLanguage("hi") },
-                        label = { Text("हिन्दी (Hindi)") },
+                        label = { Text(stringResource(R.string.ui_txt_hindi)) },
                         modifier = Modifier.testTag("settings_lang_hi")
                     )
                 }
@@ -220,7 +222,7 @@ fun SettingsScreen(
                 SectionAccentHeader("Financial Profile Defaults", badge = "PLANNER DEFAULTS")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Used as defaults across My Loans (DTI), Loan Eligibility, Income Tax, Retirement Planner, 50/30/20 Rules, and Where to Invest.",
+                    stringResource(R.string.ui_txt_used_as_defaults_across_my_loans_d),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -249,24 +251,32 @@ fun SettingsScreen(
                     modifier = Modifier.testTag("settings_age_input")
                 )
                 Spacer(Modifier.height(10.dp))
-                Text("Preferred Tax Regime", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.ui_txt_preferred_tax_regime),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
                         selected = preferences.preferredTaxRegime == "NEW",
                         onClick = { onSetTaxRegime("NEW") },
-                        label = { Text("New Regime (Default)") },
+                        label = { Text(stringResource(R.string.ui_txt_new_regime_default)) },
                         modifier = Modifier.testTag("settings_regime_new")
                     )
                     FilterChip(
                         selected = preferences.preferredTaxRegime == "OLD",
                         onClick = { onSetTaxRegime("OLD") },
-                        label = { Text("Old Regime") },
+                        label = { Text(stringResource(R.string.ui_txt_old_regime)) },
                         modifier = Modifier.testTag("settings_regime_old")
                     )
                 }
                 Spacer(Modifier.height(10.dp))
-                Text("Default Risk Profile", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.ui_txt_default_risk_profile),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Spacer(Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -294,7 +304,7 @@ fun SettingsScreen(
                 SectionAccentHeader("Loan Catalog Config", badge = "${catalog.categories.size} CATS")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Customize Indian loan categories, variants, tenure limits, and RBI LTV caps, or edit rates centrally in Data & Rates.",
+                    stringResource(R.string.ui_txt_customize_indian_loan_categories_v),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -308,7 +318,7 @@ fun SettingsScreen(
                 ) {
                     Icon(Icons.Outlined.EditNote, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Edit Loan Catalog")
+                    Text(stringResource(R.string.ui_txt_edit_loan_catalog))
                 }
             }
         }
@@ -319,7 +329,7 @@ fun SettingsScreen(
                 SectionAccentHeader("Encrypted Backup & Restore", badge = "AES-256-GCM")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Sensitive tables and security keys are excluded from Android cloud Auto Backup. Export a password-encrypted AES-256-GCM JSON backup anytime or restore from a file.",
+                    stringResource(R.string.ui_txt_sensitive_tables_and_security_keys),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -334,7 +344,7 @@ fun SettingsScreen(
                     ) {
                         Icon(Icons.Outlined.Backup, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Encrypted Export")
+                        Text(stringResource(R.string.ui_txt_encrypted_export))
                     }
                     OutlinedButton(
                         onClick = { restoreLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
@@ -345,7 +355,7 @@ fun SettingsScreen(
                     ) {
                         Icon(Icons.Outlined.Restore, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Restore")
+                        Text(stringResource(R.string.ui_txt_restore))
                     }
                 }
             }
@@ -357,7 +367,7 @@ fun SettingsScreen(
                 SectionAccentHeader("Reset Local Data", accentColor = DangerRed)
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Clears saved loans, comparison scenarios, preferences, app lock PIN, and restores the default seed catalog.",
+                    stringResource(R.string.ui_txt_clears_saved_loans_comparison_scen),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -372,7 +382,7 @@ fun SettingsScreen(
                 ) {
                     Icon(Icons.Outlined.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("Reset All Data")
+                    Text(stringResource(R.string.ui_txt_reset_all_data))
                 }
             }
         }
@@ -390,26 +400,32 @@ fun SettingsScreen(
 
         AlertDialog(
             onDismissRequest = { showEncryptExportDialog = false },
-            title = { Text("Encrypt Backup with Password", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.ui_txt_encrypt_backup_with_password), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Your backup will be encrypted using PBKDF2-HMAC-SHA256 + AES-256-GCM. Remember this password — it cannot be recovered if lost.",
+                        stringResource(R.string.ui_txt_your_backup_will_be_encrypted_usin),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     OutlinedTextField(
                         value = password,
-                        onValueChange = { password = it; errorText = null },
-                        label = { Text("Backup Password (min 6 chars)") },
+                        onValueChange = {
+                            password = it
+                            errorText = null
+                        },
+                        label = { Text(stringResource(R.string.ui_txt_backup_password_min_6_chars)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = confirmPassword,
-                        onValueChange = { confirmPassword = it; errorText = null },
-                        label = { Text("Confirm Password") },
+                        onValueChange = {
+                            confirmPassword = it
+                            errorText = null
+                        },
+                        label = { Text(stringResource(R.string.ui_txt_confirm_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -443,11 +459,11 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Text("Encrypt & Share", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.ui_txt_encrypt_share), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showEncryptExportDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showEncryptExportDialog = false }) { Text(stringResource(R.string.ui_txt_cancel)) }
             }
         )
     }
@@ -456,18 +472,18 @@ fun SettingsScreen(
         var restorePwd by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { pendingEncryptedRestoreJson = null },
-            title = { Text("Decrypt Backup File", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.ui_txt_decrypt_backup_file), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Enter the password used when this AES-256-GCM backup was created.",
+                        stringResource(R.string.ui_txt_enter_the_password_used_when_this),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     OutlinedTextField(
                         value = restorePwd,
                         onValueChange = { restorePwd = it },
-                        label = { Text("Backup Password") },
+                        label = { Text(stringResource(R.string.ui_txt_backup_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -483,11 +499,11 @@ fun SettingsScreen(
                     },
                     enabled = restorePwd.isNotEmpty()
                 ) {
-                    Text("Decrypt & Restore", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.ui_txt_decrypt_restore), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { pendingEncryptedRestoreJson = null }) { Text("Cancel") }
+                TextButton(onClick = { pendingEncryptedRestoreJson = null }) { Text(stringResource(R.string.ui_txt_cancel)) }
             }
         )
     }
@@ -495,8 +511,8 @@ fun SettingsScreen(
     if (showResetConfirm) {
         AlertDialog(
             onDismissRequest = { showResetConfirm = false },
-            title = { Text("Reset All Data?") },
-            text = { Text("This will delete all saved loans, comparison scenarios, PIN lock, and custom catalog edits on this device.") },
+            title = { Text(stringResource(R.string.ui_txt_reset_all_data_9ec1c2)) },
+            text = { Text(stringResource(R.string.ui_txt_this_will_delete_all_saved_loans_c)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -504,9 +520,9 @@ fun SettingsScreen(
                         onResetAllData()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = DangerRed)
-                ) { Text("Reset Everything", fontWeight = FontWeight.Bold) }
+                ) { Text(stringResource(R.string.ui_txt_reset_everything), fontWeight = FontWeight.Bold) }
             },
-            dismissButton = { TextButton(onClick = { showResetConfirm = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { showResetConfirm = false }) { Text(stringResource(R.string.ui_txt_cancel)) } }
         )
     }
 }

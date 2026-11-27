@@ -1,10 +1,7 @@
 package com.jyotirmoyb.loan.data.security
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.biometric.BiometricManager
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
@@ -12,33 +9,46 @@ import javax.crypto.spec.PBEKeySpec
 
 /**
  * Manages optional local App Lock credentials (salted PBKDF2-HMAC-SHA256 PIN hash)
- * strictly inside Android Keystore-backed [EncryptedSharedPreferences], excluded from Auto Backup.
+ * stored encrypted with Android Keystore AES-256-GCM ([KeystoreEncryptedPrefs]),
+ * excluded from Auto Backup & Device Transfer, with automatic one-time migration from
+ * legacy EncryptedSharedPreferences.
  *
  * Security invariants:
  * - Raw PIN is never stored, logged, or backed up.
  * - Verification uses constant-time [MessageDigest.isEqual].
  * - Biometric authentication delegates to Android [BiometricManager] / BiometricPrompt.
  */
-class AppLockManager(context: Context) {
+class AppLockManager internal constructor(private val appContext: Context, private val securePrefs: KeystoreEncryptedPrefs) {
 
-    private val appContext = context.applicationContext
-    private val inMemoryFallback = HashMap<String, String>()
-    private var encryptedPrefs: SharedPreferences? = null
+    constructor(context: Context) : this(
+        appContext = context.applicationContext,
+        securePrefs = KeystoreEncryptedPrefs(
+            context = context,
+            prefsFileName = PREFS_FILE_NAME,
+            keyAlias = KEYSTORE_ALIAS,
+            legacyPrefsName = LEGACY_PREFS_FILE_NAME,
+            legacyKeys = listOf(KEY_PIN_SALT, KEY_PIN_HASH)
+        )
+    )
 
-    init {
-        encryptedPrefs = runCatching {
-            val masterKey = MasterKey.Builder(appContext)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            EncryptedSharedPreferences.create(
-                appContext,
-                PREFS_FILE_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        }.getOrNull()
-    }
+    internal constructor(
+        context: Context,
+        cryptoEngineOverride: AesGcmCryptoEngine?,
+        legacyReader: ((String, Collection<String>) -> Map<String, String>?)? = null,
+        legacyDeleter: ((String) -> Boolean)? = null
+    ) : this(
+        appContext = context.applicationContext,
+        securePrefs = KeystoreEncryptedPrefs(
+            context = context,
+            prefsFileName = PREFS_FILE_NAME,
+            keyAlias = KEYSTORE_ALIAS,
+            legacyPrefsName = LEGACY_PREFS_FILE_NAME,
+            legacyKeys = listOf(KEY_PIN_SALT, KEY_PIN_HASH),
+            cryptoEngineOverride = cryptoEngineOverride,
+            legacyReader = legacyReader,
+            legacyDeleter = legacyDeleter
+        )
+    )
 
     fun isBiometricOrDeviceCredentialAvailable(): Boolean {
         val manager = BiometricManager.from(appContext)
@@ -50,8 +60,8 @@ class AppLockManager(context: Context) {
     }
 
     fun hasPinConfigured(): Boolean {
-        val salt = readString(KEY_PIN_SALT)
-        val hash = readString(KEY_PIN_HASH)
+        val salt = securePrefs.getString(KEY_PIN_SALT)
+        val hash = securePrefs.getString(KEY_PIN_HASH)
         return !salt.isNullOrBlank() && !hash.isNullOrBlank()
     }
 
@@ -61,50 +71,34 @@ class AppLockManager(context: Context) {
         }
         val salt = ByteArray(SALT_BYTES).also { SecureRandom().nextBytes(it) }
         val hash = hashPinBytes(pin, salt)
-        writeString(KEY_PIN_SALT, Base64Compat.encode(salt))
-        writeString(KEY_PIN_HASH, Base64Compat.encode(hash))
+        securePrefs.putString(KEY_PIN_SALT, Base64Compat.encode(salt))
+        securePrefs.putString(KEY_PIN_HASH, Base64Compat.encode(hash))
         return Result.success(Unit)
     }
 
     fun verifyPin(candidatePin: String): Boolean {
-        val saltB64 = readString(KEY_PIN_SALT) ?: return false
-        val hashB64 = readString(KEY_PIN_HASH) ?: return false
+        val saltB64 = securePrefs.getString(KEY_PIN_SALT) ?: return false
+        val hashB64 = securePrefs.getString(KEY_PIN_HASH) ?: return false
         return verifyPinHash(candidatePin, saltB64, hashB64)
     }
 
     fun clearPin() {
-        val prefs = encryptedPrefs
-        if (prefs != null) {
-            prefs.edit().remove(KEY_PIN_SALT).remove(KEY_PIN_HASH).apply()
-        } else {
-            inMemoryFallback.remove(KEY_PIN_SALT)
-            inMemoryFallback.remove(KEY_PIN_HASH)
-        }
-    }
-
-    private fun readString(key: String): String? =
-        encryptedPrefs?.getString(key, null) ?: inMemoryFallback[key]
-
-    private fun writeString(key: String, value: String) {
-        val prefs = encryptedPrefs
-        if (prefs != null) {
-            prefs.edit().putString(key, value).apply()
-        } else {
-            inMemoryFallback[key] = value
-        }
+        securePrefs.remove(KEY_PIN_SALT)
+        securePrefs.remove(KEY_PIN_HASH)
     }
 
     companion object {
-        const val PREFS_FILE_NAME = "loanjb_security_prefs"
-        private const val KEY_PIN_SALT = "pin_salt_b64"
-        private const val KEY_PIN_HASH = "pin_hash_b64"
+        const val PREFS_FILE_NAME = "loanjb_security_prefs_v2"
+        const val LEGACY_PREFS_FILE_NAME = "loanjb_security_prefs"
+        private const val KEYSTORE_ALIAS = "loanjb_app_lock_aes_gcm_v1"
+        internal const val KEY_PIN_SALT = "pin_salt_b64"
+        internal const val KEY_PIN_HASH = "pin_hash_b64"
         private const val SALT_BYTES = 16
         private const val HASH_BITS = 256
         private const val PIN_PBKDF2_ITERATIONS = 100_000
         private const val KDF_ALGO = "PBKDF2WithHmacSHA256"
 
-        fun isValidPinFormat(pin: String): Boolean =
-            pin.length in 4..6 && pin.all { it.isDigit() }
+        fun isValidPinFormat(pin: String): Boolean = pin.length in 4..6 && pin.all { it.isDigit() }
 
         fun createPinRecord(pin: String): Pair<String, String> {
             require(isValidPinFormat(pin)) { "PIN must be 4 to 6 digits." }

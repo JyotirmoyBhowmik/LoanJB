@@ -26,7 +26,8 @@ data class BalanceTransferUiState(
     val currency: CurrencyCode = CurrencyCode.INR
 )
 
-class BalanceTransferViewModel(application: Application) : AndroidViewModel(application),
+class BalanceTransferViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<BalanceTransferAnalysisInput, BalanceTransferAnalysisResult> {
 
     override val id: String = "balance_transfer"
@@ -62,8 +63,7 @@ class BalanceTransferViewModel(application: Application) : AndroidViewModel(appl
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BalanceTransferUiState())
 
-    override fun compute(input: BalanceTransferAnalysisInput): BalanceTransferAnalysisResult =
-        BalanceTransferEngine.analyze(input)
+    override fun compute(input: BalanceTransferAnalysisInput): BalanceTransferAnalysisResult = BalanceTransferEngine.analyze(input)
 
     fun updateInput(transform: (BalanceTransferAnalysisInput) -> BalanceTransferAnalysisInput) {
         _input.value = transform(_input.value)

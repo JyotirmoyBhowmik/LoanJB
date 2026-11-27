@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
    LoanJB Auto Backup Rules (Android 11 and below).
-   Excludes all sensitive financial tables (Room DB), EncryptedSharedPreferences (API keys & PIN hash),
-   DataStore preferences containing income/security flags, and cached exports so no personal financial
-   data leaves the device automatically via cloud backup.
+   Excludes all sensitive financial tables (Room DB), Android Keystore AES-256-GCM encrypted
+   preferences (API keys & PIN hash, both v2 and legacy files), DataStore preferences containing
+   income/security flags, and cached exports so no personal financial data leaves the device
+   automatically via cloud backup.
 -->
 <full-backup-content>
     <exclude domain="database" path="." />
@@ -11,7 +12,9 @@
     <exclude domain="database" path="loanjb_offline.db-wal" />
     <exclude domain="database" path="loanjb_offline.db-shm" />
     <exclude domain="sharedpref" path="loanjb_secure_api_keys.xml" />
+    <exclude domain="sharedpref" path="loanjb_secure_api_keys_v2.xml" />
     <exclude domain="sharedpref" path="loanjb_security_prefs.xml" />
+    <exclude domain="sharedpref" path="loanjb_security_prefs_v2.xml" />
     <exclude domain="file" path="datastore/loanjb_settings.preferences_pb" />
     <exclude domain="file" path="exports/" />
 </full-backup-content>

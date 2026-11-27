@@ -32,9 +32,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.CurrencyCode
 import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.domain.YearlySummary
@@ -47,13 +49,7 @@ import com.jyotirmoyb.loan.viewmodel.CompareItemModel
 import kotlin.math.max
 
 @Composable
-fun PrincipalInterestDonutChart(
-    principal: Double,
-    interest: Double,
-    fees: Double,
-    currency: CurrencyCode,
-    modifier: Modifier = Modifier
-) {
+fun PrincipalInterestDonutChart(principal: Double, interest: Double, fees: Double, currency: CurrencyCode, modifier: Modifier = Modifier) {
     val total = max(1.0, principal + interest + fees)
     val pFrac by animateFloatAsState(
         targetValue = (principal / total).toFloat(),
@@ -139,7 +135,7 @@ fun PrincipalInterestDonutChart(
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Total Cost",
+                    text = stringResource(R.string.ui_txt_total_cost),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -227,12 +223,16 @@ fun BalanceOverTimeLineChart(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Balance Over Time",
+                stringResource(R.string.ui_txt_balance_over_time),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                "Start: ${CurrencyFormatter.formatCompact(startingBalance, currency)} → ${CurrencyFormatter.format(0.0, currency)}",
+                stringResource(
+                    R.string.ui_txt_start_9f8a47,
+                    CurrencyFormatter.formatCompact(startingBalance, currency),
+                    CurrencyFormatter.format(0.0, currency)
+                ),
                 style = MonoSmallStyle,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -316,16 +316,20 @@ fun BalanceOverTimeLineChart(
                 .padding(horizontal = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Start", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.ui_txt_start_a6122a),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             if (yearlySummaries.size >= 2) {
                 Text(
-                    "Year ${yearlySummaries.size / 2}",
+                    stringResource(R.string.ui_txt_year_d39f19, yearlySummaries.size / 2),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
-                "Year ${yearlySummaries.size}",
+                stringResource(R.string.ui_txt_year_d39f19, yearlySummaries.size),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -334,11 +338,7 @@ fun BalanceOverTimeLineChart(
 }
 
 @Composable
-fun CompareBarChart(
-    items: List<CompareItemModel>,
-    currency: CurrencyCode,
-    modifier: Modifier = Modifier
-) {
+fun CompareBarChart(items: List<CompareItemModel>, currency: CurrencyCode, modifier: Modifier = Modifier) {
     if (items.isEmpty()) return
     val maxCost = max(1.0, items.maxOf { it.result.effectiveTotalCost })
     val cheapestCost = items.minOf { it.result.effectiveTotalCost }

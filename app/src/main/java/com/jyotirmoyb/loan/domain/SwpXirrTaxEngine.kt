@@ -445,7 +445,9 @@ object MfTaxGainsEngine {
                 if (isLongTerm) {
                     exemptionBd = MoneyMath.bd(config.equityLtcgExemption).min(gainBd)
                     baseRatePercent = config.equityLtcgRatePercent
-                    ruleLabel = "Equity LTCG (≥${config.equityLtcgHoldingMonths}m) — Sec 112A @ ${config.equityLtcgRatePercent}% above ${CurrencyFormatter.formatCompact(config.equityLtcgExemption, CurrencyCode.INR)}"
+                    val exemptionLabel = CurrencyFormatter.formatCompact(config.equityLtcgExemption, CurrencyCode.INR)
+                    ruleLabel = "Equity LTCG (≥${config.equityLtcgHoldingMonths}m) — " +
+                        "Sec 112A @ ${config.equityLtcgRatePercent}% above $exemptionLabel"
                 } else {
                     exemptionBd = MoneyMath.ZERO
                     baseRatePercent = config.equityStcgRatePercent
@@ -482,7 +484,9 @@ object MfTaxGainsEngine {
             totalTaxBd.multiply(MoneyMath.HUNDRED, MoneyMath.MC)
                 .divide(gainBd, 2, RoundingMode.HALF_UP)
                 .toDouble()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         return MfTaxResult(
             isValid = true,

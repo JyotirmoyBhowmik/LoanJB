@@ -137,11 +137,20 @@ fun RetirementPlannerScreen(
                         style = MonoLargeStyle,
                         color = PrincipalEmerald
                     )
+                    val sipSummaryText = if (result.additionalMonthlySipNeeded > 0.0) {
+                        stringResource(
+                            R.string.ui_ret_monthly_sip_extra,
+                            CurrencyFormatter.format(result.monthlySipNeededTotal, currency),
+                            CurrencyFormatter.format(result.additionalMonthlySipNeeded, currency)
+                        )
+                    } else {
+                        stringResource(
+                            R.string.ui_ret_monthly_sip_on_track,
+                            CurrencyFormatter.format(result.monthlySipNeededTotal, currency)
+                        )
+                    }
                     Text(
-                        text = "Monthly SIP needed: ${CurrencyFormatter.format(result.monthlySipNeededTotal, currency)}/mo" +
-                            if (result.additionalMonthlySipNeeded > 0.0) {
-                                " (+${CurrencyFormatter.format(result.additionalMonthlySipNeeded, currency)}/mo extra)"
-                            } else " (On Track!)",
+                        text = sipSummaryText,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.9f),
                         fontWeight = FontWeight.SemiBold
@@ -341,14 +350,34 @@ fun RetirementPlannerScreen(
                 Spacer(Modifier.height(8.dp))
                 KeyValueRow("Projected from Existing Savings", CurrencyFormatter.format(result.projectedCorpusFromExisting, currency))
                 KeyValueRow("Projected from Current SIP", CurrencyFormatter.format(result.projectedCorpusFromCurrentSip, currency))
-                KeyValueRow("Total Projected Corpus", CurrencyFormatter.format(result.projectedTotalCorpus, currency), valueColor = SavingsGreen)
+                KeyValueRow(
+                    "Total Projected Corpus",
+                    CurrencyFormatter.format(result.projectedTotalCorpus, currency),
+                    valueColor = SavingsGreen
+                )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
-                KeyValueRow("Required Target Corpus", CurrencyFormatter.format(result.requiredCorpusAtRetirement, currency), valueColor = InfoBlue)
+                KeyValueRow(
+                    "Required Target Corpus",
+                    CurrencyFormatter.format(result.requiredCorpusAtRetirement, currency),
+                    valueColor = InfoBlue
+                )
                 if (result.corpusShortfall > 0.0) {
-                    KeyValueRow("Projected Shortfall", CurrencyFormatter.format(result.corpusShortfall, currency), valueColor = InterestAmber)
-                    KeyValueRow("Additional Monthly SIP Needed", CurrencyFormatter.format(result.additionalMonthlySipNeeded, currency), valueColor = InterestAmber)
+                    KeyValueRow(
+                        "Projected Shortfall",
+                        CurrencyFormatter.format(result.corpusShortfall, currency),
+                        valueColor = InterestAmber
+                    )
+                    KeyValueRow(
+                        "Additional Monthly SIP Needed",
+                        CurrencyFormatter.format(result.additionalMonthlySipNeeded, currency),
+                        valueColor = InterestAmber
+                    )
                 } else {
-                    KeyValueRow("Projected Surplus", CurrencyFormatter.format(result.corpusSurplus, currency), valueColor = PrincipalEmerald)
+                    KeyValueRow(
+                        "Projected Surplus",
+                        CurrencyFormatter.format(result.corpusSurplus, currency),
+                        valueColor = PrincipalEmerald
+                    )
                 }
             }
         }
@@ -360,10 +389,7 @@ fun RetirementPlannerScreen(
 }
 
 @Composable
-private fun RetirementShortfallChart(
-    points: List<RetirementProjectionPoint>,
-    currency: CurrencyCode
-) {
+private fun RetirementShortfallChart(points: List<RetirementProjectionPoint>, currency: CurrencyCode) {
     val maxVal = max(1.0, points.maxOf { max(it.projectedCorpus, it.targetTrajectoryCorpus) })
     val gridColor = MaterialTheme.colorScheme.outlineVariant
     val targetColor = InfoBlue
@@ -474,13 +500,21 @@ private fun RetirementShortfallChart(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Age ${points.first().age}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
-                "Target: ${CurrencyFormatter.formatCompact(points.last().targetTrajectoryCorpus, currency)}",
+                stringResource(R.string.ui_txt_age_904bce, points.first().age),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                stringResource(R.string.ui_txt_target, CurrencyFormatter.formatCompact(points.last().targetTrajectoryCorpus, currency)),
                 style = MonoSmallStyle,
                 color = targetColor
             )
-            Text("Age ${points.last().age}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.ui_txt_age_904bce, points.last().age),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -499,7 +533,12 @@ internal fun AgeSliderRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-            Text("$value yrs", style = MonoSmallStyle, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.ui_txt_yrs_4c2f7f, value),
+                style = MonoSmallStyle,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
         }
         Slider(
             value = value.toFloat().coerceIn(range.start, range.endInclusive),
@@ -523,5 +562,4 @@ internal fun ChartLegendDot(color: Color, label: String) {
     }
 }
 
-private fun formatRate(v: Double): String =
-    if (v % 1.0 == 0.0) v.toInt().toString() else String.format("%.2f", v).trimEnd('0').trimEnd('.')
+private fun formatRate(v: Double): String = if (v % 1.0 == 0.0) v.toInt().toString() else String.format("%.2f", v).trimEnd('0').trimEnd('.')

@@ -6,6 +6,10 @@ import com.jyotirmoyb.loan.data.RemoteConfigCacheEntity
 import com.jyotirmoyb.loan.data.RemoteConfigDao
 import com.jyotirmoyb.loan.data.SyncMetadataEntity
 import com.jyotirmoyb.loan.data.UserPreferencesRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +19,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 interface SeedConfigProvider {
     fun loadSeedJson(fileName: String): String?
@@ -30,13 +30,7 @@ class AssetSeedConfigProvider(private val context: Context) : SeedConfigProvider
     }.getOrNull()
 }
 
-data class RefreshSummary(
-    val updatedFiles: Int,
-    val notModifiedFiles: Int,
-    val failedFiles: Int,
-    val message: String,
-    val success: Boolean
-)
+data class RefreshSummary(val updatedFiles: Int, val notModifiedFiles: Int, val failedFiles: Int, val message: String, val success: Boolean)
 
 class RatesRepository(
     private val remoteConfigDao: RemoteConfigDao,
@@ -46,8 +40,7 @@ class RatesRepository(
 ) {
     private val moshi = RemoteConfigMoshi.instance
     private val overridesExportAdapter = moshi.adapter(ManualOverridesExport::class.java).indent("  ")
-    private val updateBundleAdapter = moshi.adapter(LoanJbUpdateBundle::class.java)
-    private val documentAdapter = moshi.adapter(RemoteConfigDocument::class.java).indent("  ")
+    private val bundleManager = UpdateBundleManager(remoteConfigDao, moshi)
     private val isSyncingFlow = MutableStateFlow(false)
 
     private val seedDocuments: Map<String, RemoteConfigDocument> by lazy {
@@ -66,28 +59,31 @@ class RatesRepository(
         remoteConfigDao.observeManualOverrides(),
         prefsRepo.preferencesFlow.map { it.useOnlineData }
     ) { caches, overrides, useOnlineData ->
-        val onlineDocs = LinkedHashMap<String, RemoteConfigDocument>()
-        for (cache in caches) {
-            RemoteConfigValidator.parseAndValidate(cache.rawJson, moshi).getOrNull()?.let { doc ->
-                onlineDocs[cache.fileName] = doc
-            }
-        }
+        val onlineDocs = bundleManager.extractOnlineDocuments(caches)
+        val importedDocs = bundleManager.extractImportedDocuments(caches)
         val overrideMap = overrides.associateBy { it.key }
         DataSourceResolver.resolveAll(
             seedDocuments = seedDocuments,
             onlineDocuments = onlineDocs,
             manualOverrides = overrideMap,
-            useOnlineData = useOnlineData
+            useOnlineData = useOnlineData,
+            importedDocuments = importedDocs
         )
     }
 
     val resolvedMapFlow: Flow<Map<String, ResolvedConfigItem>> =
         resolvedItemsFlow.map { list -> list.associateBy { it.key } }
 
+    val importHistoryCountFlow: Flow<Int> =
+        remoteConfigDao.observeAllCaches().map { caches -> bundleManager.readHistoryCount(caches) }
+
+    val latestImportSummaryFlow: Flow<String?> =
+        remoteConfigDao.observeAllCaches().map { caches -> bundleManager.readLatestHistorySummary(caches) }
+
     /**
-     * Emits the versioned per-FY Taxation catalog from `taxslabs.json` (Online cached when enabled
-     * -> Bundled seed fallback), merged with any user manual overrides on scalar keys such as
-     * cess, HRA metro/non-metro %, and TDS thresholds/rates.
+     * Emits the versioned per-FY Taxation catalog from `taxslabs.json`
+     * (Imported / Online with newest dataVersion -> Bundled seed fallback),
+     * merged with any user manual overrides on scalar keys.
      */
     val taxRulesCatalogFlow: Flow<TaxRulesCatalog> = combine(
         remoteConfigDao.observeAllCaches(),
@@ -95,17 +91,17 @@ class RatesRepository(
         prefsRepo.preferencesFlow.map { it.useOnlineData }
     ) { caches, resolvedMap, useOnlineData ->
         val seedDoc = seedDocuments["taxslabs.json"]
-        val onlineDoc = if (useOnlineData) {
-            caches.firstOrNull { it.fileName == "taxslabs.json" }
-                ?.let { RemoteConfigValidator.parseAndValidate(it.rawJson, moshi).getOrNull() }
-        } else null
+        val onlineDoc = bundleManager.extractOnlineDocuments(caches)["taxslabs.json"]
+        val importedDoc = bundleManager.extractImportedDocuments(caches)["taxslabs.json"]
 
-        val activeDoc = if (onlineDoc != null && !onlineDoc.taxYears.isNullOrEmpty()) onlineDoc else seedDoc
-        val baseSource = if (activeDoc === onlineDoc && onlineDoc != null) {
-            ConfigValueSource.ONLINE
-        } else {
-            ConfigValueSource.BUILT_IN
-        }
+        val (winningDoc, winningSource) = DataSourceResolver.selectWinningDocument(
+            seedDoc = seedDoc,
+            onlineDoc = onlineDoc,
+            importedDoc = importedDoc,
+            useOnlineData = useOnlineData
+        )
+        val activeDoc = if (winningDoc != null && !winningDoc.taxYears.isNullOrEmpty()) winningDoc else seedDoc
+        val baseSource = if (activeDoc === winningDoc && winningDoc != null) winningSource else ConfigValueSource.BUILT_IN
 
         val cessOverride = resolvedMap[ConfigKeys.TAX_CESS_PERCENT]?.numericValue
         val rawYears = activeDoc?.taxYears.orEmpty()
@@ -144,8 +140,8 @@ class RatesRepository(
 
     /**
      * Emits the data-driven Retirement, Government Pension (APY, PM-SYM, PMVVY/Senior Schemes),
-     * and Asset Allocation catalog from `schemes.json` (Online cached when enabled -> Bundled seed fallback),
-     * merged with any user manual overrides on scalar keys.
+     * and Asset Allocation catalog from `schemes.json`
+     * (Imported / Online with newest dataVersion -> Bundled seed fallback).
      */
     val retirementSchemesCatalogFlow: Flow<RetirementSchemesCatalog> = combine(
         remoteConfigDao.observeAllCaches(),
@@ -153,17 +149,17 @@ class RatesRepository(
         prefsRepo.preferencesFlow.map { it.useOnlineData }
     ) { caches, resolvedMap, useOnlineData ->
         val seedDoc = seedDocuments["schemes.json"]
-        val onlineDoc = if (useOnlineData) {
-            caches.firstOrNull { it.fileName == "schemes.json" }
-                ?.let { RemoteConfigValidator.parseAndValidate(it.rawJson, moshi).getOrNull() }
-        } else null
+        val onlineDoc = bundleManager.extractOnlineDocuments(caches)["schemes.json"]
+        val importedDoc = bundleManager.extractImportedDocuments(caches)["schemes.json"]
 
-        val activeDoc = if (onlineDoc != null && !onlineDoc.apyTable.isNullOrEmpty()) onlineDoc else seedDoc
-        val baseSource = if (activeDoc === onlineDoc && onlineDoc != null) {
-            ConfigValueSource.ONLINE
-        } else {
-            ConfigValueSource.BUILT_IN
-        }
+        val (winningDoc, winningSource) = DataSourceResolver.selectWinningDocument(
+            seedDoc = seedDoc,
+            onlineDoc = onlineDoc,
+            importedDoc = importedDoc,
+            useOnlineData = useOnlineData
+        )
+        val activeDoc = if (winningDoc != null && !winningDoc.apyTable.isNullOrEmpty()) winningDoc else seedDoc
+        val baseSource = if (activeDoc === winningDoc && winningDoc != null) winningSource else ConfigValueSource.BUILT_IN
 
         val sampleItem = activeDoc?.items?.firstOrNull { it.key.startsWith("scheme.") }
         val publishedOn = activeDoc?.publishedOn ?: "2026-11-25"
@@ -203,11 +199,10 @@ class RatesRepository(
         prefsRepo.preferencesFlow.map { it.useOnlineData }
     ) { caches, useOnlineData ->
         val seedDoc = seedDocuments["rates.json"]
-        val onlineDoc = if (useOnlineData) {
-            caches.firstOrNull { it.fileName == "rates.json" }
-                ?.let { RemoteConfigValidator.parseAndValidate(it.rawJson, moshi).getOrNull() }
-        } else null
-        onlineDoc?.bankFdRates?.takeIf { it.isNotEmpty() } ?: seedDoc?.bankFdRates.orEmpty()
+        val onlineDoc = bundleManager.extractOnlineDocuments(caches)["rates.json"]
+        val importedDoc = bundleManager.extractImportedDocuments(caches)["rates.json"]
+        val (winningDoc, _) = DataSourceResolver.selectWinningDocument(seedDoc, onlineDoc, importedDoc, useOnlineData)
+        winningDoc?.bankFdRates?.takeIf { it.isNotEmpty() } ?: seedDoc?.bankFdRates.orEmpty()
     }
 
     val marketPreviousValuesFlow: Flow<Map<String, Double>> = combine(
@@ -215,13 +210,12 @@ class RatesRepository(
         prefsRepo.preferencesFlow.map { it.useOnlineData }
     ) { caches, useOnlineData ->
         val seedDoc = seedDocuments["rates.json"]
-        val onlineDoc = if (useOnlineData) {
-            caches.firstOrNull { it.fileName == "rates.json" }
-                ?.let { RemoteConfigValidator.parseAndValidate(it.rawJson, moshi).getOrNull() }
-        } else null
+        val onlineDoc = bundleManager.extractOnlineDocuments(caches)["rates.json"]
+        val importedDoc = bundleManager.extractImportedDocuments(caches)["rates.json"]
+        val (winningDoc, _) = DataSourceResolver.selectWinningDocument(seedDoc, onlineDoc, importedDoc, useOnlineData)
         val map = LinkedHashMap<String, Double>()
         seedDoc?.items.orEmpty().forEach { item -> item.previousValue?.let { map[item.key] = it } }
-        onlineDoc?.items.orEmpty().forEach { item -> item.previousValue?.let { map[item.key] = it } }
+        winningDoc?.items.orEmpty().forEach { item -> item.previousValue?.let { map[item.key] = it } }
         map
     }
 
@@ -231,9 +225,10 @@ class RatesRepository(
     ) { caches, useOnlineData ->
         val seedDoc = seedDocuments["articles.json"]
         val onlineDoc = if (useOnlineData) {
-            caches.firstOrNull { it.fileName == "articles.json" }
-                ?.let { RemoteConfigValidator.parseAndValidate(it.rawJson, moshi).getOrNull() }
-        } else null
+            bundleManager.extractOnlineDocuments(caches)["articles.json"]
+        } else {
+            null
+        }
         if (onlineDoc != null && !onlineDoc.articles.isNullOrEmpty()) {
             onlineDoc.articles to ConfigValueSource.ONLINE
         } else {
@@ -254,11 +249,6 @@ class RatesRepository(
         )
     }
 
-    /**
-     * Fetches all 4 remote-config files using conditional ETag (`If-None-Match`), validates each
-     * payload against schema rules, and caches valid documents in Room. Invalid or offline responses
-     * safely preserve cached or bundled seed data.
-     */
     suspend fun refreshNow(): RefreshSummary = withContext(Dispatchers.IO) {
         val useOnline = prefsRepo.preferencesFlow.first().useOnlineData
         val now = System.currentTimeMillis()
@@ -402,21 +392,81 @@ class RatesRepository(
         return overridesExportAdapter.toJson(payload)
     }
 
-    suspend fun importOverridesJson(rawJson: String): Result<Int> {
-        if (rawJson.isBlank() || rawJson.length > 512_000) {
-            return Result.failure(IllegalArgumentException("Import JSON is empty or too large."))
+    /**
+     * Validates a candidate update bundle (max 1 MB) without modifying any stored data,
+     * returning a structured [UpdateBundlePreview] for user review.
+     */
+    suspend fun previewUpdateBundle(rawJson: String, fileName: String? = null): Result<UpdateBundlePreview> {
+        val currentResolved = resolvedMapFlow.first()
+        return bundleManager.buildPreview(
+            rawJson = rawJson,
+            fileName = fileName,
+            seedDocuments = seedDocuments,
+            currentResolved = currentResolved
+        )
+    }
+
+    /**
+     * Applies user-selected changes from a validated [UpdateBundlePreview] into the
+     * `"Imported"` cache layer (retaining up to 5 undo snapshots).
+     */
+    suspend fun applyUpdateBundlePreview(
+        preview: UpdateBundlePreview,
+        selectedItemKeys: Set<String> = preview.itemChanges.map { it.key }.toSet(),
+        selectedTableIds: Set<String> = preview.tableChanges.map { it.id }.toSet(),
+        applyConfirmedUnchanged: Boolean = true
+    ): Result<Int> {
+        val now = System.currentTimeMillis()
+        val result = bundleManager.applyPreview(
+            preview = preview,
+            selectedItemKeys = selectedItemKeys,
+            selectedTableIds = selectedTableIds,
+            applyConfirmedUnchanged = applyConfirmedUnchanged,
+            seedDocuments = seedDocuments,
+            nowMillis = now
+        )
+        if (result.isSuccess) {
+            val partSuffix = preview.partInfo?.let { " (${it.label})" }.orEmpty()
+            recordSyncMetadata(
+                attemptMillis = now,
+                success = true,
+                message = "Imported update bundle (${preview.dataVersion}$partSuffix)",
+                updateSuccessTimestamp = true
+            )
+        }
+        return result
+    }
+
+    /**
+     * Reverts the most recent imported update bundle (last 5 imports retained).
+     */
+    suspend fun undoLastImport(): Result<String> {
+        val now = System.currentTimeMillis()
+        val result = bundleManager.undoLastImport(now)
+        if (result.isSuccess) {
+            recordSyncMetadata(
+                attemptMillis = now,
+                success = true,
+                message = "Undid import (${result.getOrThrow()})",
+                updateSuccessTimestamp = false
+            )
+        }
+        return result
+    }
+
+    suspend fun importOverridesJson(rawJson: String, fileName: String? = null): Result<Int> {
+        if (rawJson.isBlank()) {
+            return Result.failure(IllegalArgumentException("Import JSON is empty."))
+        }
+        if (rawJson.toByteArray(Charsets.UTF_8).size > RemoteConfigValidator.MAX_UPDATE_BUNDLE_BYTES) {
+            return Result.failure(IllegalArgumentException("Import JSON exceeds the 1 MB file size limit."))
         }
 
-        // 1. Check if payload is a LoanJB AI Data Update Bundle (loanjb-update-bundle.json)
-        if (rawJson.contains("\"bundleVersion\"") ||
-            (rawJson.contains("\"rates\"") && rawJson.contains("\"confirmedUnchanged\""))
-        ) {
-            val bundle = runCatching { updateBundleAdapter.fromJson(rawJson) }.getOrNull()
-                ?: return Result.failure(IllegalArgumentException("Could not parse update bundle JSON."))
-            if (bundle.bundleVersion < 1) {
-                return Result.failure(IllegalArgumentException("Unsupported bundleVersion."))
-            }
-            return applyUpdateBundle(bundle)
+        // 1. Update bundle payload -> strictly validate and merge into Imported cache
+        if (isUpdateBundlePayload(rawJson)) {
+            val preview = previewUpdateBundle(rawJson, fileName)
+            if (preview.isFailure) return Result.failure(preview.exceptionOrNull()!!)
+            return applyUpdateBundlePreview(preview.getOrThrow())
         }
 
         // 2. Otherwise parse as ManualOverridesExport
@@ -446,121 +496,10 @@ class RatesRepository(
         return Result.success(imported)
     }
 
-    private suspend fun applyUpdateBundle(bundle: LoanJbUpdateBundle): Result<Int> {
-        val now = System.currentTimeMillis()
-        val verifiedDate = bundle.generatedOn.ifBlank { currentIsoDate() }
-        val targetVersion = bundle.dataVersion.ifBlank { "$verifiedDate.1" }
-        val confirmedSet = bundle.confirmedUnchanged.toSet()
-        var appliedCount = 0
+    fun isUpdateBundlePayload(rawJson: String): Boolean = rawJson.contains("\"bundleVersion\"") ||
+        (rawJson.contains("\"rates\"") && rawJson.contains("\"confirmedUnchanged\""))
 
-        suspend fun mergeSection(fileName: String, section: UpdateBundleSection?) {
-            val existingCache = remoteConfigDao.getCacheByFile(fileName)
-            val baseDoc = existingCache?.let {
-                RemoteConfigValidator.parseAndValidate(it.rawJson, moshi).getOrNull()
-            } ?: seedDocuments[fileName] ?: return
-
-            val incomingByKey = section?.items.orEmpty().associateBy { it.key }
-            val mergedItems = baseDoc.items.map { existing ->
-                val incoming = incomingByKey[existing.key]
-                when {
-                    incoming != null -> {
-                        appliedCount++
-                        existing.copy(
-                            value = incoming.value,
-                            unit = incoming.unit.ifBlank { existing.unit },
-                            effectiveFrom = incoming.effectiveFrom.ifBlank { existing.effectiveFrom },
-                            sourceName = incoming.sourceName.ifBlank { existing.sourceName },
-                            sourceUrl = incoming.sourceUrl.ifBlank { existing.sourceUrl },
-                            lastVerified = incoming.lastVerified.ifBlank { verifiedDate },
-                            previousValue = incoming.previousValue ?: existing.value.numericValue ?: existing.previousValue
-                        )
-                    }
-                    confirmedSet.contains(existing.key) -> {
-                        existing.copy(lastVerified = verifiedDate)
-                    }
-                    else -> existing
-                }
-            }
-
-            val updatedBankFds = section?.bankFdRates?.takeIf { it.isNotEmpty() }?.also {
-                appliedCount += it.size
-            } ?: baseDoc.bankFdRates
-
-            val updatedTaxYears = section?.taxYears?.takeIf { it.isNotEmpty() }?.also {
-                appliedCount += it.size
-            } ?: baseDoc.taxYears
-
-            val updatedSeniorSchemes = section?.seniorPensionSchemes?.takeIf { it.isNotEmpty() }?.also {
-                appliedCount += it.size
-            } ?: baseDoc.seniorPensionSchemes
-
-            val updatedApy = section?.apyTable?.takeIf { it.isNotEmpty() } ?: baseDoc.apyTable
-            val updatedPmsym = section?.pmsymTable?.takeIf { it.isNotEmpty() } ?: baseDoc.pmsymTable
-
-            val mergedDoc = baseDoc.copy(
-                dataVersion = targetVersion,
-                publishedOn = verifiedDate,
-                items = mergedItems,
-                bankFdRates = updatedBankFds,
-                taxYears = updatedTaxYears,
-                seniorPensionSchemes = updatedSeniorSchemes,
-                apyTable = updatedApy,
-                pmsymTable = updatedPmsym
-            )
-            val serialized = documentAdapter.toJson(mergedDoc)
-            if (RemoteConfigValidator.parseAndValidate(serialized, moshi).isSuccess) {
-                remoteConfigDao.upsertCache(
-                    RemoteConfigCacheEntity(
-                        fileName = fileName,
-                        rawJson = serialized,
-                        etag = existingCache?.etag,
-                        dataVersion = mergedDoc.dataVersion,
-                        publishedOn = mergedDoc.publishedOn,
-                        fetchedAtMillis = now
-                    )
-                )
-            }
-        }
-
-        mergeSection("rates.json", bundle.rates)
-        mergeSection("taxslabs.json", bundle.taxslabs)
-        mergeSection("schemes.json", bundle.schemes)
-
-        // Also apply manual overrides for explicitly updated scalar items so they take immediate effect even in offline mode
-        val currentResolved = resolvedMapFlow.first()
-        val allBundleItems = bundle.rates?.items.orEmpty() +
-            bundle.taxslabs?.items.orEmpty() +
-            bundle.schemes?.items.orEmpty()
-        for (item in allBundleItems) {
-            val targetItem = currentResolved[item.key] ?: continue
-            val validated = RemoteConfigValidator.validateManualOverride(targetItem, item.value.formattedNumber())
-            if (validated.isSuccess) {
-                remoteConfigDao.upsertManualOverride(
-                    ManualOverrideEntity(
-                        key = item.key,
-                        valueText = validated.getOrThrow(),
-                        updatedAtMillis = now,
-                        updatedOnDate = item.lastVerified.ifBlank { verifiedDate }
-                    )
-                )
-            }
-        }
-
-        recordSyncMetadata(
-            attemptMillis = now,
-            success = true,
-            message = "Imported update bundle ($targetVersion)",
-            updateSuccessTimestamp = true
-        )
-        return Result.success(appliedCount.coerceAtLeast(allBundleItems.size))
-    }
-
-    private suspend fun recordSyncMetadata(
-        attemptMillis: Long,
-        success: Boolean,
-        message: String,
-        updateSuccessTimestamp: Boolean
-    ) {
+    private suspend fun recordSyncMetadata(attemptMillis: Long, success: Boolean, message: String, updateSuccessTimestamp: Boolean) {
         val prev = remoteConfigDao.getSyncMetadataOnce()
         remoteConfigDao.upsertSyncMetadata(
             SyncMetadataEntity(
@@ -573,9 +512,7 @@ class RatesRepository(
         )
     }
 
-    private fun currentIsoDate(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-    }
+    private fun currentIsoDate(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
     companion object {
         fun createDefaultApi(baseUrl: String = REMOTE_CONFIG_BASE_URL): RemoteConfigApi {

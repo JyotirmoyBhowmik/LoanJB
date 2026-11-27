@@ -76,10 +76,7 @@ object LoanJBElevation {
  * Consistent accessible loading state used across data-fetching or background calculation views.
  */
 @Composable
-fun LoanJBLoadingState(
-    message: String = "Loading financial data…",
-    modifier: Modifier = Modifier
-) {
+fun LoanJBLoadingState(message: String = "Loading financial data…", modifier: Modifier = Modifier) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
@@ -309,7 +306,7 @@ fun FinancialDisclaimerBanner(
                                 .testTag("disclaimer_learn_more_btn")
                         ) {
                             Text(
-                                text = "About, Terms & Sources",
+                                text = stringResource(R.string.ui_txt_about_terms_sources),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold
                             )

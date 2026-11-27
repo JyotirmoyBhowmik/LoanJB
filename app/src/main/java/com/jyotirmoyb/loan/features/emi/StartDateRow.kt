@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -217,7 +216,7 @@ fun StartDateRow(
                         FilterChip(
                             selected = emiDayOfMonth == presetDay,
                             onClick = { onEmiDayOfMonthChange(presetDay) },
-                            label = { Text("${presetDay}th", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(R.string.ui_txt_th, presetDay), style = MaterialTheme.typography.labelSmall) },
                             modifier = Modifier.testTag("emi_day_chip_$presetDay")
                         )
                     }
@@ -282,7 +281,7 @@ fun StartDateRow(
                         showDatePicker = false
                     }
                 ) {
-                    Text("Apply", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.ui_txt_apply), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {

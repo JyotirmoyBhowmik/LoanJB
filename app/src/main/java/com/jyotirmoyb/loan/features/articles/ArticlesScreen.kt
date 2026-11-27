@@ -186,13 +186,15 @@ fun ArticlesScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text("${stringResource(R.string.articles_saved)} (${uiState.bookmarkedCount})") },
+                        label = {
+                            Text(stringResource(R.string.ui_txt_fmt, stringResource(R.string.articles_saved), uiState.bookmarkedCount))
+                        },
                         modifier = Modifier.testTag("articles_filter_bookmarked")
                     )
                     FilterChip(
                         selected = uiState.selectedCategory == null,
                         onClick = { onSelectCategory(null) },
-                        label = { Text("All (${uiState.allArticles.size})") },
+                        label = { Text(stringResource(R.string.ui_txt_all, uiState.allArticles.size)) },
                         modifier = Modifier.testTag("articles_cat_all")
                     )
                     ArticleCategory.entries.forEach { cat ->
@@ -200,7 +202,7 @@ fun ArticlesScreen(
                         FilterChip(
                             selected = uiState.selectedCategory == cat,
                             onClick = { onSelectCategory(cat) },
-                            label = { Text("${cat.displayTitle} ($count)") },
+                            label = { Text(stringResource(R.string.ui_txt_fmt, cat.displayTitle, count)) },
                             modifier = Modifier.testTag("articles_cat_${cat.name.lowercase()}")
                         )
                     }
@@ -243,12 +245,7 @@ fun ArticlesScreen(
 }
 
 @Composable
-private fun ArticleSummaryCard(
-    article: ArticleItem,
-    onOpen: () -> Unit,
-    onToggleBookmark: () -> Unit,
-    onShare: () -> Unit
-) {
+private fun ArticleSummaryCard(article: ArticleItem, onOpen: () -> Unit, onToggleBookmark: () -> Unit, onShare: () -> Unit) {
     val accent = categoryAccentColor(article.category)
     FintechCard(
         modifier = Modifier
@@ -333,7 +330,11 @@ private fun ArticleSummaryCard(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "${article.readingTimeMinutes} ${stringResource(R.string.articles_min_read)}",
+                    text = stringResource(
+                        R.string.ui_txt_fmt_dfac19,
+                        article.readingTimeMinutes,
+                        stringResource(R.string.articles_min_read)
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -347,7 +348,11 @@ private fun ArticleSummaryCard(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "${stringResource(R.string.articles_last_reviewed)}: ${article.lastReviewedFormatted}",
+                    text = stringResource(
+                        R.string.ui_txt_fmt_6c03a4,
+                        stringResource(R.string.articles_last_reviewed),
+                        article.lastReviewedFormatted
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -431,7 +436,11 @@ private fun ArticleReaderView(
                     )
                 }
                 Text(
-                    text = "${article.readingTimeMinutes} ${stringResource(R.string.articles_min_read)}",
+                    text = stringResource(
+                        R.string.ui_txt_fmt_dfac19,
+                        article.readingTimeMinutes,
+                        stringResource(R.string.articles_min_read)
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -457,7 +466,11 @@ private fun ArticleReaderView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${stringResource(R.string.articles_last_reviewed)}: ${article.lastReviewedFormatted}",
+                    text = stringResource(
+                        R.string.ui_txt_fmt_6c03a4,
+                        stringResource(R.string.articles_last_reviewed),
+                        article.lastReviewedFormatted
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = TealPrimaryDark

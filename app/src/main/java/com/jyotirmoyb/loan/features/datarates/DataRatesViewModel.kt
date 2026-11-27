@@ -3,12 +3,15 @@ package com.jyotirmoyb.loan.features.datarates
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.data.AppContainer
+import com.jyotirmoyb.loan.data.UserPreferences
 import com.jyotirmoyb.loan.data.market.ApiKeyStatusSnapshot
 import com.jyotirmoyb.loan.data.market.MarketApiProviderSlot
 import com.jyotirmoyb.loan.data.remote.ConfigCategory
 import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
 import com.jyotirmoyb.loan.data.remote.SyncStatus
+import com.jyotirmoyb.loan.data.remote.UpdateBundlePreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +26,11 @@ data class DataRatesUiState(
     val syncStatus: SyncStatus = SyncStatus(),
     val overrideCount: Int = 0,
     val marketStaleHours: Int = 24,
+    val staleDataThresholdDays: Int = 90,
     val apiKeyStatus: ApiKeyStatusSnapshot = ApiKeyStatusSnapshot(),
+    val importHistoryCount: Int = 0,
+    val latestImportSummary: String? = null,
+    val pendingBundlePreview: UpdateBundlePreview? = null,
     val snackbarMessage: String? = null
 ) {
     val groupedItems: Map<ConfigCategory, List<ResolvedConfigItem>>
@@ -38,28 +45,36 @@ data class DataRatesUiState(
 
 class DataRatesViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val appContext = application.applicationContext
     private val ratesRepository = AppContainer.provideRatesRepository(application)
     private val prefsRepository = AppContainer.providePreferencesRepository(application)
     private val secureApiKeyStore = AppContainer.provideSecureApiKeyStore(application)
 
     private val _selectedCategory = MutableStateFlow<ConfigCategory?>(null)
     private val _snackbar = MutableStateFlow<String?>(null)
+    private val _pendingBundlePreview = MutableStateFlow<UpdateBundlePreview?>(null)
 
     val uiState: StateFlow<DataRatesUiState> = combine(
         ratesRepository.resolvedItemsFlow,
         ratesRepository.syncStatusFlow,
         prefsRepository.preferencesFlow,
         secureApiKeyStore.statusFlow,
+        ratesRepository.importHistoryCountFlow,
+        ratesRepository.latestImportSummaryFlow,
         _selectedCategory,
+        _pendingBundlePreview,
         _snackbar
     ) { args ->
         @Suppress("UNCHECKED_CAST")
         val items = args[0] as List<ResolvedConfigItem>
         val syncStatus = args[1] as SyncStatus
-        val prefs = args[2] as com.jyotirmoyb.loan.data.UserPreferences
+        val prefs = args[2] as UserPreferences
         val apiStatus = args[3] as ApiKeyStatusSnapshot
-        val selectedCat = args[4] as ConfigCategory?
-        val snackbar = args[5] as String?
+        val historyCount = args[4] as Int
+        val latestSummary = args[5] as String?
+        val selectedCat = args[6] as ConfigCategory?
+        val preview = args[7] as UpdateBundlePreview?
+        val snackbar = args[8] as String?
 
         DataRatesUiState(
             items = items,
@@ -68,7 +83,11 @@ class DataRatesViewModel(application: Application) : AndroidViewModel(applicatio
             syncStatus = syncStatus,
             overrideCount = items.count { it.isOverridden },
             marketStaleHours = prefs.marketStaleHours,
+            staleDataThresholdDays = prefs.staleDataThresholdDays,
             apiKeyStatus = apiStatus,
+            importHistoryCount = historyCount,
+            latestImportSummary = latestSummary,
+            pendingBundlePreview = preview,
             snackbarMessage = snackbar
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DataRatesUiState())
@@ -92,6 +111,13 @@ class DataRatesViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             prefsRepository.setMarketStaleHours(hours)
             _snackbar.value = "Market stale threshold set to ${hours}h"
+        }
+    }
+
+    fun setStaleDataThresholdDays(days: Int) {
+        viewModelScope.launch {
+            prefsRepository.setStaleDataThresholdDays(days)
+            _snackbar.value = "Rates staleness warning set to ${days}d"
         }
     }
 
@@ -148,12 +174,57 @@ class DataRatesViewModel(application: Application) : AndroidViewModel(applicatio
 
     suspend fun exportOverridesJson(): String = ratesRepository.exportOverridesJson()
 
-    fun importOverridesJson(rawJson: String) {
+    /**
+     * Handles either a LoanJB Update Bundle (opens Preview before anything is saved)
+     * or a legacy ManualOverridesExport file.
+     */
+    fun importFileContent(rawJson: String, fileName: String? = null) {
         viewModelScope.launch {
-            val res = ratesRepository.importOverridesJson(rawJson)
+            if (ratesRepository.isUpdateBundlePayload(rawJson)) {
+                val previewRes = ratesRepository.previewUpdateBundle(rawJson, fileName)
+                previewRes.fold(
+                    onSuccess = { preview -> _pendingBundlePreview.value = preview },
+                    onFailure = { err -> _snackbar.value = err.message ?: "Invalid update bundle" }
+                )
+            } else {
+                val res = ratesRepository.importOverridesJson(rawJson, fileName)
+                _snackbar.value = res.fold(
+                    onSuccess = { count -> "Imported $count manual override(s)" },
+                    onFailure = { err -> err.message ?: "Import failed" }
+                )
+            }
+        }
+    }
+
+    fun applyPendingBundle(selectedItemKeys: Set<String>, selectedTableIds: Set<String>, applyConfirmedUnchanged: Boolean) {
+        val preview = _pendingBundlePreview.value ?: return
+        viewModelScope.launch {
+            val res = ratesRepository.applyUpdateBundlePreview(
+                preview = preview,
+                selectedItemKeys = selectedItemKeys,
+                selectedTableIds = selectedTableIds,
+                applyConfirmedUnchanged = applyConfirmedUnchanged
+            )
+            _pendingBundlePreview.value = null
             _snackbar.value = res.fold(
-                onSuccess = { count -> "Imported $count manual override(s)" },
-                onFailure = { err -> err.message ?: "Import failed" }
+                onSuccess = { count ->
+                    appContext.getString(R.string.bundle_applied_summary, count, preview.dataVersion)
+                },
+                onFailure = { err -> err.message ?: "Apply failed" }
+            )
+        }
+    }
+
+    fun dismissBundlePreview() {
+        _pendingBundlePreview.value = null
+    }
+
+    fun undoLastImport() {
+        viewModelScope.launch {
+            val res = ratesRepository.undoLastImport()
+            _snackbar.value = res.fold(
+                onSuccess = { summary -> appContext.getString(R.string.bundle_undone_summary, summary) },
+                onFailure = { err -> err.message ?: "Nothing to undo" }
             )
         }
     }

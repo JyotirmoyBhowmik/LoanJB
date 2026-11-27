@@ -109,7 +109,9 @@ internal object LoanSpecialtyCalculators {
 
         val effectiveEvents = if (input.flexiEvents.isEmpty()) {
             mapOf(1 to listOf(FlexiEvent(1, drawAmount = LoanCalculationEngine.roundPaisa(input.principal * 0.7))))
-        } else eventsByMonth
+        } else {
+            eventsByMonth
+        }
 
         for (m in 1..months) {
             val evs = effectiveEvents[m].orEmpty()
@@ -216,7 +218,13 @@ internal object LoanSpecialtyCalculators {
             gstOnFeeAmount = fees.gstOnFee,
             totalFees = fees.totalFees,
             effectiveTotalCost = LoanCalculationEngine.roundPaisa(advanceBd.toDouble() + totalCost),
-            interestToPrincipalPercent = if (advanceBd > MoneyMath.ZERO) LoanCalculationEngine.roundPaisa((discountFeeBd.toDouble() / advanceBd.toDouble()) * 100.0) else 0.0,
+            interestToPrincipalPercent = if (advanceBd >
+                MoneyMath.ZERO
+            ) {
+                LoanCalculationEngine.roundPaisa((discountFeeBd.toDouble() / advanceBd.toDouble()) * 100.0)
+            } else {
+                0.0
+            },
             loanFreeDateLabel = LoanCalculationEngine.computeLoanFreeDate(input, 1),
             actualTenureMonths = 1,
             ltvPercent = input.billAdvancePercent,
@@ -282,7 +290,13 @@ internal object LoanSpecialtyCalculators {
             insuranceAmount = fees.insurance,
             totalFees = totalFees,
             effectiveTotalCost = LoanCalculationEngine.roundPaisa(maturityPay + totalFees),
-            interestToPrincipalPercent = if (pBd > MoneyMath.ZERO) LoanCalculationEngine.roundPaisa((interestBd.toDouble() / pBd.toDouble()) * 100.0) else 0.0,
+            interestToPrincipalPercent = if (pBd >
+                MoneyMath.ZERO
+            ) {
+                LoanCalculationEngine.roundPaisa((interestBd.toDouble() / pBd.toDouble()) * 100.0)
+            } else {
+                0.0
+            },
             loanFreeDateLabel = LoanCalculationEngine.computeLoanFreeDate(input, 1),
             actualTenureMonths = 1,
             ltvPercent = ltvPercent,
@@ -346,7 +360,13 @@ internal object LoanSpecialtyCalculators {
             insuranceAmount = fees.insurance,
             totalFees = fees.totalFees,
             effectiveTotalCost = LoanCalculationEngine.roundPaisa(totalPayment + fees.totalFees),
-            interestToPrincipalPercent = if (pBd > MoneyMath.ZERO) LoanCalculationEngine.roundPaisa((totalInterest / pBd.toDouble()) * 100.0) else 0.0,
+            interestToPrincipalPercent = if (pBd >
+                MoneyMath.ZERO
+            ) {
+                LoanCalculationEngine.roundPaisa((totalInterest / pBd.toDouble()) * 100.0)
+            } else {
+                0.0
+            },
             loanFreeDateLabel = LoanCalculationEngine.computeLoanFreeDate(input, months),
             actualTenureMonths = months,
             ltvPercent = ltvPercent,
@@ -432,7 +452,13 @@ internal object LoanSpecialtyCalculators {
 
         val totalPayment = LoanCalculationEngine.roundPaisa(pBd.toDouble() + totalInterestBd.toDouble())
         val fees = LoanCalculationEngine.calculateFeeBundle(input.principal, input, isFloating = false, totalPrepaid = 0.0)
-        val peakLtv = if (input.assetValue > 0.0) LoanCalculationEngine.roundPaisa((totalPayment / input.assetValue) * 100.0) else ltvPercent
+        val peakLtv = if (input.assetValue >
+            0.0
+        ) {
+            LoanCalculationEngine.roundPaisa((totalPayment / input.assetValue) * 100.0)
+        } else {
+            ltvPercent
+        }
         val isAuctionRisk = input.assetValue > 0.0 && peakLtv >= input.goldAuctionRiskLtvPercent - 0.01
 
         return CalculationResult(
@@ -448,7 +474,13 @@ internal object LoanSpecialtyCalculators {
             insuranceAmount = fees.insurance,
             totalFees = fees.totalFees,
             effectiveTotalCost = LoanCalculationEngine.roundPaisa(totalPayment + fees.totalFees),
-            interestToPrincipalPercent = if (pBd > MoneyMath.ZERO) LoanCalculationEngine.roundPaisa((totalInterestBd.toDouble() / pBd.toDouble()) * 100.0) else 0.0,
+            interestToPrincipalPercent = if (pBd >
+                MoneyMath.ZERO
+            ) {
+                LoanCalculationEngine.roundPaisa((totalInterestBd.toDouble() / pBd.toDouble()) * 100.0)
+            } else {
+                0.0
+            },
             loanFreeDateLabel = LoanCalculationEngine.computeLoanFreeDate(input, months),
             actualTenureMonths = months,
             ltvPercent = ltvPercent,

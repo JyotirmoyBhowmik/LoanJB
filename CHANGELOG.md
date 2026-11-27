@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.1.0] — Build Hardening, Keystore AES-GCM Storage & Modularization
+
+### Added
+- **Gradle Wrapper (Gradle 9.3.1)**: Added `gradlew`, `gradlew.bat`, and `gradle/wrapper/` pinned to Gradle 9.3.1 for AGP 9.1.1 compatibility.
+- **Static Analysis (`ktlint`)**: Added `org.jlleitschuh.gradle.ktlint` with `.editorconfig` and a baseline (`app/config/ktlint/baseline.xml`) so CI passes on existing code and fails on new lint violations.
+- **Android Keystore + AES-256-GCM Encrypted Preferences (`KeystoreEncryptedPrefs`)**: Replaced active `EncryptedSharedPreferences` usage in `AppLockManager` and `SecureApiKeyStore` with a Keystore-backed AES-256-GCM wrapper with AAD key-binding, automatic one-time migration from legacy `EncryptedSharedPreferences` files, immediate legacy file deletion, and updated backup exclusion rules (`backup_rules.xml`, `data_extraction_rules.xml`).
+- **Security & Migration Unit Tests**: Added `KeystoreEncryptedPrefsAndMigrationTest` covering AES-GCM tamper/AAD checks, PIN setup/verification/clearing, API key save/load/mask/clear, and one-time legacy migration idempotency.
+
+### Changed
+- **Unified CI Workflow**: Merged `.github/workflows/android-build.yml` and `.github/workflows/android-ci.yml` into a single `android-ci.yml` workflow using `actions/checkout@v4`, `actions/setup-java@v4` (Temurin 17), `gradle/actions/setup-gradle@v4`, and `./gradlew` for `ktlintCheck`, `testDebugUnitTest`, `jacocoTestReport`, `lintDebug`, `assembleDebug`, and `minifyReleaseWithR8` / `bundleRelease` with a throwaway CI key; kept `validate-config.yml`.
+- **Dependencies**: Updated Compose BOM (`2026.06.01`) and AndroidX libraries (`core-ktx` 1.18.0, `lifecycle` 2.10.0, `activity-compose` 1.13.0, `navigation-compose` 2.9.8, `room` 2.8.5, `work` 2.12.0, `datastore` 1.3.0, `appcompat` 1.8.0, `profileinstaller` 1.4.1, `security-crypto` 1.1.0 stable for one-time migration) to latest stable versions compatible with `compileSdk 36`; updated `LoanTypeDropdown` to `ExposedDropdownMenuAnchorType`.
+- **Narrowed R8 Rules (`app/proguard-rules.pro`)**: Replaced broad `data.**` and `domain.**` wildcard keep rules with targeted rules for Moshi `@JsonClass` models/adapters, Room entities/DAOs, WorkManager workers, BroadcastReceivers, and AppWidgetProvider.
+- **File Modularization (≤600 lines)**: Split 7 large files without changing behavior:
+  - `LoanCalculationEngine.kt` → extracted `LoanScheduleSimulator.kt`
+  - `RetirementEngines.kt` → extracted `EpfAndPensionEngines.kt`
+  - `LoanComparisonScreen.kt` → extracted `LoanComparisonCharts.kt`
+  - `DataRatesScreen.kt` → extracted `DataRatesComponents.kt`
+  - `FixedDepositScreen.kt` → extracted `DepositSharedComponents.kt`
+  - `ExploreScreen.kt` → extracted `ExploreDetailComponents.kt`
+  - `IncomeTaxScreen.kt` → extracted `IncomeTaxComponents.kt`
+- **Version Bump**: Bumped `appVersionCode` to `2` and `appVersionName` to `2.1.0` in `gradle/libs.versions.toml`.
+
+### Removed
+- Removed unused `google-services` and `secrets` Gradle plugins, commented-out Firebase/Camera/Coil dependencies, `googleServices.missing.passthrough`, redundant `android-build.yml` workflow, and the placeholder static-analysis file-existence step in CI.
+
 ## [2.0.0] — MoneyWink-Style Indian Financial Hub Redesign
 
 ### Kept Untouched (Core Engine, Persistence & Utilities)

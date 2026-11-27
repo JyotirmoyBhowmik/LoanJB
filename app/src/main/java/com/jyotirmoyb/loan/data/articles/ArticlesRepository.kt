@@ -13,11 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 
-class ArticlesRepository(
-    private val context: Context,
-    private val articlesDao: ArticlesDao,
-    private val ratesRepository: RatesRepository
-) {
+class ArticlesRepository(private val context: Context, private val articlesDao: ArticlesDao, private val ratesRepository: RatesRepository) {
     private val appContext = context.applicationContext
     private val assetCache = HashMap<String, String>()
 

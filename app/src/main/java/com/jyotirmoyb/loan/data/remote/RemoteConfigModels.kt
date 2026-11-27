@@ -23,6 +23,7 @@ const val UNVERIFIED_MARKER = "UNVERIFIED"
 
 enum class ConfigValueSource {
     MANUAL,
+    IMPORTED,
     ONLINE,
     BUILT_IN
 }
@@ -53,10 +54,7 @@ enum class ConfigCategory(val displayTitle: String) {
  * Type-safe scalar wrapper supporting both numeric rates/caps and string article values
  * without resorting to `Any`.
  */
-data class ConfigScalar(
-    val textValue: String,
-    val numericValue: Double? = textValue.toDoubleOrNull()
-) {
+data class ConfigScalar(val textValue: String, val numericValue: Double? = textValue.toDoubleOrNull()) {
     val isNumeric: Boolean get() = numericValue != null
 
     fun formattedNumber(): String {
@@ -67,24 +65,22 @@ data class ConfigScalar(
 }
 
 class ConfigScalarJsonAdapter : JsonAdapter<ConfigScalar>() {
-    override fun fromJson(reader: JsonReader): ConfigScalar? {
-        return when (reader.peek()) {
-            JsonReader.Token.NUMBER -> {
-                val raw = reader.nextString()
-                val num = raw.toDoubleOrNull()
-                    ?: throw JsonDataException("Invalid numeric value: $raw")
-                ConfigScalar(textValue = raw, numericValue = num)
-            }
-            JsonReader.Token.STRING -> {
-                val text = reader.nextString()
-                ConfigScalar(textValue = text, numericValue = null)
-            }
-            JsonReader.Token.NULL -> {
-                reader.nextNull<Unit>()
-                null
-            }
-            else -> throw JsonDataException("Expected number or string for config value at ${reader.path}")
+    override fun fromJson(reader: JsonReader): ConfigScalar? = when (reader.peek()) {
+        JsonReader.Token.NUMBER -> {
+            val raw = reader.nextString()
+            val num = raw.toDoubleOrNull()
+                ?: throw JsonDataException("Invalid numeric value: $raw")
+            ConfigScalar(textValue = raw, numericValue = num)
         }
+        JsonReader.Token.STRING -> {
+            val text = reader.nextString()
+            ConfigScalar(textValue = text, numericValue = null)
+        }
+        JsonReader.Token.NULL -> {
+            reader.nextNull<Unit>()
+            null
+        }
+        else -> throw JsonDataException("Expected number or string for config value at ${reader.path}")
     }
 
     override fun toJson(writer: JsonWriter, value: ConfigScalar?) {
@@ -108,10 +104,7 @@ data class TaxSlabBand(
 )
 
 @JsonClass(generateAdapter = true)
-data class SurchargeBand(
-    val aboveIncome: Double,
-    val ratePercent: Double
-)
+data class SurchargeBand(val aboveIncome: Double, val ratePercent: Double)
 
 @JsonClass(generateAdapter = true)
 data class TaxDeductionRule(
@@ -200,10 +193,7 @@ data class ApyContributionRow(
 }
 
 @JsonClass(generateAdapter = true)
-data class PmsymContributionRow(
-    val entryAge: Int,
-    val monthlyContribution: Double
-)
+data class PmsymContributionRow(val entryAge: Int, val monthlyContribution: Double)
 
 @JsonClass(generateAdapter = true)
 data class SeniorSchemeStatusRule(
@@ -338,48 +328,13 @@ data class ResolvedConfigItem(
 }
 
 @JsonClass(generateAdapter = true)
-data class ManualOverrideRecord(
-    val key: String,
-    val value: String,
-    val updatedOnDate: String
-)
+data class ManualOverrideRecord(val key: String, val value: String, val updatedOnDate: String)
 
 @JsonClass(generateAdapter = true)
 data class ManualOverridesExport(
     val schemaVersion: Int = 1,
     val exportedOn: String,
     val overrides: List<ManualOverrideRecord> = emptyList()
-)
-
-@JsonClass(generateAdapter = true)
-data class UpdateBundleSection(
-    val items: List<RemoteConfigItem>? = null,
-    val bankFdRates: List<BankFdRateSeed>? = null,
-    val taxYears: List<TaxYearRules>? = null,
-    val seniorPensionSchemes: List<SeniorSchemeStatusRule>? = null,
-    val apyTable: List<ApyContributionRow>? = null,
-    val pmsymTable: List<PmsymContributionRow>? = null
-)
-
-@JsonClass(generateAdapter = true)
-data class UnresolvedItemNote(
-    val key: String,
-    val reason: String
-)
-
-@JsonClass(generateAdapter = true)
-data class LoanJbUpdateBundle(
-    val bundleVersion: Int = 1,
-    val generatedOn: String = "",
-    val generatedBy: String = "",
-    val dataVersion: String = "",
-    val rates: UpdateBundleSection? = null,
-    val taxslabs: UpdateBundleSection? = null,
-    val schemes: UpdateBundleSection? = null,
-    val confirmedUnchanged: List<String> = emptyList(),
-    val unresolved: List<UnresolvedItemNote> = emptyList(),
-    val suggestedNewKeys: List<RemoteConfigItem> = emptyList(),
-    val notes: List<String> = emptyList()
 )
 
 data class SyncStatus(

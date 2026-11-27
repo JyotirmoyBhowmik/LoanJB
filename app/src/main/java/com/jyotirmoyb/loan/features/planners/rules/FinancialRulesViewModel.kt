@@ -65,10 +65,7 @@ data class FinancialRulesUiState(
     val healthConfigItem: ResolvedConfigItem? = null
 )
 
-class FinancialRulesViewModel(
-    prefsRepo: UserPreferencesRepository,
-    ratesRepo: RatesRepository
-) : ViewModel() {
+class FinancialRulesViewModel(prefsRepo: UserPreferencesRepository, ratesRepo: RatesRepository) : ViewModel() {
 
     private data class Draft(
         val activeTab: FinancialRuleTab = FinancialRuleTab.BUDGET_50_30_20,
@@ -169,7 +166,11 @@ class FinancialRulesViewModel(
             existingHealthCover = d.existingHealthCover,
             insuranceResult = insuranceRes,
             termConfigItem = resolvedMap[ConfigKeys.PLANNER_TERM_MULTIPLIER],
-            healthConfigItem = if (d.isMetroCity) resolvedMap[ConfigKeys.PLANNER_HEALTH_METRO] else resolvedMap[ConfigKeys.PLANNER_HEALTH_NON_METRO]
+            healthConfigItem = if (d.isMetroCity) {
+                resolvedMap[ConfigKeys.PLANNER_HEALTH_METRO]
+            } else {
+                resolvedMap[ConfigKeys.PLANNER_HEALTH_NON_METRO]
+            }
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FinancialRulesUiState())
 
@@ -248,12 +249,8 @@ class FinancialRulesViewModel(
         draft.update { it.copy(existingHealthCover = amount.coerceAtLeast(0.0)) }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepo: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepo: RatesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            FinancialRulesViewModel(prefsRepo, ratesRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = FinancialRulesViewModel(prefsRepo, ratesRepo) as T
     }
 }

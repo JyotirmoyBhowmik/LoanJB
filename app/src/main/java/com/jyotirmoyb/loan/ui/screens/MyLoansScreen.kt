@@ -42,9 +42,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.CurrencyCode
 import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
@@ -136,12 +138,12 @@ fun MyLoansScreen(
                             modifier = Modifier.size(48.dp)
                         )
                         Text(
-                            "No Saved Loans Yet",
+                            stringResource(R.string.ui_txt_no_saved_loans_yet),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            "Calculate any loan in the EMI Calculator and tap \"Save Loan\" to track EMIs, NACH auto-debit, reminders, prepayments, floating-rate resets, closure checklists, and DTI.",
+                            stringResource(R.string.ui_txt_calculate_any_loan_in_the_emi_calc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -155,7 +157,7 @@ fun MyLoansScreen(
                         ) {
                             Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Plan & Save a Loan")
+                            Text(stringResource(R.string.ui_txt_plan_save_a_loan))
                         }
                     }
                 }
@@ -183,11 +185,7 @@ fun MyLoansScreen(
 }
 
 @Composable
-private fun PortfolioDashboardCard(
-    metrics: PortfolioMetrics,
-    monthlyIncome: Double,
-    currency: CurrencyCode
-) {
+private fun PortfolioDashboardCard(metrics: PortfolioMetrics, monthlyIncome: Double, currency: CurrencyCode) {
     val dtiColor = when {
         metrics.dtiPercent <= 35.0 -> Color(0xFF5EEAD4)
         metrics.dtiPercent <= 50.0 -> Color(0xFFFCD34D)
@@ -214,10 +212,14 @@ private fun PortfolioDashboardCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("INDIA DEBT PORTFOLIO", style = MaterialTheme.typography.labelSmall, color = Color(0xFFA7F3E8))
+                Text(
+                    stringResource(R.string.ui_txt_india_debt_portfolio),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFFA7F3E8)
+                )
                 Surface(color = Color.White.copy(alpha = 0.14f), shape = RoundedCornerShape(8.dp)) {
                     Text(
-                        "${metrics.activeLoanCount} Active",
+                        stringResource(R.string.ui_txt_active, metrics.activeLoanCount),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -231,7 +233,11 @@ private fun PortfolioDashboardCard(
                 verticalAlignment = Alignment.Bottom
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Total Outstanding Debt", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                    Text(
+                        stringResource(R.string.ui_txt_total_outstanding_debt),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFCBD5E1)
+                    )
                     Text(
                         CurrencyFormatter.format(metrics.totalOutstandingDebt, currency),
                         style = MonoLargeStyle,
@@ -239,7 +245,11 @@ private fun PortfolioDashboardCard(
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("INTEREST SAVED", style = MaterialTheme.typography.labelSmall, color = Color(0xFFA7F3E8))
+                    Text(
+                        stringResource(R.string.ui_txt_interest_saved),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFA7F3E8)
+                    )
                     Text(
                         CurrencyFormatter.format(metrics.totalInterestSaved, currency),
                         style = MonoMediumStyle,
@@ -249,7 +259,7 @@ private fun PortfolioDashboardCard(
                     )
                     if (metrics.totalMonthsSaved > 0) {
                         Text(
-                            "${metrics.totalMonthsSaved} mo(s) cut",
+                            stringResource(R.string.ui_txt_mo_s_cut, metrics.totalMonthsSaved),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFFA7F3E8)
                         )
@@ -261,7 +271,11 @@ private fun PortfolioDashboardCard(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
-                    Text("MONTHLY OBLIGATIONS", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                    Text(
+                        stringResource(R.string.ui_txt_monthly_obligations),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFCBD5E1)
+                    )
                     Text(
                         CurrencyFormatter.format(metrics.totalMonthlyEmiBurden, currency),
                         style = MonoMediumStyle,
@@ -269,9 +283,13 @@ private fun PortfolioDashboardCard(
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("DEBT-TO-INCOME (DTI)", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
                     Text(
-                        "${String.format("%.1f", metrics.dtiPercent)}% • $dtiLabel",
+                        stringResource(R.string.ui_txt_debt_to_income_dti),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFCBD5E1)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_fmt_6a68b0, String.format("%.1f", metrics.dtiPercent), dtiLabel),
                         style = MonoSmallStyle,
                         fontWeight = FontWeight.Bold,
                         color = dtiColor
@@ -293,12 +311,7 @@ private fun PortfolioDashboardCard(
 }
 
 @Composable
-private fun SavedLoanListCard(
-    loan: TrackedLoanSummary,
-    currency: CurrencyCode,
-    onClick: () -> Unit,
-    onQuickPayNext: () -> Unit
-) {
+private fun SavedLoanListCard(loan: TrackedLoanSummary, currency: CurrencyCode, onClick: () -> Unit, onQuickPayNext: () -> Unit) {
     FintechCard(
         modifier = Modifier
             .clickable(onClick = onClick)
@@ -328,7 +341,7 @@ private fun SavedLoanListCard(
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                "NACH",
+                                stringResource(R.string.ui_txt_nach),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = PrincipalEmerald,
@@ -338,7 +351,7 @@ private fun SavedLoanListCard(
                     }
                 }
                 Text(
-                    "${loan.entity.lender} • ${loan.entity.categoryName} • Day ${loan.emiDayOfMonth}",
+                    stringResource(R.string.ui_txt_day, loan.entity.lender, loan.entity.categoryName, loan.emiDayOfMonth),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -351,7 +364,11 @@ private fun SavedLoanListCard(
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("Next Due", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.ui_txt_next_due),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Text(loan.nextDueDateLabel, style = MonoSmallStyle, fontWeight = FontWeight.Bold)
             }
         }
@@ -360,13 +377,21 @@ private fun SavedLoanListCard(
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column {
-                Text("Outstanding", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.ui_txt_outstanding),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Text(CurrencyFormatter.format(loan.outstandingPrincipal, currency), style = MonoMediumStyle)
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("Paid / Total EMIs", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${loan.paidMonthNumbers.size} / ${loan.result.schedule.size}",
+                    stringResource(R.string.ui_txt_paid_total_emis),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    stringResource(R.string.ui_txt_fmt_077e75, loan.paidMonthNumbers.size, loan.result.schedule.size),
                     style = MonoMediumStyle,
                     color = PrincipalEmerald
                 )
@@ -387,9 +412,20 @@ private fun SavedLoanListCard(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Icon(Icons.Outlined.Savings, contentDescription = null, tint = SavingsGreen, modifier = Modifier.size(14.dp))
+                    val savedBadgeText = if (loan.monthsSaved > 0) {
+                        stringResource(
+                            R.string.ui_loan_saved_with_months,
+                            CurrencyFormatter.format(loan.interestSaved, currency),
+                            loan.monthsSaved
+                        )
+                    } else {
+                        stringResource(
+                            R.string.ui_loan_saved_only,
+                            CurrencyFormatter.format(loan.interestSaved, currency)
+                        )
+                    }
                     Text(
-                        "Saved ${CurrencyFormatter.format(loan.interestSaved, currency)}" +
-                            if (loan.monthsSaved > 0) " • ${loan.monthsSaved} mo(s) faster" else "",
+                        text = savedBadgeText,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = SavingsGreen
@@ -415,7 +451,11 @@ private fun SavedLoanListCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "EMI: ${CurrencyFormatter.format(loan.result.monthlyEmi, currency)} • ${String.format("%.2f", loan.input.annualRate)}%",
+                stringResource(
+                    R.string.ui_txt_emi_08e871,
+                    CurrencyFormatter.format(loan.result.monthlyEmi, currency),
+                    String.format("%.2f", loan.input.annualRate)
+                ),
                 style = MonoSmallStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -430,7 +470,7 @@ private fun SavedLoanListCard(
                 ) {
                     Icon(Icons.Outlined.CheckCircle, contentDescription = null, modifier = Modifier.size(15.dp))
                     Spacer(Modifier.width(5.dp))
-                    Text("Mark M#${loan.nextDueMonthNumber} Paid", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.ui_txt_mark_m_paid, loan.nextDueMonthNumber), style = MaterialTheme.typography.labelMedium)
                 }
             }
         }

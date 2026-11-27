@@ -97,7 +97,7 @@ internal fun VariantAdaptiveAdvanceRows(
                 )
                 ltvConfigItem?.let {
                     Text(
-                        text = "Max LTV Cap: ${it.valueText}% (${it.label})",
+                        text = stringResource(R.string.ui_txt_max_ltv_cap, it.valueText, it.label),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -183,7 +183,7 @@ internal fun VariantAdaptiveAdvanceRows(
 
                 if (isMclr) {
                     Text(
-                        text = "MCLR Reset Frequency",
+                        text = stringResource(R.string.ui_txt_mclr_reset_frequency),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -192,7 +192,7 @@ internal fun VariantAdaptiveAdvanceRows(
                             FilterChip(
                                 selected = input.mclrResetMonths == resetM,
                                 onClick = { onUpdateInput { it.copy(mclrResetMonths = resetM) } },
-                                label = { Text("Every $resetM months") },
+                                label = { Text(stringResource(R.string.ui_txt_every_months, resetM)) },
                                 modifier = Modifier.testTag("mclr_reset_$resetM")
                             )
                         }
@@ -213,7 +213,9 @@ internal fun VariantAdaptiveAdvanceRows(
                         AssistChip(
                             onClick = { onApplyRepoScenario(delta) },
                             label = { Text(label, style = MaterialTheme.typography.labelSmall) },
-                            modifier = Modifier.testTag("repo_scenario_${if (delta > 0) "plus" else "minus"}_${kotlin.math.abs((delta * 100).toInt())}")
+                            modifier = Modifier.testTag(
+                                "repo_scenario_${if (delta > 0) "plus" else "minus"}_${kotlin.math.abs((delta * 100).toInt())}"
+                            )
                         )
                     }
                 }
@@ -262,7 +264,7 @@ internal fun VariantAdaptiveAdvanceRows(
                 ) {
                     Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Add Rate Change")
+                    Text(stringResource(R.string.ui_txt_add_rate_change))
                 }
             }
         }
@@ -297,7 +299,9 @@ internal fun VariantAdaptiveAdvanceRows(
                         label = "Subsidy Amount (${currency.symbol})",
                         valueText = input.pmaySubsidyAmount.toLong().toString(),
                         onValueChange = { txt ->
-                            onUpdateInput { it.copy(pmaySubsidyEnabled = true, pmaySubsidyAmount = (txt.toDoubleOrNull() ?: 0.0).coerceAtLeast(0.0)) }
+                            onUpdateInput {
+                                it.copy(pmaySubsidyEnabled = true, pmaySubsidyAmount = (txt.toDoubleOrNull() ?: 0.0).coerceAtLeast(0.0))
+                            }
                         },
                         trailingBadge = CurrencyFormatter.formatShortLabel(input.pmaySubsidyAmount, currency),
                         modifier = Modifier.weight(1.3f)
@@ -405,7 +409,7 @@ internal fun VariantAdaptiveAdvanceRows(
                 ) {
                     Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Add Tranche")
+                    Text(stringResource(R.string.ui_txt_add_tranche))
                 }
             }
         }

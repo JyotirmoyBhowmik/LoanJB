@@ -23,6 +23,8 @@ import com.jyotirmoyb.loan.domain.STANDARD_PLANNING_DISCLAIMER
 import com.jyotirmoyb.loan.domain.TrancheEntry
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
 import com.jyotirmoyb.loan.util.EmiReminderScheduler
+import java.util.Calendar
+import kotlin.math.abs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,8 +32,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import kotlin.math.abs
 
 data class EmiUiState(
     val catalog: LoanCatalog = LoanCatalog(),
@@ -72,7 +72,8 @@ private fun defaultIndianInput(): CalculationInput {
     )
 }
 
-class EmiViewModel(application: Application) : AndroidViewModel(application),
+class EmiViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<CalculationInput, CalculationResult> {
 
     override val id: String = "loan_emi"
@@ -94,6 +95,7 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
         _snackbarMessage
     ) { values ->
         val rawCatalog = values[0] as LoanCatalog
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = values[1] as Map<String, ResolvedConfigItem>
         val rawInput = values[2] as CalculationInput
@@ -215,7 +217,11 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
             rateChanges = curr.rateChanges + RateChangeEvent(afterMonth = afterMonth, newAnnualRate = newRate)
         )
         val dir = if (deltaPercent > 0) "hike" else "cut"
-        _snackbarMessage.value = "Added repo $dir (${if (deltaPercent > 0) "+" else ""}${String.format("%.2f", deltaPercent)}%) at Month $afterMonth → ${String.format("%.2f", newRate)}%"
+        _snackbarMessage.value =
+            "Added repo $dir (${if (deltaPercent > 0) "+" else ""}${String.format(
+                "%.2f",
+                deltaPercent
+            )}%) at Month $afterMonth → ${String.format("%.2f", newRate)}%"
     }
 
     fun updateEmiDayOfMonth(day: Int) {
@@ -266,7 +272,9 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
 
         val midRate = when {
             flags.contains("RATE_EBLR") -> LoanCalculationEngine.roundPaisa(repo + spread)
-            preselectedVariant != null -> LoanCalculationEngine.roundPaisa((preselectedVariant.rateRangeMin + preselectedVariant.rateRangeMax) / 2.0)
+            preselectedVariant != null -> LoanCalculationEngine.roundPaisa(
+                (preselectedVariant.rateRangeMin + preselectedVariant.rateRangeMax) / 2.0
+            )
             else -> LoanCalculationEngine.roundPaisa((category.rateRangeMin + category.rateRangeMax) / 2.0)
         }
 
@@ -378,8 +386,13 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
     fun selectEmiModeFlag(modeFlag: String) {
         val current = _input.value
         val emiFlags = setOf(
-            "EMI_STANDARD", "RATE_FLAT", "EMI_STEP_UP", "EMI_STEP_DOWN",
-            "EMI_BALLOON", "RATE_HYBRID", "EMI_OFFSET"
+            "EMI_STANDARD",
+            "RATE_FLAT",
+            "EMI_STEP_UP",
+            "EMI_STEP_DOWN",
+            "EMI_BALLOON",
+            "RATE_HYBRID",
+            "EMI_OFFSET"
         )
         val filtered = current.ruleFlags.filterNot { it in emiFlags }.toMutableList()
         filtered.add(modeFlag)
@@ -478,23 +491,31 @@ class EmiViewModel(application: Application) : AndroidViewModel(application),
             appendLine("Interest Rate: ${CurrencyFormatter.formatPercent(state.input.annualRate)}")
             appendLine("Tenure: ${r.actualTenureMonths} months (Loan-Free: ${r.loanFreeDateLabel})")
             appendLine("Monthly EMI: ${CurrencyFormatter.format(r.monthlyEmi, cur, true)}")
-            appendLine("Total Interest: ${CurrencyFormatter.format(r.totalInterest, cur)} (${String.format("%.1f", r.interestToPrincipalPercent)}% of principal)")
+            appendLine(
+                "Total Interest: ${CurrencyFormatter.format(
+                    r.totalInterest,
+                    cur
+                )} (${String.format("%.1f", r.interestToPrincipalPercent)}% of principal)"
+            )
             appendLine("Total Payable: ${CurrencyFormatter.format(r.totalPayment, cur)}")
             r.insights.prepaymentImpact?.let { p ->
-                appendLine("Prepayment Savings: ${CurrencyFormatter.format(p.interestSaved, cur)} interest, ${p.monthsSaved} month(s) saved")
+                appendLine(
+                    "Prepayment Savings: ${CurrencyFormatter.format(p.interestSaved, cur)} interest, ${p.monthsSaved} month(s) saved"
+                )
             }
             appendLine(STANDARD_PLANNING_DISCLAIMER)
         }
     }
 
-    private fun applyDataDrivenBounds(
-        input: CalculationInput,
-        resolved: Map<String, ResolvedConfigItem>
-    ): CalculationInput {
+    private fun applyDataDrivenBounds(input: CalculationInput, resolved: Map<String, ResolvedConfigItem>): CalculationInput {
         if (resolved.isEmpty()) return input
         return input.copy(
             gstRatePercent = DataSourceResolver.resolveDouble(resolved, ConfigKeys.GST_BANKING_SERVICES, input.gstRatePercent),
-            goldAuctionRiskLtvPercent = DataSourceResolver.resolveDouble(resolved, ConfigKeys.GOLD_AUCTION_RISK_LTV, input.goldAuctionRiskLtvPercent),
+            goldAuctionRiskLtvPercent = DataSourceResolver.resolveDouble(
+                resolved,
+                ConfigKeys.GOLD_AUCTION_RISK_LTV,
+                input.goldAuctionRiskLtvPercent
+            ),
             section24bCap = DataSourceResolver.resolveDouble(resolved, ConfigKeys.SEC_24B_CAP, input.section24bCap),
             section80cCap = DataSourceResolver.resolveDouble(resolved, ConfigKeys.SEC_80C_CAP, input.section80cCap),
             section80eMaxYears = DataSourceResolver.resolveInt(resolved, ConfigKeys.SEC_80E_MAX_YEARS, input.section80eMaxYears)

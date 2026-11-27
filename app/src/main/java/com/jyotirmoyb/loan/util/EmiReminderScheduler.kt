@@ -11,6 +11,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.jyotirmoyb.loan.R
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -19,14 +20,13 @@ enum class ReminderScheduleMode {
     INEXACT_FALLBACK
 }
 
-class EmiReminderWorker(
-    appContext: Context,
-    params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+class EmiReminderWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         val loanId = inputData.getLong(EmiReminderReceiver.EXTRA_LOAN_ID, 0L)
-        val title = inputData.getString(EmiReminderReceiver.EXTRA_TITLE) ?: "LoanJB EMI Reminder"
-        val body = inputData.getString(EmiReminderReceiver.EXTRA_BODY) ?: "Your upcoming loan EMI is due soon."
+        val title = inputData.getString(EmiReminderReceiver.EXTRA_TITLE)
+            ?: applicationContext.getString(R.string.notif_emi_default_title)
+        val body = inputData.getString(EmiReminderReceiver.EXTRA_BODY)
+            ?: applicationContext.getString(R.string.notif_emi_default_body)
         EmiReminderReceiver.showNotification(applicationContext, loanId, title, body)
         return Result.success()
     }
@@ -69,14 +69,14 @@ object EmiReminderScheduler {
         val delayMillis = maxOf(5_000L, triggerMillis - now)
 
         val title = if (autoDebitNach) {
-            "NACH Auto-Debit Soon: $nickname"
+            context.getString(R.string.notif_nach_title, nickname)
         } else {
-            "EMI Due Soon: $nickname"
+            context.getString(R.string.notif_emi_due_title, nickname)
         }
         val body = if (autoDebitNach) {
-            "Auto-debit (NACH) EMI of $emiFormatted is due in $daysBefore day(s). Ensure sufficient bank balance."
+            context.getString(R.string.notif_nach_body, emiFormatted, daysBefore)
         } else {
-            "Upcoming EMI of $emiFormatted is due in $daysBefore day(s). Open LoanJB to mark it paid."
+            context.getString(R.string.notif_emi_due_body, emiFormatted, daysBefore)
         }
 
         val pendingIntent = buildPendingIntent(
@@ -86,10 +86,11 @@ object EmiReminderScheduler {
             body = body
         )
 
-        val canScheduleExact = alarmManager != null && (
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
-                alarmManager.canScheduleExactAlarms()
-            )
+        val canScheduleExact = alarmManager != null &&
+            (
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                    alarmManager.canScheduleExactAlarms()
+                )
 
         return if (canScheduleExact && alarmManager != null) {
             cancelFallbackWork(context, loanId)
@@ -153,12 +154,7 @@ object EmiReminderScheduler {
 
     private fun uniqueWorkName(loanId: Long): String = "loanjb_emi_reminder_$loanId"
 
-    private fun buildPendingIntent(
-        context: Context,
-        loanId: Long,
-        title: String,
-        body: String
-    ): PendingIntent {
+    private fun buildPendingIntent(context: Context, loanId: Long, title: String, body: String): PendingIntent {
         val intent = Intent(context, EmiReminderReceiver::class.java).apply {
             putExtra(EmiReminderReceiver.EXTRA_LOAN_ID, loanId)
             putExtra(EmiReminderReceiver.EXTRA_TITLE, title)

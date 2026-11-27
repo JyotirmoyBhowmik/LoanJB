@@ -74,10 +74,7 @@ private fun emptyTaxCatalog(): TaxRulesCatalog = TaxRulesCatalog(
     source = ConfigValueSource.BUILT_IN
 )
 
-class IncomeTaxViewModel(
-    private val prefsRepo: UserPreferencesRepository,
-    private val ratesRepository: RatesRepository
-) : ViewModel() {
+class IncomeTaxViewModel(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(IncomeTaxUiState())
     val uiState: StateFlow<IncomeTaxUiState> = _uiState.asStateFlow()
@@ -202,13 +199,9 @@ class IncomeTaxViewModel(
         }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepository: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) :
+        ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return IncomeTaxViewModel(prefsRepo, ratesRepository) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = IncomeTaxViewModel(prefsRepo, ratesRepository) as T
     }
 }

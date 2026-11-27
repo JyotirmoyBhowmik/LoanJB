@@ -15,6 +15,7 @@ import com.jyotirmoyb.loan.features.CalculatorRegistry
 import com.jyotirmoyb.loan.features.emi.EmiUiState
 import com.jyotirmoyb.loan.features.emi.results.EmiResultsScreen
 import com.jyotirmoyb.loan.ui.theme.LoanJBTheme
+import kotlin.system.measureTimeMillis
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -22,7 +23,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import kotlin.system.measureTimeMillis
 
 /**
  * Cold-start & 360-row amortization schedule performance benchmark test.

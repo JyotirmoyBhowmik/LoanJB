@@ -48,8 +48,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     ) { values ->
         val prefs = values[0] as UserPreferences
         val cat = values[1] as LoanCatalog
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = values[2] as Map<String, com.jyotirmoyb.loan.data.remote.ResolvedConfigItem>
+
         @Suppress("UNCHECKED_CAST")
         val loans = values[3] as List<com.jyotirmoyb.loan.data.SavedLoanEntity>
         val msg = values[4] as String?
@@ -76,8 +78,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun serializeCatalog(catalog: LoanCatalog): String = repository.serializeCatalog(catalog)
 
-    suspend fun createEncryptedBackupJson(password: String): Result<String> =
-        repository.createEncryptedBackupJson(password)
+    suspend fun createEncryptedBackupJson(password: String): Result<String> = repository.createEncryptedBackupJson(password)
 
     fun setRegion(region: RegionCode) {
         viewModelScope.launch { repository.setRegion(region) }

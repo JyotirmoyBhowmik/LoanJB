@@ -11,6 +11,7 @@ import com.jyotirmoyb.loan.domain.LoanCatalog
 import com.jyotirmoyb.loan.domain.LoanCategory
 import com.jyotirmoyb.loan.domain.LoanVariant
 import com.jyotirmoyb.loan.domain.VariantGroup
+import java.io.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -31,7 +32,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Response
-import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -42,28 +42,27 @@ class RemoteConfigAndResolverTest {
         private val overrides = MutableStateFlow<Map<String, ManualOverrideEntity>>(emptyMap())
         private val meta = MutableStateFlow<SyncMetadataEntity?>(null)
 
-        override fun observeAllCaches(): Flow<List<RemoteConfigCacheEntity>> =
-            caches.map { it.values.sortedBy { c -> c.fileName } }
+        override fun observeAllCaches(): Flow<List<RemoteConfigCacheEntity>> = caches.map { it.values.sortedBy { c -> c.fileName } }
 
-        override suspend fun getCacheByFile(fileName: String): RemoteConfigCacheEntity? =
-            caches.value[fileName]
+        override suspend fun getCacheByFile(fileName: String): RemoteConfigCacheEntity? = caches.value[fileName]
 
-        override suspend fun getAllCachesOnce(): List<RemoteConfigCacheEntity> =
-            caches.value.values.toList()
+        override suspend fun getAllCachesOnce(): List<RemoteConfigCacheEntity> = caches.value.values.toList()
 
         override suspend fun upsertCache(entity: RemoteConfigCacheEntity) {
             caches.value = caches.value + (entity.fileName to entity)
+        }
+
+        override suspend fun deleteCacheByFile(fileName: String) {
+            caches.value = caches.value - fileName
         }
 
         override suspend fun clearAllCaches() {
             caches.value = emptyMap()
         }
 
-        override fun observeManualOverrides(): Flow<List<ManualOverrideEntity>> =
-            overrides.map { it.values.sortedBy { o -> o.key } }
+        override fun observeManualOverrides(): Flow<List<ManualOverrideEntity>> = overrides.map { it.values.sortedBy { o -> o.key } }
 
-        override suspend fun getAllManualOverridesOnce(): List<ManualOverrideEntity> =
-            overrides.value.values.toList()
+        override suspend fun getAllManualOverridesOnce(): List<ManualOverrideEntity> = overrides.value.values.toList()
 
         override suspend fun upsertManualOverride(entity: ManualOverrideEntity) {
             overrides.value = overrides.value + (entity.key to entity)
@@ -90,9 +89,8 @@ class RemoteConfigAndResolverTest {
         override fun loadSeedJson(fileName: String): String? = files[fileName]
     }
 
-    private class FakeRemoteConfigApi(
-        private val handler: (file: String, ifNoneMatch: String?) -> Response<ResponseBody>
-    ) : RemoteConfigApi {
+    private class FakeRemoteConfigApi(private val handler: (file: String, ifNoneMatch: String?) -> Response<ResponseBody>) :
+        RemoteConfigApi {
         val seenIfNoneMatch = mutableMapOf<String, MutableList<String?>>()
         override suspend fun fetchConfig(file: String, ifNoneMatch: String?): Response<ResponseBody> {
             seenIfNoneMatch.getOrPut(file) { mutableListOf() }.add(ifNoneMatch)

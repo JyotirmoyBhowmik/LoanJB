@@ -13,13 +13,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -81,7 +81,7 @@ fun LoanTypeDropdown(
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                     .testTag("emi_loan_type_dropdown")
             )
 
@@ -103,7 +103,11 @@ fun LoanTypeDropdown(
                                 Column {
                                     Text(cat.name, fontWeight = FontWeight.SemiBold)
                                     Text(
-                                        text = "${String.format("%.1f", cat.rateRangeMin)}–${String.format("%.1f", cat.rateRangeMax)}%",
+                                        text = stringResource(
+                                            R.string.ui_txt_fmt_d623c1,
+                                            String.format("%.1f", cat.rateRangeMin),
+                                            String.format("%.1f", cat.rateRangeMax)
+                                        ),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

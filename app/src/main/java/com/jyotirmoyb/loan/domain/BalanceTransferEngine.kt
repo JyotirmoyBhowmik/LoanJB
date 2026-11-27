@@ -191,23 +191,21 @@ object BalanceTransferEngine {
         breakEvenMonth: Int?,
         remainingMonths: Int,
         rateDrop: Double
-    ): Triple<TransferRecommendation, String, String> {
-        return when {
-            rateDrop <= 0.0 || netSavings <= 0.0 || breakEvenMonth == null -> Triple(
-                TransferRecommendation.NOT_RECOMMENDED,
-                "Stay With Current Lender",
-                "Switching costs outweigh the rate benefit over your remaining tenure. Negotiate a conversion rate with your existing bank instead."
-            )
-            breakEvenMonth <= minOf(24, (remainingMonths / 3).coerceAtLeast(6)) && netSavings >= 50000.0 -> Triple(
-                TransferRecommendation.STRONGLY_RECOMMENDED,
-                "Strong Transfer Savings",
-                "You recover all switching costs by month $breakEvenMonth and lock in substantial net interest savings."
-            )
-            else -> Triple(
-                TransferRecommendation.WORTH_CONSIDERING,
-                "Moderate Transfer Benefit",
-                "Transfer breaks even in month $breakEvenMonth. Worth pursuing if you plan to keep the loan longer than $breakEvenMonth months or can negotiate lower processing fees."
-            )
-        }
+    ): Triple<TransferRecommendation, String, String> = when {
+        rateDrop <= 0.0 || netSavings <= 0.0 || breakEvenMonth == null -> Triple(
+            TransferRecommendation.NOT_RECOMMENDED,
+            "Stay With Current Lender",
+            "Switching costs outweigh the rate benefit over your remaining tenure. Negotiate a conversion rate with your existing bank instead."
+        )
+        breakEvenMonth <= minOf(24, (remainingMonths / 3).coerceAtLeast(6)) && netSavings >= 50000.0 -> Triple(
+            TransferRecommendation.STRONGLY_RECOMMENDED,
+            "Strong Transfer Savings",
+            "You recover all switching costs by month $breakEvenMonth and lock in substantial net interest savings."
+        )
+        else -> Triple(
+            TransferRecommendation.WORTH_CONSIDERING,
+            "Moderate Transfer Benefit",
+            "Transfer breaks even in month $breakEvenMonth. Worth pursuing if you plan to keep the loan longer than $breakEvenMonth months or can negotiate lower processing fees."
+        )
     }
 }

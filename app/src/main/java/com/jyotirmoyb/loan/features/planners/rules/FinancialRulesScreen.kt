@@ -363,7 +363,7 @@ private fun EmergencyFundSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Funded: ${res.fundedPercent}%",
+                    text = stringResource(R.string.ui_txt_funded, res.fundedPercent),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (res.shortfall <= 0.0) SavingsGreen else InfoBlue
@@ -397,7 +397,17 @@ private fun EmergencyFundSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 HeroMetricItem("Saved Now", CurrencyFormatter.formatCompact(res.currentLiquidSavings, currency), PrincipalEmerald)
-                HeroMetricItem("Shortfall", CurrencyFormatter.formatCompact(res.shortfall, currency), if (res.shortfall > 0.0) InterestAmber else SavingsGreen)
+                HeroMetricItem(
+                    "Shortfall",
+                    CurrencyFormatter.formatCompact(res.shortfall, currency),
+                    if (res.shortfall >
+                        0.0
+                    ) {
+                        InterestAmber
+                    } else {
+                        SavingsGreen
+                    }
+                )
                 HeroMetricItem(
                     "Time to Build",
                     when (val m = res.monthsToBuild) {
@@ -425,8 +435,16 @@ private fun EmergencyFundSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Safety Buffer Duration", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                Text("${uiState.targetMonths} months", style = MonoSmallStyle, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.ui_txt_safety_buffer_duration),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    stringResource(R.string.ui_txt_months, uiState.targetMonths),
+                    style = MonoSmallStyle,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
             Slider(
                 value = uiState.targetMonths.toFloat(),

@@ -47,13 +47,10 @@ data class MarketUiState(
     val staleCount: Int
         get() = cards.count { it.isStale }
 
-    fun cardsForSection(section: MarketMetricSection): List<MarketMetricCardData> =
-        cards.filter { it.section == section }
+    fun cardsForSection(section: MarketMetricSection): List<MarketMetricCardData> = cards.filter { it.section == section }
 }
 
-class MarketViewModel(
-    private val marketRepository: MarketRepository
-) : ViewModel() {
+class MarketViewModel(private val marketRepository: MarketRepository) : ViewModel() {
 
     private val _selectedFilter = MutableStateFlow(MarketFilterTab.ALL)
     private val _selectedCardKey = MutableStateFlow<String?>(null)
@@ -104,12 +101,7 @@ class MarketViewModel(
         }
     }
 
-    fun saveManualMetric(
-        metricKey: String,
-        rawText: String,
-        onValidationError: (String) -> Unit,
-        onSaved: () -> Unit
-    ) {
+    fun saveManualMetric(metricKey: String, rawText: String, onValidationError: (String) -> Unit, onSaved: () -> Unit) {
         val parsed = rawText.trim().replace(",", "").toDoubleOrNull()
         if (parsed == null || !parsed.isFinite() || parsed < 0.0) {
             onValidationError("Enter a valid non-negative number.")
@@ -195,8 +187,6 @@ class MarketViewModel(
 
     class Factory(private val marketRepository: MarketRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MarketViewModel(marketRepository) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = MarketViewModel(marketRepository) as T
     }
 }

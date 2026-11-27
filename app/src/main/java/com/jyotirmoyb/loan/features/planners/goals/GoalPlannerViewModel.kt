@@ -9,13 +9,13 @@ import com.jyotirmoyb.loan.domain.FinancialGoalItem
 import com.jyotirmoyb.loan.domain.GoalCategory
 import com.jyotirmoyb.loan.domain.MultiGoalPlannerEngine
 import com.jyotirmoyb.loan.domain.MultiGoalSummaryResult
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import java.util.UUID
 
 data class GoalPlannerUiState(
     val goals: List<FinancialGoalItem> = defaultStarterGoals(),
@@ -62,9 +62,7 @@ data class GoalPlannerUiState(
     }
 }
 
-class GoalPlannerViewModel(
-    prefsRepo: UserPreferencesRepository
-) : ViewModel() {
+class GoalPlannerViewModel(prefsRepo: UserPreferencesRepository) : ViewModel() {
 
     private data class Draft(
         val goals: List<FinancialGoalItem> = GoalPlannerUiState.defaultStarterGoals(),
@@ -138,11 +136,8 @@ class GoalPlannerViewModel(
         }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            GoalPlannerViewModel(prefsRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = GoalPlannerViewModel(prefsRepo) as T
     }
 }

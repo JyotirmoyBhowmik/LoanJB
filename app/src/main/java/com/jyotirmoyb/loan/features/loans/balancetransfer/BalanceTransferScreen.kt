@@ -126,15 +126,23 @@ fun BalanceTransferScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text(stringResource(R.string.bt_monthly_savings), style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
                                 Text(
-                                    text = "${CurrencyFormatter.format(res.monthlyEmiSavings, cur)}/mo",
+                                    stringResource(R.string.bt_monthly_savings),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
+                                Text(
+                                    text = stringResource(R.string.ui_txt_mo, CurrencyFormatter.format(res.monthlyEmiSavings, cur)),
                                     style = MonoMediumStyle,
                                     color = Color.White
                                 )
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                Text(stringResource(R.string.bt_switching_cost), style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                                Text(
+                                    stringResource(R.string.bt_switching_cost),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
                                 Text(
                                     text = CurrencyFormatter.format(res.totalSwitchingCost, cur),
                                     style = MonoMediumStyle,
@@ -194,9 +202,21 @@ fun BalanceTransferScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Proc. Fee: ${CurrencyFormatter.format(res.processingFeeAmount, cur)}", style = MonoSmallStyle)
-                        Text("GST: ${CurrencyFormatter.format(res.gstOnFeeAmount, cur)}", style = MonoSmallStyle)
-                        Text("Legal+FC: ${CurrencyFormatter.format(res.legalChargesAmount + res.foreclosureFeeAmount, cur)}", style = MonoSmallStyle)
+                        Text(
+                            stringResource(R.string.ui_txt_proc_fee, CurrencyFormatter.format(res.processingFeeAmount, cur)),
+                            style = MonoSmallStyle
+                        )
+                        Text(stringResource(R.string.ui_txt_gst, CurrencyFormatter.format(res.gstOnFeeAmount, cur)), style = MonoSmallStyle)
+                        Text(
+                            stringResource(
+                                R.string.ui_txt_legal_fc,
+                                CurrencyFormatter.format(
+                                    res.legalChargesAmount + res.foreclosureFeeAmount,
+                                    cur
+                                )
+                            ),
+                            style = MonoSmallStyle
+                        )
                     }
                 }
             }
@@ -218,13 +238,17 @@ fun BalanceTransferScreen(
                     NumericInputField(
                         label = stringResource(R.string.bt_current_rate),
                         valueText = inp.currentAnnualRatePercent.toString(),
-                        onValueChange = { txt -> txt.toDoubleOrNull()?.let { r -> onUpdateInput { it.copy(currentAnnualRatePercent = r) } } },
+                        onValueChange = { txt ->
+                            txt.toDoubleOrNull()?.let { r -> onUpdateInput { it.copy(currentAnnualRatePercent = r) } }
+                        },
                         modifier = Modifier.weight(1f)
                     )
                     NumericInputField(
                         label = stringResource(R.string.bt_remaining_months),
                         valueText = inp.remainingMonths.toString(),
-                        onValueChange = { txt -> txt.toIntOrNull()?.let { m -> onUpdateInput { it.copy(remainingMonths = m.coerceIn(1, 420)) } } },
+                        onValueChange = { txt ->
+                            txt.toIntOrNull()?.let { m -> onUpdateInput { it.copy(remainingMonths = m.coerceIn(1, 420)) } }
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -278,7 +302,9 @@ fun BalanceTransferScreen(
                     NumericInputField(
                         label = stringResource(R.string.bt_legal_charges),
                         valueText = inp.legalAndValuationCharges.toInt().toString(),
-                        onValueChange = { txt -> txt.toDoubleOrNull()?.let { v -> onUpdateInput { it.copy(legalAndValuationCharges = v) } } },
+                        onValueChange = { txt ->
+                            txt.toDoubleOrNull()?.let { v -> onUpdateInput { it.copy(legalAndValuationCharges = v) } }
+                        },
                         prefix = cur.symbol,
                         modifier = Modifier.weight(1f)
                     )
@@ -297,7 +323,7 @@ fun BalanceTransferScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "${stringResource(R.string.bt_gst_toggle)} (${inp.gstRatePercent}%)",
+                            text = stringResource(R.string.ui_txt_fmt_c36d80, stringResource(R.string.bt_gst_toggle), inp.gstRatePercent),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -347,13 +373,17 @@ fun BalanceTransferScreen(
                         NumericInputField(
                             label = stringResource(R.string.bt_topup_rate),
                             valueText = inp.topUpAnnualRatePercent.toString(),
-                            onValueChange = { txt -> txt.toDoubleOrNull()?.let { r -> onUpdateInput { it.copy(topUpAnnualRatePercent = r) } } },
+                            onValueChange = { txt ->
+                                txt.toDoubleOrNull()?.let { r -> onUpdateInput { it.copy(topUpAnnualRatePercent = r) } }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                         NumericInputField(
                             label = stringResource(R.string.bt_topup_tenure),
                             valueText = inp.topUpTenureMonths.toString(),
-                            onValueChange = { txt -> txt.toIntOrNull()?.let { m -> onUpdateInput { it.copy(topUpTenureMonths = m.coerceIn(6, 360)) } } },
+                            onValueChange = { txt ->
+                                txt.toIntOrNull()?.let { m -> onUpdateInput { it.copy(topUpTenureMonths = m.coerceIn(6, 360)) } }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }

@@ -1,26 +1,23 @@
 package com.jyotirmoyb.loan.util
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.ComparisonScenarioEvaluated
 import com.jyotirmoyb.loan.domain.CurrencyCode
 import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.domain.LoanComparisonReport
-import com.jyotirmoyb.loan.domain.STANDARD_PLANNING_DISCLAIMER
 import java.io.File
 import java.io.FileOutputStream
 
 internal object ComparisonReportExporter {
 
-    fun writeComparisonPdf(
-        file: File,
-        report: LoanComparisonReport,
-        currency: CurrencyCode
-    ) {
+    fun writeComparisonPdf(context: Context, file: File, report: LoanComparisonReport, currency: CurrencyCode) {
         val doc = PdfDocument()
         val pageWidth = 595
         val pageHeight = 842
@@ -35,7 +32,10 @@ internal object ComparisonReportExporter {
         val cardBg = Paint().apply { color = Color.WHITE }
         val highlightBg = Paint().apply { color = Color.parseColor("#E3EFE2") }
         val accentPaint = Paint().apply { color = Color.parseColor("#5B8A5A") }
-        val dividerPaint = Paint().apply { color = Color.parseColor("#D5D0C3"); strokeWidth = 1f }
+        val dividerPaint = Paint().apply {
+            color = Color.parseColor("#D5D0C3")
+            strokeWidth = 1f
+        }
         val titlePaint = Paint().apply {
             color = Color.WHITE
             textSize = 18f
@@ -70,11 +70,11 @@ internal object ComparisonReportExporter {
 
         var y = margin
         canvas.drawRoundRect(margin, y, pageWidth - margin, y + 66f, 12f, 12f, headerBg)
-        canvas.drawText("LoanJB — Side-by-Side Loan Comparison", margin + 16f, y + 28f, titlePaint)
+        canvas.drawText(context.getString(R.string.export_cmp_pdf_title), margin + 16f, y + 28f, titlePaint)
         val savingsText = if (report.maxSavings > 0.0) {
-            "Best offer saves up to ${CurrencyFormatter.format(report.maxSavings, currency)} in total cost"
+            context.getString(R.string.export_cmp_best_saves, CurrencyFormatter.format(report.maxSavings, currency))
         } else {
-            "${report.scenarios.size} loan offer(s) compared"
+            context.getString(R.string.export_cmp_offers_compared, report.scenarios.size)
         }
         canvas.drawText(savingsText, margin + 16f, y + 48f, subtitlePaint)
         y += 82f
@@ -84,28 +84,38 @@ internal object ComparisonReportExporter {
         val scenarioColW = (contentWidth - metricColW) / scenarios.size.coerceAtLeast(1)
 
         canvas.drawRoundRect(margin, y, pageWidth - margin, y + 54f, 10f, 10f, cardBg)
-        canvas.drawText("METRIC", margin + 10f, y + 32f, labelPaint)
+        canvas.drawText(context.getString(R.string.export_cmp_metric_header), margin + 10f, y + 32f, labelPaint)
+        val cheapestBadge = context.getString(R.string.export_cmp_cheapest_badge)
         scenarios.forEachIndexed { idx, s ->
             val x = margin + metricColW + idx * scenarioColW
             if (s.isCheapest) {
                 canvas.drawRoundRect(x + 2f, y + 4f, x + scenarioColW - 4f, y + 50f, 8f, 8f, highlightBg)
             }
             canvas.drawText(s.label.take(18), x + 8f, y + 24f, labelPaint)
-            val badge = if (s.isCheapest) "★ CHEAPEST" else s.categoryName.take(16)
+            val badge = if (s.isCheapest) cheapestBadge else s.categoryName.take(16)
             canvas.drawText(badge, x + 8f, y + 40f, if (s.isCheapest) greenPaint else footerPaint)
         }
         y += 64f
 
+        val totalCostLabel = context.getString(R.string.export_cmp_row_total_cost_gst)
+        val savingsLabel = context.getString(R.string.export_cmp_row_savings)
         val rows: List<Pair<String, (ComparisonScenarioEvaluated) -> String>> = listOf(
-            "Loan Amount" to { CurrencyFormatter.format(it.input.principal, currency) },
-            "Interest Rate" to { CurrencyFormatter.formatPercent(it.input.annualRate) },
-            "Tenure" to { "${it.result.actualTenureMonths} mos (${it.result.actualTenureMonths / 12}y ${it.result.actualTenureMonths % 12}m)" },
-            "Monthly EMI" to { CurrencyFormatter.format(it.result.monthlyEmi, currency, true) },
-            "Total Interest" to { CurrencyFormatter.format(it.result.totalInterest, currency) },
-            "Fees + GST" to { CurrencyFormatter.format(it.result.totalFees, currency) },
-            "Total Cost (incl. GST)" to { CurrencyFormatter.format(it.result.effectiveTotalCost, currency) },
-            "Loan-Free Date" to { it.result.loanFreeDateLabel.ifBlank { "-" } },
-            "Savings vs Priciest" to {
+            context.getString(R.string.export_cmp_row_loan_amount) to { CurrencyFormatter.format(it.input.principal, currency) },
+            context.getString(R.string.export_cmp_row_interest_rate) to { CurrencyFormatter.formatPercent(it.input.annualRate) },
+            context.getString(R.string.export_cmp_row_tenure) to {
+                context.getString(
+                    R.string.export_cmp_tenure_fmt,
+                    it.result.actualTenureMonths,
+                    it.result.actualTenureMonths / 12,
+                    it.result.actualTenureMonths % 12
+                )
+            },
+            context.getString(R.string.export_cmp_row_monthly_emi) to { CurrencyFormatter.format(it.result.monthlyEmi, currency, true) },
+            context.getString(R.string.export_cmp_row_total_interest) to { CurrencyFormatter.format(it.result.totalInterest, currency) },
+            context.getString(R.string.export_cmp_row_fees_gst) to { CurrencyFormatter.format(it.result.totalFees, currency) },
+            totalCostLabel to { CurrencyFormatter.format(it.result.effectiveTotalCost, currency) },
+            context.getString(R.string.export_cmp_row_loan_free) to { it.result.loanFreeDateLabel.ifBlank { "-" } },
+            savingsLabel to {
                 if (it.savingsVsMostExpensive > 0.0) CurrencyFormatter.format(it.savingsVsMostExpensive, currency) else "—"
             }
         )
@@ -117,7 +127,7 @@ internal object ComparisonReportExporter {
             canvas.drawText(metricLabel, margin + 10f, rowTop + 21f, labelPaint)
             scenarios.forEachIndexed { idx, s ->
                 val x = margin + metricColW + idx * scenarioColW
-                val paint = if (s.isCheapest && (metricLabel.contains("Total Cost") || metricLabel.contains("Savings"))) {
+                val paint = if (s.isCheapest && (metricLabel == totalCostLabel || metricLabel == savingsLabel)) {
                     greenPaint
                 } else {
                     valuePaint
@@ -130,18 +140,14 @@ internal object ComparisonReportExporter {
         }
 
         canvas.drawLine(margin, pageHeight - 44f, pageWidth - margin, pageHeight - 44f, accentPaint)
-        canvas.drawText(STANDARD_PLANNING_DISCLAIMER, margin, pageHeight - 24f, footerPaint)
+        canvas.drawText(context.getString(R.string.disclaimer_text), margin, pageHeight - 24f, footerPaint)
 
         doc.finishPage(page)
         FileOutputStream(file).use { out -> doc.writeTo(out) }
         doc.close()
     }
 
-    fun writeComparisonImage(
-        file: File,
-        report: LoanComparisonReport,
-        currency: CurrencyCode
-    ) {
+    fun writeComparisonImage(context: Context, file: File, report: LoanComparisonReport, currency: CurrencyCode) {
         val scenarios = report.scenarios
         val width = 1080
         val rowH = 68
@@ -158,7 +164,10 @@ internal object ComparisonReportExporter {
         val heroBg = Paint().apply { color = Color.parseColor("#1E2A4A") }
         val cardBg = Paint().apply { color = Color.WHITE }
         val cheapestBg = Paint().apply { color = Color.parseColor("#E3EFE2") }
-        val dividerPaint = Paint().apply { color = Color.parseColor("#DDD9CC"); strokeWidth = 2f }
+        val dividerPaint = Paint().apply {
+            color = Color.parseColor("#DDD9CC")
+            strokeWidth = 2f
+        }
         val titlePaint = Paint().apply {
             color = Color.WHITE
             textSize = 40f
@@ -193,11 +202,11 @@ internal object ComparisonReportExporter {
         val pad = 40f
 
         canvas.drawRoundRect(pad, pad, width - pad, pad + 130f, 24f, 24f, heroBg)
-        canvas.drawText("LoanJB — Loan Offer Comparison", pad + 32f, pad + 58f, titlePaint)
+        canvas.drawText(context.getString(R.string.export_cmp_img_title), pad + 32f, pad + 58f, titlePaint)
         val subtitle = if (report.maxSavings > 0.0) {
-            "Cheapest offer saves ${CurrencyFormatter.format(report.maxSavings, currency)} total"
+            context.getString(R.string.export_cmp_img_saves, CurrencyFormatter.format(report.maxSavings, currency))
         } else {
-            "${scenarios.size} scenario(s) • Offline India Loan Planner"
+            context.getString(R.string.export_cmp_img_scenarios, scenarios.size)
         }
         canvas.drawText(subtitle, pad + 32f, pad + 100f, subPaint)
 
@@ -207,27 +216,38 @@ internal object ComparisonReportExporter {
         val colW = (tableW - metricW) / scenarios.size.coerceAtLeast(1)
 
         canvas.drawRoundRect(pad, y, width - pad, y + colHeaderH, 20f, 20f, cardBg)
-        canvas.drawText("METRIC", pad + 20f, y + 62f, labelPaint)
+        canvas.drawText(context.getString(R.string.export_cmp_metric_header), pad + 20f, y + 62f, labelPaint)
+        val cheapestBadge = context.getString(R.string.export_cmp_cheapest_badge)
         scenarios.forEachIndexed { idx, s ->
             val x = pad + metricW + idx * colW
             if (s.isCheapest) {
                 canvas.drawRoundRect(x + 6f, y + 10f, x + colW - 8f, y + colHeaderH - 10f, 14f, 14f, cheapestBg)
             }
             canvas.drawText(s.label.take(15), x + 16f, y + 48f, labelPaint)
-            val tag = if (s.isCheapest) "★ CHEAPEST" else "${CurrencyFormatter.formatPercent(s.input.annualRate)} p.a."
+            val tag = if (s.isCheapest) {
+                cheapestBadge
+            } else {
+                context.getString(
+                    R.string.export_rate_pa,
+                    CurrencyFormatter.formatPercent(s.input.annualRate)
+                )
+            }
             canvas.drawText(tag, x + 16f, y + 84f, if (s.isCheapest) greenPaint else footPaint)
         }
         y += colHeaderH + 16f
 
+        val totalCostShortLabel = context.getString(R.string.export_cmp_row_total_cost)
         val rows: List<Pair<String, (ComparisonScenarioEvaluated) -> String>> = listOf(
-            "Loan Amount" to { CurrencyFormatter.formatCompact(it.input.principal, currency) },
-            "Interest Rate" to { CurrencyFormatter.formatPercent(it.input.annualRate) },
-            "Monthly EMI" to { CurrencyFormatter.format(it.result.monthlyEmi, currency) },
-            "Total Interest" to { CurrencyFormatter.formatCompact(it.result.totalInterest, currency) },
-            "Fees + GST" to { CurrencyFormatter.format(it.result.totalFees, currency) },
-            "Total Cost" to { CurrencyFormatter.formatCompact(it.result.effectiveTotalCost, currency) },
-            "Tenure" to { "${it.result.actualTenureMonths} mos" },
-            "Loan-Free Date" to { it.result.loanFreeDateLabel.ifBlank { "-" } }
+            context.getString(R.string.export_cmp_row_loan_amount) to { CurrencyFormatter.formatCompact(it.input.principal, currency) },
+            context.getString(R.string.export_cmp_row_interest_rate) to { CurrencyFormatter.formatPercent(it.input.annualRate) },
+            context.getString(R.string.export_cmp_row_monthly_emi) to { CurrencyFormatter.format(it.result.monthlyEmi, currency) },
+            context.getString(R.string.export_cmp_row_total_interest) to
+                { CurrencyFormatter.formatCompact(it.result.totalInterest, currency) },
+            context.getString(R.string.export_cmp_row_fees_gst) to { CurrencyFormatter.format(it.result.totalFees, currency) },
+            totalCostShortLabel to { CurrencyFormatter.formatCompact(it.result.effectiveTotalCost, currency) },
+            context.getString(R.string.export_cmp_row_tenure) to
+                { context.getString(R.string.export_cmp_mos_short, it.result.actualTenureMonths) },
+            context.getString(R.string.export_cmp_row_loan_free) to { it.result.loanFreeDateLabel.ifBlank { "-" } }
         )
 
         canvas.drawRoundRect(pad, y, width - pad, y + rows.size * rowH + 16f, 20f, 20f, cardBg)
@@ -237,7 +257,7 @@ internal object ComparisonReportExporter {
             canvas.drawText(label, pad + 20f, rowY + 44f, labelPaint)
             scenarios.forEachIndexed { idx, s ->
                 val x = pad + metricW + idx * colW
-                val p = if (s.isCheapest && label == "Total Cost") greenPaint else valPaint
+                val p = if (s.isCheapest && label == totalCostShortLabel) greenPaint else valPaint
                 canvas.drawText(fn(s).take(16), x + 16f, rowY + 44f, p)
             }
             if (rIdx < rows.lastIndex) {
@@ -245,10 +265,11 @@ internal object ComparisonReportExporter {
             }
         }
 
+        val disclaimer = context.getString(R.string.disclaimer_text)
         val footY = height - 60f
-        canvas.drawText(STANDARD_PLANNING_DISCLAIMER.take(86), pad, footY, footPaint)
-        if (STANDARD_PLANNING_DISCLAIMER.length > 86) {
-            canvas.drawText(STANDARD_PLANNING_DISCLAIMER.substring(86).trim(), pad, footY + 26f, footPaint)
+        canvas.drawText(disclaimer.take(86), pad, footY, footPaint)
+        if (disclaimer.length > 86) {
+            canvas.drawText(disclaimer.substring(86).trim(), pad, footY + 26f, footPaint)
         }
 
         FileOutputStream(file).use { out ->

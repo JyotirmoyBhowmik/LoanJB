@@ -18,12 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.jyotirmoyb.loan.features.onboarding.OnboardingScreen
 import com.jyotirmoyb.loan.features.profile.ProfileViewModel
 import com.jyotirmoyb.loan.features.security.AppLockScreen
@@ -42,9 +42,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun LoanJBApp(
-    profileViewModel: ProfileViewModel = viewModel()
-) {
+fun LoanJBApp(profileViewModel: ProfileViewModel = viewModel()) {
     val profileState by profileViewModel.uiState.collectAsStateWithLifecycle()
     val prefs = profileState.preferences
     val activity = LocalContext.current as? AppCompatActivity

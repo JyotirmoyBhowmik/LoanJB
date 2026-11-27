@@ -31,7 +31,8 @@ data class MfTaxGainsUiState(
     val currency: CurrencyCode = CurrencyCode.INR
 )
 
-class MfTaxGainsViewModel(application: Application) : AndroidViewModel(application),
+class MfTaxGainsViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<MfTaxInput, MfTaxResult> {
 
     override val id: String = "mf_tax"
@@ -61,8 +62,7 @@ class MfTaxGainsViewModel(application: Application) : AndroidViewModel(applicati
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MfTaxGainsUiState())
 
-    override fun compute(input: MfTaxInput): MfTaxResult =
-        MfTaxGainsEngine.calculate(input, latestConfig)
+    override fun compute(input: MfTaxInput): MfTaxResult = MfTaxGainsEngine.calculate(input, latestConfig)
 
     fun selectCategory(category: MfFundTaxCategory) {
         _input.value = _input.value.copy(category = category)

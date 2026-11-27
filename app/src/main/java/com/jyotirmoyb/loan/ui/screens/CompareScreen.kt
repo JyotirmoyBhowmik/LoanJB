@@ -35,10 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.CurrencyCode
 import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.ui.components.CompareBarChart
@@ -87,7 +89,11 @@ fun CompareScreen(
                             .weight(1f)
                             .testTag("compare_preset_ffh_btn")
                     ) {
-                        Text("Fixed vs Float vs Hybrid", style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
+                        Text(
+                            stringResource(R.string.ui_txt_fixed_vs_float_vs_hybrid),
+                            style = MaterialTheme.typography.labelMedium,
+                            textAlign = TextAlign.Center
+                        )
                     }
                     OutlinedButton(
                         onClick = { onLoadPreset("CURRENT_VS_BT") },
@@ -97,7 +103,11 @@ fun CompareScreen(
                             .weight(1f)
                             .testTag("compare_preset_bt_btn")
                     ) {
-                        Text("Current vs Balance Transfer", style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
+                        Text(
+                            stringResource(R.string.ui_txt_current_vs_balance_transfer),
+                            style = MaterialTheme.typography.labelMedium,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
@@ -120,15 +130,19 @@ fun CompareScreen(
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(44.dp)
                         )
-                        Text("Compare 2–3 Loan Offers Side by Side", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(
-                            "Tap a preset above, or tap \"Compare\" inside the Calculator or My Loans to add scenarios here.",
+                            stringResource(R.string.ui_txt_compare_2_3_loan_offers_side_by_si),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_tap_a_preset_above_or_tap_compare),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                         Button(onClick = onOpenCalculator, shape = RoundedCornerShape(12.dp)) {
-                            Text("Go to Calculator")
+                            Text(stringResource(R.string.ui_txt_go_to_calculator))
                         }
                     }
                 }
@@ -146,7 +160,13 @@ fun CompareScreen(
                             val isSelected = activeItems.any { it.id == item.id }
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                color = if (isSelected) {
+                                    MaterialTheme.colorScheme.primaryContainer.copy(
+                                        alpha = 0.45f
+                                    )
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                                },
                                 border = BorderStroke(
                                     width = if (isSelected) 1.5.dp else 1.dp,
                                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
@@ -170,7 +190,11 @@ fun CompareScreen(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(item.label, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                                         Text(
-                                            "${item.variantSummary} • EMI ${CurrencyFormatter.format(item.result.monthlyEmi, currency)}",
+                                            stringResource(
+                                                R.string.ui_txt_emi_4ca96e,
+                                                item.variantSummary,
+                                                CurrencyFormatter.format(item.result.monthlyEmi, currency)
+                                            ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             maxLines = 1,
@@ -200,13 +224,27 @@ fun CompareScreen(
                     borderColor = SavingsGreen.copy(alpha = 0.4f)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.EmojiEvents, contentDescription = "Best value", tint = SavingsGreen, modifier = Modifier.size(26.dp))
+                        Icon(
+                            Icons.Outlined.EmojiEvents,
+                            contentDescription = "Best value",
+                            tint = SavingsGreen,
+                            modifier = Modifier.size(26.dp)
+                        )
                         Spacer(Modifier.width(10.dp))
                         Column {
-                            Text("CHEAPEST OPTION", style = MaterialTheme.typography.labelSmall, color = SavingsGreen, fontWeight = FontWeight.Bold)
+                            Text(
+                                stringResource(R.string.ui_txt_cheapest_option),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = SavingsGreen,
+                                fontWeight = FontWeight.Bold
+                            )
                             Text(cheapest.label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                             Text(
-                                "Saves ${CurrencyFormatter.format(maxSavings, currency)} in total effective cost vs ${priciest.label}.",
+                                stringResource(
+                                    R.string.ui_txt_saves_in_total_effective_cost_vs,
+                                    CurrencyFormatter.format(maxSavings, currency),
+                                    priciest.label
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -227,7 +265,12 @@ fun CompareScreen(
                             .background(SlateNavy, RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                             .padding(horizontal = 8.dp, vertical = 9.dp)
                     ) {
-                        Text("METRIC", style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.weight(0.95f))
+                        Text(
+                            stringResource(R.string.ui_txt_metric),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.weight(0.95f)
+                        )
                         activeItems.forEach { item ->
                             val isWin = item.id == cheapest.id
                             Text(
@@ -295,13 +338,7 @@ fun CompareScreen(
 }
 
 @Composable
-private fun CompareMetricRow(
-    label: String,
-    values: List<String>,
-    highlightIndex: Int,
-    bold: Boolean = false,
-    valueColor: Color? = null
-) {
+private fun CompareMetricRow(label: String, values: List<String>, highlightIndex: Int, bold: Boolean = false, valueColor: Color? = null) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

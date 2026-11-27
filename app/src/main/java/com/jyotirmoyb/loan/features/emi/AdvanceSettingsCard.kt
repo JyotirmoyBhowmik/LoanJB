@@ -109,7 +109,9 @@ fun AdvanceSettingsCard(
             else -> "/${first.intervalMonths}m"
         }
         if (input.prepayments.size == 1) "$amtStr $suffix" else "$amtStr +${input.prepayments.size - 1}"
-    } else null
+    } else {
+        null
+    }
 
     FintechCard(
         borderColor = if (cardExpanded) MaterialTheme.colorScheme.primary.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outline,
@@ -158,7 +160,7 @@ fun AdvanceSettingsCard(
                                 modifier = Modifier.testTag("emi_advance_active_badge")
                             ) {
                                 Text(
-                                    text = "${activeLabels.size} Active",
+                                    text = stringResource(R.string.ui_txt_active, activeLabels.size),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onPrimary,
@@ -326,7 +328,17 @@ fun AdvanceSettingsCard(
                     testTag = "adv_row_processing_fee",
                     onCheckedChange = { checked ->
                         if (checked) {
-                            onUpdateInput { it.copy(processingFeePercent = if (it.processingFeePercent <= 0.0) 0.5 else it.processingFeePercent) }
+                            onUpdateInput {
+                                it.copy(
+                                    processingFeePercent = if (it.processingFeePercent <=
+                                        0.0
+                                    ) {
+                                        0.5
+                                    } else {
+                                        it.processingFeePercent
+                                    }
+                                )
+                            }
                             expandedRowKey = "processing_fee"
                         } else {
                             onUpdateInput { it.copy(processingFeePercent = 0.0, insurancePremium = 0.0, gstOnFeesEnabled = false) }
@@ -334,7 +346,10 @@ fun AdvanceSettingsCard(
                     },
                     onInfoClick = {
                         infoDialogContent = "Processing Fee, GST & Insurance" to
-                            "Indian lenders typically charge 0.25%–2% processing fee plus ${String.format("%.0f", input.gstRatePercent)}% GST on banking fees (and on monthly Credit Card EMI interest). Edit the GST rate centrally under Profile → Data & Rates."
+                            "Indian lenders typically charge 0.25%–2% processing fee plus ${String.format(
+                                "%.0f",
+                                input.gstRatePercent
+                            )}% GST on banking fees (and on monthly Credit Card EMI interest). Edit the GST rate centrally under Profile → Data & Rates."
                     },
                     onExpandToggle = {
                         expandedRowKey = if (expandedRowKey == "processing_fee") null else "processing_fee"
@@ -358,7 +373,9 @@ fun AdvanceSettingsCard(
                                 },
                                 trailingBadge = if (input.insurancePremium > 0) {
                                     CurrencyFormatter.formatShortLabel(input.insurancePremium, currency)
-                                } else null,
+                                } else {
+                                    null
+                                },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -370,7 +387,11 @@ fun AdvanceSettingsCard(
                         ) {
                             Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                                 Text(
-                                    text = "${stringResource(R.string.emi_gst_on_fees_label)} (${String.format("%.0f", input.gstRatePercent)}%)",
+                                    text = stringResource(
+                                        R.string.ui_txt_fmt_c36d80,
+                                        stringResource(R.string.emi_gst_on_fees_label),
+                                        String.format("%.0f", input.gstRatePercent)
+                                    ),
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -400,7 +421,13 @@ fun AdvanceSettingsCard(
                     testTag = "adv_row_prepayment",
                     onCheckedChange = { checked ->
                         if (checked) {
-                            val defaultAmt = if (input.principal >= 10_00_000.0) 600000.0 else (input.principal * 0.2).coerceAtLeast(10000.0)
+                            val defaultAmt = if (input.principal >=
+                                10_00_000.0
+                            ) {
+                                600000.0
+                            } else {
+                                (input.principal * 0.2).coerceAtLeast(10000.0)
+                            }
                             val rules = input.prepayments.ifEmpty {
                                 listOf(
                                     PrepaymentRule(
@@ -439,7 +466,9 @@ fun AdvanceSettingsCard(
                     checked = isMoratoriumActive,
                     chipText = if (isMoratoriumActive) {
                         "${input.moratoriumMonths}m ${if (input.moratoriumCompound) "Compound" else "Simple"}"
-                    } else null,
+                    } else {
+                        null
+                    },
                     chipHighlighted = isMoratoriumActive,
                     expanded = expandedRowKey == "moratorium",
                     testTag = "adv_row_moratorium",
@@ -474,7 +503,7 @@ fun AdvanceSettingsCard(
                                     curr.copy(moratoriumCompound = false, ruleFlags = clean)
                                 }
                             },
-                            label = { Text("Simple (Pay Interest)") }
+                            label = { Text(stringResource(R.string.ui_txt_simple_pay_interest)) }
                         )
                         FilterChip(
                             selected = input.moratoriumCompound,
@@ -484,7 +513,7 @@ fun AdvanceSettingsCard(
                                     curr.copy(moratoriumCompound = true, ruleFlags = clean)
                                 }
                             },
-                            label = { Text("Compound (Capitalize)") }
+                            label = { Text(stringResource(R.string.ui_txt_compound_capitalize)) }
                         )
                     }
                 }
@@ -514,7 +543,7 @@ fun AdvanceSettingsCard(
             text = { Text(body, style = MaterialTheme.typography.bodyMedium) },
             confirmButton = {
                 TextButton(onClick = { infoDialogContent = null }) {
-                    Text("Got it", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.ui_txt_got_it), fontWeight = FontWeight.Bold)
                 }
             }
         )

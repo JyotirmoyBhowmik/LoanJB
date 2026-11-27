@@ -55,13 +55,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
+import com.jyotirmoyb.loan.data.remote.ConfigValueSource
+import com.jyotirmoyb.loan.data.remote.DataSourceResolver
 import com.jyotirmoyb.loan.domain.BankFdRateItem
 import com.jyotirmoyb.loan.domain.MarketMetricCardData
 import com.jyotirmoyb.loan.domain.MarketMetricSection
+import com.jyotirmoyb.loan.domain.MarketSourceType
 import com.jyotirmoyb.loan.domain.MarketStalenessEvaluator
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.components.SectionAccentHeader
+import com.jyotirmoyb.loan.ui.components.ValueSourceBadgesRow
 import com.jyotirmoyb.loan.ui.theme.FeesIndigo
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.PurpleAccent
@@ -126,7 +130,7 @@ fun MarketScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Stale alert after ${uiState.staleLimitHours}h",
+                            text = stringResource(R.string.ui_txt_stale_alert_after_h, uiState.staleLimitHours),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -150,7 +154,13 @@ fun MarketScreen(
                             Icon(Icons.Outlined.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                text = if (uiState.isRefreshing) stringResource(R.string.syncing_now) else stringResource(R.string.refresh_now),
+                                text = if (uiState.isRefreshing) {
+                                    stringResource(
+                                        R.string.syncing_now
+                                    )
+                                } else {
+                                    stringResource(R.string.refresh_now)
+                                },
                                 maxLines = 1
                             )
                         }
@@ -339,11 +349,7 @@ private fun MarketSectionBlock(
 }
 
 @Composable
-private fun MarketMetricCard(
-    card: MarketMetricCardData,
-    accentColor: Color,
-    onClick: () -> Unit
-) {
+private fun MarketMetricCard(card: MarketMetricCardData, accentColor: Color, onClick: () -> Unit) {
     FintechCard(
         modifier = Modifier
             .clickable(onClick = onClick)
@@ -385,23 +391,34 @@ private fun MarketMetricCard(
         Spacer(Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                MarketSourceChip(sourceType = card.sourceType)
-                if (card.isStale) {
-                    MarketStaleBadge()
-                }
+            val mappedSource = when (card.sourceType) {
+                MarketSourceType.MANUAL -> ConfigValueSource.MANUAL
+                MarketSourceType.IMPORTED -> ConfigValueSource.IMPORTED
+                MarketSourceType.ONLINE, MarketSourceType.LIVE_API -> ConfigValueSource.ONLINE
+                MarketSourceType.BUILT_IN -> ConfigValueSource.BUILT_IN
             }
-            Text(
-                text = "${stringResource(R.string.market_as_of)} ${MarketStalenessEvaluator.formatTimestamp(card.asOfMillis)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            val compactDate = DataSourceResolver.formatMillisToCompactDate(card.asOfMillis)
+            ValueSourceBadgesRow(
+                source = mappedSource,
+                asOfDate = compactDate,
+                isUnverified = card.isUnverified,
+                sourceName = card.sourceName,
+                sourceUrl = card.sourceUrl,
+                effectiveFrom = card.effectiveFrom.ifBlank { compactDate },
+                lastVerified = card.lastVerified,
+                customSourceLabel = if (card.sourceType == MarketSourceType.LIVE_API) {
+                    stringResource(R.string.source_live_api)
+                } else {
+                    null
+                },
+                modifier = Modifier.weight(1f)
             )
+            if (card.isStale) {
+                MarketStaleBadge()
+            }
         }
     }
 }
@@ -437,19 +454,19 @@ private fun EditableBankFdTableCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Bank & Tenure",
+                text = stringResource(R.string.ui_txt_bank_tenure),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1.5f)
             )
             Text(
-                text = "Gen %",
+                text = stringResource(R.string.ui_txt_gen),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(0.65f)
             )
             Text(
-                text = "Sr %",
+                text = stringResource(R.string.ui_txt_sr),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(0.65f)
@@ -481,7 +498,7 @@ private fun EditableBankFdTableCard(
                                 shape = RoundedCornerShape(4.dp)
                             ) {
                                 Text(
-                                    text = "Edited",
+                                    text = stringResource(R.string.ui_txt_edited),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = PurpleAccent,
                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)

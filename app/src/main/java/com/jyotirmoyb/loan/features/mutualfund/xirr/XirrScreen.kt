@@ -189,7 +189,7 @@ fun XirrScreen(
                 OutlinedTextField(
                     value = noteInput,
                     onValueChange = { noteInput = it },
-                    label = { Text("Note (optional)") },
+                    label = { Text(stringResource(R.string.ui_txt_note_optional)) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -213,7 +213,7 @@ fun XirrScreen(
                     ) {
                         Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Add")
+                        Text(stringResource(R.string.ui_txt_add))
                     }
                     OutlinedButton(
                         onClick = { showBulkDialog = true },
@@ -314,10 +314,10 @@ fun XirrScreen(
                         onImportBulk(bulkText)
                         showBulkDialog = false
                     }
-                ) { Text("Import") }
+                ) { Text(stringResource(R.string.ui_txt_import)) }
             },
             dismissButton = {
-                TextButton(onClick = { showBulkDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showBulkDialog = false }) { Text(stringResource(R.string.ui_txt_cancel)) }
             }
         )
     }

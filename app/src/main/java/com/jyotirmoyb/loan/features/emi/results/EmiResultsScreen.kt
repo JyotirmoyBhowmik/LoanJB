@@ -249,7 +249,10 @@ fun EmiResultsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${String.format("%.1f", result.interestToPrincipalPercent)}% of principal",
+                                text = stringResource(
+                                    R.string.ui_txt_of_principal,
+                                    String.format("%.1f", result.interestToPrincipalPercent)
+                                ),
                                 style = MonoSmallStyle,
                                 fontWeight = FontWeight.Bold,
                                 color = InterestAmber
@@ -262,7 +265,7 @@ fun EmiResultsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${result.loanFreeDateLabel} (${result.actualTenureMonths}m)",
+                                text = stringResource(R.string.ui_txt_m, result.loanFreeDateLabel, result.actualTenureMonths),
                                 style = MonoSmallStyle,
                                 fontWeight = FontWeight.Bold,
                                 color = PrincipalEmerald,
@@ -295,7 +298,12 @@ fun EmiResultsScreen(
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Text(
-                                        text = "${stringResource(R.string.emi_total_saved_banner)}: ${CurrencyFormatter.format(prep.netSavings, currency)} • ${prep.monthsSaved} month(s) saved",
+                                        text = stringResource(
+                                            R.string.ui_txt_month_s_saved,
+                                            stringResource(R.string.emi_total_saved_banner),
+                                            CurrencyFormatter.format(prep.netSavings, currency),
+                                            prep.monthsSaved
+                                        ),
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = SavingsGreen
@@ -352,9 +360,13 @@ fun EmiResultsScreen(
                         .weight(0.8f)
                         .testTag("results_export_pdf_btn")
                 ) {
-                    Icon(Icons.Outlined.PictureAsPdf, contentDescription = stringResource(R.string.export_pdf), modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Outlined.PictureAsPdf,
+                        contentDescription = stringResource(R.string.export_pdf),
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(Modifier.width(3.dp))
-                    Text("PDF", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.ui_txt_pdf), style = MaterialTheme.typography.labelMedium)
                 }
                 OutlinedButton(
                     onClick = {
@@ -368,9 +380,13 @@ fun EmiResultsScreen(
                         .weight(0.8f)
                         .testTag("results_export_csv_btn")
                 ) {
-                    Icon(Icons.Outlined.Description, contentDescription = stringResource(R.string.export_csv), modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Outlined.Description,
+                        contentDescription = stringResource(R.string.export_csv),
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(Modifier.width(3.dp))
-                    Text("CSV", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.ui_txt_csv), style = MaterialTheme.typography.labelMedium)
                 }
             }
             Spacer(Modifier.height(6.dp))
@@ -400,12 +416,7 @@ fun EmiResultsScreen(
 }
 
 @Composable
-private fun SummaryStripColumn(
-    label: String,
-    value: String,
-    valueColor: Color,
-    modifier: Modifier = Modifier
-) {
+private fun SummaryStripColumn(label: String, value: String, valueColor: Color, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -442,27 +453,27 @@ private fun SaveLoanDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save to My Loans", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.ui_txt_save_to_my_loans), fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
                     value = nickname,
                     onValueChange = { nickname = it },
-                    label = { Text("Account Nickname") },
+                    label = { Text(stringResource(R.string.ui_txt_account_nickname)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = lender,
                     onValueChange = { lender = it },
-                    label = { Text("Bank / NBFC Lender") },
+                    label = { Text(stringResource(R.string.ui_txt_bank_nbfc_lender)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = emiDayText,
                     onValueChange = { txt -> emiDayText = txt.filter { it.isDigit() }.take(2) },
-                    label = { Text("Monthly EMI Due Date (Day 1–28)") },
+                    label = { Text(stringResource(R.string.ui_txt_monthly_emi_due_date_day_1_28)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -471,14 +482,14 @@ private fun SaveLoanDialog(
                     modifier = Modifier.clickable { autoDebitNach = !autoDebitNach }
                 ) {
                     Checkbox(checked = autoDebitNach, onCheckedChange = { autoDebitNach = it })
-                    Text("Auto-Debit / NACH mandate enabled", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.ui_txt_auto_debit_nach_mandate_enabled), style = MaterialTheme.typography.bodySmall)
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable { reminderEnabled = !reminderEnabled }
                 ) {
                     Checkbox(checked = reminderEnabled, onCheckedChange = { reminderEnabled = it })
-                    Text("Remind 3 days before EMI due date", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.ui_txt_remind_3_days_before_emi_due_date), style = MaterialTheme.typography.bodySmall)
                 }
             }
         },
@@ -490,11 +501,11 @@ private fun SaveLoanDialog(
                 },
                 modifier = Modifier.testTag("save_loan_confirm_btn")
             ) {
-                Text("Save Loan", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.ui_txt_save_loan), fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.ui_txt_cancel)) }
         }
     )
 }

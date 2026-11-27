@@ -53,10 +53,7 @@ data class GstUiState(
     val syncFeedback: String? = null
 )
 
-class GstViewModel(
-    private val prefsRepo: UserPreferencesRepository,
-    private val ratesRepository: RatesRepository
-) : ViewModel() {
+class GstViewModel(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GstUiState())
     val uiState: StateFlow<GstUiState> = _uiState.asStateFlow()
@@ -102,13 +99,9 @@ class GstViewModel(
         }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepository: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) :
+        ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return GstViewModel(prefsRepo, ratesRepository) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = GstViewModel(prefsRepo, ratesRepository) as T
     }
 }

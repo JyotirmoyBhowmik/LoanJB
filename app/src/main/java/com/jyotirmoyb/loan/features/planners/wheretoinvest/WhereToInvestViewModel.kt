@@ -35,10 +35,7 @@ data class WhereToInvestUiState(
     }
 }
 
-class WhereToInvestViewModel(
-    prefsRepo: UserPreferencesRepository,
-    ratesRepo: RatesRepository
-) : ViewModel() {
+class WhereToInvestViewModel(prefsRepo: UserPreferencesRepository, ratesRepo: RatesRepository) : ViewModel() {
 
     private data class Draft(
         val age: Int = 32,
@@ -118,12 +115,8 @@ class WhereToInvestViewModel(
         }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepo: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepo: RatesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            WhereToInvestViewModel(prefsRepo, ratesRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = WhereToInvestViewModel(prefsRepo, ratesRepo) as T
     }
 }

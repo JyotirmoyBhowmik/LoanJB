@@ -51,12 +51,7 @@ import com.jyotirmoyb.loan.ui.theme.SavingsGreen
 import com.jyotirmoyb.loan.ui.theme.SlateNavy
 
 @Composable
-fun PmsymScreen(
-    uiState: GovPensionUiState,
-    onUpdateAge: (Int) -> Unit,
-    onUpdateIncome: (Double) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun PmsymScreen(uiState: GovPensionUiState, onUpdateAge: (Int) -> Unit, onUpdateIncome: (Double) -> Unit, modifier: Modifier = Modifier) {
     val result = uiState.pmsymResult
     val currency = uiState.currency
     val catalog = uiState.catalog
@@ -88,12 +83,16 @@ fun PmsymScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${CurrencyFormatter.format(result.subscriberMonthlyContribution, currency)}/mo",
+                        text = stringResource(R.string.ui_txt_mo, CurrencyFormatter.format(result.subscriberMonthlyContribution, currency)),
                         style = MonoLargeStyle,
                         color = PrincipalEmerald
                     )
                     Text(
-                        text = "+ Equal Govt. of India Match: ${CurrencyFormatter.format(result.govtMatchingMonthlyContribution, currency)}/mo → Assured ${CurrencyFormatter.format(result.assuredMonthlyPension, currency)}/mo pension at 60",
+                        text = stringResource(
+                            R.string.ui_txt_equal_govt_of_india_match_mo_assur,
+                            CurrencyFormatter.format(result.govtMatchingMonthlyContribution, currency),
+                            CurrencyFormatter.format(result.assuredMonthlyPension, currency)
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.90f),
                         fontWeight = FontWeight.SemiBold
@@ -146,7 +145,10 @@ fun PmsymScreen(
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            text = "Entered income exceeds the ${CurrencyFormatter.format(result.incomeCeilingApplied, currency)}/month eligibility ceiling for PM-SYM. Consider Atal Pension Yojana (APY) or NPS instead.",
+                            text = stringResource(
+                                R.string.ui_txt_entered_income_exceeds_the_month_e,
+                                CurrencyFormatter.format(result.incomeCeilingApplied, currency)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             fontWeight = FontWeight.Medium
@@ -168,7 +170,10 @@ fun PmsymScreen(
                 ValueSourceBadgesRow(
                     source = catalog.source,
                     asOfDate = catalog.asOfDateFormatted,
-                    isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true)
+                    isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true),
+                    sourceName = catalog.sourceName,
+                    effectiveFrom = catalog.publishedOn,
+                    lastVerified = catalog.lastVerified
                 )
                 Spacer(Modifier.height(12.dp))
 
@@ -212,10 +217,33 @@ fun PmsymScreen(
                         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                         .padding(horizontal = 8.dp, vertical = 6.dp)
                 ) {
-                    Text("Age", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.8f))
-                    Text("You / mo", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                    Text("Govt / mo", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                    Text("Total / mo", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                    Text(
+                        stringResource(R.string.ui_txt_age),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(0.8f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_you_mo),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_govt_mo),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_total_mo),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
                 Spacer(Modifier.height(4.dp))
 
@@ -232,10 +260,33 @@ fun PmsymScreen(
                             .padding(horizontal = 8.dp, vertical = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("${row.entryAge}", style = MonoSmallStyle, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = if (isSelected) SavingsGreen else MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(0.8f))
-                        Text("₹$sub", style = MonoSmallStyle, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                        Text("₹$sub", style = MonoSmallStyle, color = SavingsGreen, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                        Text("₹${sub * 2}", style = MonoSmallStyle, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                        Text(
+                            stringResource(R.string.ui_txt_fmt_986d4f, row.entryAge),
+                            style = MonoSmallStyle,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) SavingsGreen else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(0.8f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_fmt_82d0a2, sub),
+                            style = MonoSmallStyle,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_fmt_82d0a2, sub),
+                            style = MonoSmallStyle,
+                            color = SavingsGreen,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_fmt_82d0a2, sub * 2),
+                            style = MonoSmallStyle,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }

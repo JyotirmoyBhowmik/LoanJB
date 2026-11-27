@@ -148,7 +148,9 @@ fun AdvanceTaxScreen(
                                 text = if (advResult.isExempt) {
                                     advResult.exemptionReason
                                 } else {
-                                    "${uiState.advanceInput.fyCode} • ${advResult.installments.size} scheduled instalment(s) (Sec 208 threshold ${CurrencyFormatter.format(advResult.thresholdApplied, currency)})"
+                                    val thresholdText = CurrencyFormatter.format(advResult.thresholdApplied, currency)
+                                    "${uiState.advanceInput.fyCode} • ${advResult.installments.size} " +
+                                        "scheduled instalment(s) (Sec 208 threshold $thresholdText)"
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.White.copy(alpha = 0.85f)
@@ -204,8 +206,16 @@ fun AdvanceTaxScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.adv_presumptive_toggle), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                                Text(stringResource(R.string.adv_presumptive_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    stringResource(R.string.adv_presumptive_toggle),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    stringResource(R.string.adv_presumptive_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                             Switch(
                                 checked = uiState.advanceInput.isPresumptive44AdAda,
@@ -221,8 +231,16 @@ fun AdvanceTaxScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.adv_senior_exempt_toggle), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                                Text(stringResource(R.string.adv_senior_exempt_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    stringResource(R.string.adv_senior_exempt_toggle),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    stringResource(R.string.adv_senior_exempt_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                             Switch(
                                 checked = uiState.advanceInput.isSeniorWithoutBusiness,
@@ -249,10 +267,33 @@ fun AdvanceTaxScreen(
                                     .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                                     .padding(horizontal = 8.dp, vertical = 6.dp)
                             ) {
-                                Text("Due Date", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.1f))
-                                Text("Cum %", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(0.7f))
-                                Text("Instalment", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
-                                Text("Cumulative", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
+                                Text(
+                                    stringResource(R.string.ui_txt_due_date),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1.1f)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_cum),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(0.7f)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_instalment),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(1.1f)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_cumulative),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(1.1f)
+                                )
                             }
                             Spacer(Modifier.height(4.dp))
 
@@ -263,8 +304,18 @@ fun AdvanceTaxScreen(
                                         .padding(horizontal = 8.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(row.dueDateFormatted, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.1f))
-                                    Text("${row.cumulativePercent.toInt()}%", style = MonoSmallStyle, textAlign = TextAlign.End, modifier = Modifier.weight(0.7f))
+                                    Text(
+                                        row.dueDateFormatted,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.weight(1.1f)
+                                    )
+                                    Text(
+                                        stringResource(R.string.ui_txt_fmt_361cec, row.cumulativePercent.toInt()),
+                                        style = MonoSmallStyle,
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.weight(0.7f)
+                                    )
                                     Text(
                                         CurrencyFormatter.formatCompact(row.installmentAmount, currency),
                                         style = MonoSmallStyle,
@@ -316,7 +367,7 @@ fun AdvanceTaxScreen(
                             FilterChip(
                                 selected = uiState.fdIsSenior,
                                 onClick = { onToggleFdSenior(!uiState.fdIsSenior) },
-                                label = { Text("Senior Citizen (60+)") },
+                                label = { Text(stringResource(R.string.ui_txt_senior_citizen_60)) },
                                 modifier = Modifier.testTag("tds_fd_senior_chip")
                             )
                             FilterChip(
@@ -330,8 +381,16 @@ fun AdvanceTaxScreen(
                         if (fdTds != null) {
                             Spacer(Modifier.height(10.dp))
                             KeyValueRow("Exemption Threshold", CurrencyFormatter.format(fdTds.threshold, currency))
-                            KeyValueRow("Estimated Bank TDS", CurrencyFormatter.format(fdTds.estimatedTds, currency), valueColor = InterestAmber)
-                            KeyValueRow("Net Interest Credited", CurrencyFormatter.format(fdTds.netInterestAfterTds, currency), valueColor = SavingsGreen)
+                            KeyValueRow(
+                                "Estimated Bank TDS",
+                                CurrencyFormatter.format(fdTds.estimatedTds, currency),
+                                valueColor = InterestAmber
+                            )
+                            KeyValueRow(
+                                "Net Interest Credited",
+                                CurrencyFormatter.format(fdTds.netInterestAfterTds, currency),
+                                valueColor = SavingsGreen
+                            )
                             Spacer(Modifier.height(6.dp))
                             Text(
                                 text = fdTds.guidanceNote,
@@ -379,7 +438,7 @@ fun AdvanceTaxScreen(
                                 FilterChip(
                                     selected = uiState.salaryRemainingMonths == m,
                                     onClick = { onUpdateSalaryRemainingMonths(m) },
-                                    label = { Text("${m}M") },
+                                    label = { Text(stringResource(R.string.ui_txt_m_79c614, m)) },
                                     modifier = Modifier.testTag("tds_salary_months_$m")
                                 )
                             }
@@ -387,7 +446,11 @@ fun AdvanceTaxScreen(
 
                         Spacer(Modifier.height(10.dp))
                         KeyValueRow("Remaining Tax Liability", CurrencyFormatter.format(salTds.remainingTaxPayable, currency))
-                        KeyValueRow("Est. Monthly Salary TDS", CurrencyFormatter.format(salTds.estimatedMonthlyTds, currency), valueColor = InfoBlue)
+                        KeyValueRow(
+                            "Est. Monthly Salary TDS",
+                            CurrencyFormatter.format(salTds.estimatedMonthlyTds, currency),
+                            valueColor = InfoBlue
+                        )
                         Spacer(Modifier.height(6.dp))
                         Text(
                             text = salTds.guidanceNote,
@@ -420,9 +483,12 @@ fun AdvanceTaxScreen(
                         )
                         Spacer(Modifier.height(10.dp))
 
+                        val ltcgExemption = CurrencyFormatter.format(cfg.equityLtcgExemption, currency)
                         CapitalGainsRuleTile(
                             title = "Equity & Equity Mutual Funds",
-                            detail = "STCG (<${cfg.equityLtcgHoldingMonths}m): ${cfg.equityStcgRatePercent}% (Sec 111A)\nLTCG (≥${cfg.equityLtcgHoldingMonths}m): ${cfg.equityLtcgRatePercent}% above ${CurrencyFormatter.format(cfg.equityLtcgExemption, currency)} exemption (Sec 112A)"
+                            detail = "STCG (<${cfg.equityLtcgHoldingMonths}m): ${cfg.equityStcgRatePercent}% (Sec 111A)\n" +
+                                "LTCG (≥${cfg.equityLtcgHoldingMonths}m): ${cfg.equityLtcgRatePercent}% above " +
+                                "$ltcgExemption exemption (Sec 112A)"
                         )
                         Spacer(Modifier.height(8.dp))
                         CapitalGainsRuleTile(
@@ -432,7 +498,8 @@ fun AdvanceTaxScreen(
                         Spacer(Modifier.height(8.dp))
                         CapitalGainsRuleTile(
                             title = "Gold ETFs, FoFs, International & Hybrid Funds",
-                            detail = "STCG (<${cfg.hybridLtcgHoldingMonths}m): Slab rate • LTCG (≥${cfg.hybridLtcgHoldingMonths}m): ${cfg.hybridLtcgRatePercent}% without indexation (Sec 112)."
+                            detail = "STCG (<${cfg.hybridLtcgHoldingMonths}m): Slab rate • " +
+                                "LTCG (≥${cfg.hybridLtcgHoldingMonths}m): ${cfg.hybridLtcgRatePercent}% without indexation (Sec 112)."
                         )
 
                         Spacer(Modifier.height(14.dp))
@@ -473,10 +540,7 @@ fun AdvanceTaxScreen(
 }
 
 @Composable
-private fun CapitalGainsRuleTile(
-    title: String,
-    detail: String
-) {
+private fun CapitalGainsRuleTile(title: String, detail: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),

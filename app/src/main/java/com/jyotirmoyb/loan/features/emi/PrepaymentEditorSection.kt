@@ -194,7 +194,11 @@ internal fun PrepaymentEditorContent(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "${CurrencyFormatter.format(impact.netSavings, currency)} net saved • ${impact.monthsSaved} month(s) cut",
+                                text = stringResource(
+                                    R.string.ui_txt_net_saved_month_s_cut,
+                                    CurrencyFormatter.format(impact.netSavings, currency),
+                                    impact.monthsSaved
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -220,7 +224,7 @@ internal fun PrepaymentEditorContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Prepayment #${idx + 1}",
+                            text = stringResource(R.string.ui_txt_prepayment, idx + 1),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = TealPrimaryDark
@@ -257,7 +261,9 @@ internal fun PrepaymentEditorContent(
                             },
                             trailingBadge = if (rule.amount > 0) {
                                 CurrencyFormatter.formatShortLabel(rule.amount, currency)
-                            } else null,
+                            } else {
+                                null
+                            },
                             modifier = Modifier.weight(1.25f)
                         )
                         NumericInputField(
@@ -282,7 +288,7 @@ internal fun PrepaymentEditorContent(
                                 val updated = rules.toMutableList().apply { set(idx, rule.copy(isRecurring = false)) }
                                 onUpdateInput { it.copy(prepayments = updated) }
                             },
-                            label = { Text("One-Time") }
+                            label = { Text(stringResource(R.string.ui_txt_one_time)) }
                         )
                         FilterChip(
                             selected = rule.isRecurring && rule.intervalMonths == 1,
@@ -290,7 +296,7 @@ internal fun PrepaymentEditorContent(
                                 val updated = rules.toMutableList().apply { set(idx, rule.copy(isRecurring = true, intervalMonths = 1)) }
                                 onUpdateInput { it.copy(prepayments = updated) }
                             },
-                            label = { Text("Monthly") }
+                            label = { Text(stringResource(R.string.ui_txt_monthly)) }
                         )
                         FilterChip(
                             selected = rule.isRecurring && rule.intervalMonths == 12,
@@ -298,7 +304,7 @@ internal fun PrepaymentEditorContent(
                                 val updated = rules.toMutableList().apply { set(idx, rule.copy(isRecurring = true, intervalMonths = 12)) }
                                 onUpdateInput { it.copy(prepayments = updated) }
                             },
-                            label = { Text("Yearly") }
+                            label = { Text(stringResource(R.string.ui_txt_yearly)) }
                         )
                     }
 
@@ -312,7 +318,7 @@ internal fun PrepaymentEditorContent(
                                 }
                                 onUpdateInput { it.copy(prepayments = updated) }
                             },
-                            label = { Text("Reduce Tenure") },
+                            label = { Text(stringResource(R.string.ui_txt_reduce_tenure)) },
                             modifier = Modifier.testTag("prepay_mode_tenure_$idx")
                         )
                         FilterChip(
@@ -323,7 +329,7 @@ internal fun PrepaymentEditorContent(
                                 }
                                 onUpdateInput { it.copy(prepayments = updated) }
                             },
-                            label = { Text("Reduce EMI") },
+                            label = { Text(stringResource(R.string.ui_txt_reduce_emi)) },
                             modifier = Modifier.testTag("prepay_mode_emi_$idx")
                         )
                     }
@@ -362,7 +368,7 @@ internal fun PrepaymentEditorContent(
             ) {
                 Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Add")
+                Text(stringResource(R.string.ui_txt_add))
             }
         }
     }

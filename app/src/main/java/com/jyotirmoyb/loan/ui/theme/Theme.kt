@@ -82,10 +82,7 @@ val LoanJBShapes = Shapes(
 )
 
 @Composable
-fun LoanJBTheme(
-    themeMode: AppThemeMode = AppThemeMode.LIGHT,
-    content: @Composable () -> Unit
-) {
+fun LoanJBTheme(themeMode: AppThemeMode = AppThemeMode.LIGHT, content: @Composable () -> Unit) {
     val useDark = when (themeMode) {
         AppThemeMode.SYSTEM -> isSystemInDarkTheme()
         AppThemeMode.LIGHT -> false

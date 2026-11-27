@@ -190,7 +190,11 @@ fun EmiInputScreen(
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Peak LTV reaches ${String.format("%.1f", gold.peakLtvPercent)}% (threshold: ${String.format("%.0f", gold.auctionRiskThresholdLtv)}%). Reduce principal, choose Monthly EMI/Interest-Only, or pledge more gold to avoid auction risk.",
+                        text = stringResource(
+                            R.string.ui_txt_peak_ltv_reaches_threshold_reduce,
+                            String.format("%.1f", gold.peakLtvPercent),
+                            String.format("%.0f", gold.auctionRiskThresholdLtv)
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -265,7 +269,11 @@ fun EmiInputScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text("Est. Year-1 Tax Saved", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    stringResource(R.string.ui_txt_est_year_1_tax_saved),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                                 Text(
                                     CurrencyFormatter.format(tax.estimatedAnnualTaxSaved, currency),
                                     style = MonoSmallStyle,
@@ -274,7 +282,11 @@ fun EmiInputScreen(
                                 )
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                Text("Est. Lifetime Tax Saved", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    stringResource(R.string.ui_txt_est_lifetime_tax_saved),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                                 Text(
                                     CurrencyFormatter.format(tax.estimatedTotalTaxSaved, currency),
                                     style = MonoSmallStyle,
@@ -285,7 +297,12 @@ fun EmiInputScreen(
                         }
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "${tax.sectionTitle} at ${String.format("%.0f", input.taxBracketPercent)}% slab. ${tax.notes}",
+                            text = stringResource(
+                                R.string.ui_txt_at_slab,
+                                tax.sectionTitle,
+                                String.format("%.0f", input.taxBracketPercent),
+                                tax.notes
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -309,7 +326,7 @@ fun EmiInputScreen(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Please adjust inputs",
+                            text = stringResource(R.string.ui_txt_please_adjust_inputs),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onErrorContainer
@@ -318,7 +335,7 @@ fun EmiInputScreen(
                     Spacer(Modifier.height(6.dp))
                     result.validationErrors.forEach { err ->
                         Text(
-                            text = "• $err",
+                            text = stringResource(R.string.ui_txt_fmt_bac541, err),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
@@ -348,7 +365,7 @@ fun EmiInputScreen(
                             ) {
                                 Column {
                                     Text(
-                                        text = "ESTIMATED MONTHLY EMI",
+                                        text = stringResource(R.string.ui_txt_estimated_monthly_emi),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = androidx.compose.ui.graphics.Color(0xFFA7F3E8)
                                     )
@@ -360,13 +377,17 @@ fun EmiInputScreen(
                                 }
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
-                                        text = "Interest: ${CurrencyFormatter.formatShortLabel(result.totalInterest, currency)} (${String.format("%.1f", result.interestToPrincipalPercent)}%)",
+                                        text = stringResource(
+                                            R.string.ui_txt_interest,
+                                            CurrencyFormatter.formatShortLabel(result.totalInterest, currency),
+                                            String.format("%.1f", result.interestToPrincipalPercent)
+                                        ),
                                         style = MonoSmallStyle,
                                         color = InterestAmber
                                     )
                                     Spacer(Modifier.height(2.dp))
                                     Text(
-                                        text = "Loan-Free: ${result.loanFreeDateLabel}",
+                                        text = stringResource(R.string.ui_txt_loan_free, result.loanFreeDateLabel),
                                         style = MonoSmallStyle,
                                         color = PrincipalEmerald
                                     )
@@ -385,14 +406,19 @@ fun EmiInputScreen(
                                     )
                                     val extras = buildList {
                                         if (result.gstOnFeeAmount + result.gstOnInterestAmount > 0.0) {
-                                            add("GST ${CurrencyFormatter.format(result.gstOnFeeAmount + result.gstOnInterestAmount, currency)}")
+                                            add(
+                                                "GST ${CurrencyFormatter.format(
+                                                    result.gstOnFeeAmount + result.gstOnInterestAmount,
+                                                    currency
+                                                )}"
+                                            )
                                         }
                                         if (result.brokenPeriodInterest > 0.0) {
                                             add("Pro-rata ${CurrencyFormatter.format(result.brokenPeriodInterest, currency)}")
                                         }
                                     }.joinToString(" • ")
                                     Text(
-                                        text = "Includes $extras",
+                                        text = stringResource(R.string.ui_txt_includes, extras),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = androidx.compose.ui.graphics.Color(0xFFCBD5E1)
                                     )

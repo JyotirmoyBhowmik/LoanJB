@@ -31,11 +31,8 @@ import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.TrendingUp
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,14 +55,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.CurrencyCode
 import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.domain.LoanTrackerEngine
 import com.jyotirmoyb.loan.ui.components.FintechCard
-import com.jyotirmoyb.loan.ui.components.NumericInputField
 import com.jyotirmoyb.loan.ui.components.SectionAccentHeader
 import com.jyotirmoyb.loan.ui.theme.DangerRed
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
@@ -134,7 +132,7 @@ internal fun TrackedLoanDetailScreen(
                     Column {
                         Text(loan.entity.nickname, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                         Text(
-                            "${loan.entity.lender} • ${loan.entity.variantSummary}",
+                            stringResource(R.string.ui_txt_fmt_4ed101, loan.entity.lender, loan.entity.variantSummary),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -155,11 +153,23 @@ internal fun TrackedLoanDetailScreen(
             FintechCard {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Column {
-                        Text("OUTSTANDING", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(CurrencyFormatter.format(loan.outstandingPrincipal, currency), style = MonoLargeStyle, color = PrincipalEmerald)
+                        Text(
+                            stringResource(R.string.ui_txt_outstanding_154667),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            CurrencyFormatter.format(loan.outstandingPrincipal, currency),
+                            style = MonoLargeStyle,
+                            color = PrincipalEmerald
+                        )
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("NEXT DUE DATE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            stringResource(R.string.ui_txt_next_due_date),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Text(loan.nextDueDateLabel, style = MonoMediumStyle)
                     }
                 }
@@ -175,12 +185,19 @@ internal fun TrackedLoanDetailScreen(
                 Spacer(Modifier.height(8.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        "Paid: ${CurrencyFormatter.format(loan.totalPaidSoFar, currency)} (${loan.paidMonthNumbers.size} EMIs)",
+                        stringResource(
+                            R.string.ui_txt_paid_emis,
+                            CurrencyFormatter.format(loan.totalPaidSoFar, currency),
+                            loan.paidMonthNumbers.size
+                        ),
                         style = MonoSmallStyle,
                         color = SavingsGreen
                     )
                     Text(
-                        "Remaining: ${(loan.result.schedule.size - loan.paidMonthNumbers.size).coerceAtLeast(0)} EMIs",
+                        stringResource(
+                            R.string.ui_txt_remaining_emis,
+                            (loan.result.schedule.size - loan.paidMonthNumbers.size).coerceAtLeast(0)
+                        ),
                         style = MonoSmallStyle,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -199,9 +216,20 @@ internal fun TrackedLoanDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(Icons.Outlined.Savings, contentDescription = null, tint = SavingsGreen, modifier = Modifier.size(18.dp))
+                            val savedBannerText = if (loan.monthsSaved > 0) {
+                                stringResource(
+                                    R.string.ui_tracked_saved_with_months,
+                                    CurrencyFormatter.format(loan.interestSaved, currency),
+                                    loan.monthsSaved
+                                )
+                            } else {
+                                stringResource(
+                                    R.string.ui_tracked_saved_only,
+                                    CurrencyFormatter.format(loan.interestSaved, currency)
+                                )
+                            }
                             Text(
-                                "Interest saved so far: ${CurrencyFormatter.format(loan.interestSaved, currency)}" +
-                                    if (loan.monthsSaved > 0) " • ${loan.monthsSaved} month(s) reduced" else "",
+                                text = savedBannerText,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = SavingsGreen
@@ -227,7 +255,7 @@ internal fun TrackedLoanDetailScreen(
                     ) {
                         Icon(Icons.Outlined.Payments, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(5.dp))
-                        Text("Prepayment", maxLines = 1)
+                        Text(stringResource(R.string.ui_txt_prepayment_1ff8e5), maxLines = 1)
                     }
                     OutlinedButton(
                         onClick = { showRateDialog = true },
@@ -239,7 +267,7 @@ internal fun TrackedLoanDetailScreen(
                     ) {
                         Icon(Icons.Outlined.TrendingUp, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(5.dp))
-                        Text("Rate Reset", maxLines = 1)
+                        Text(stringResource(R.string.ui_txt_rate_reset), maxLines = 1)
                     }
                 }
                 Spacer(Modifier.height(8.dp))
@@ -257,7 +285,7 @@ internal fun TrackedLoanDetailScreen(
                     ) {
                         Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("PDF Report", maxLines = 1)
+                        Text(stringResource(R.string.ui_txt_pdf_report), maxLines = 1)
                     }
                     OutlinedButton(
                         onClick = {
@@ -271,7 +299,7 @@ internal fun TrackedLoanDetailScreen(
                     ) {
                         Icon(Icons.Outlined.Description, contentDescription = null, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("CSV")
+                        Text(stringResource(R.string.ui_txt_csv))
                     }
                     OutlinedButton(
                         onClick = onAddToCompare,
@@ -282,7 +310,7 @@ internal fun TrackedLoanDetailScreen(
                     ) {
                         Icon(Icons.Outlined.CompareArrows, contentDescription = null, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Compare")
+                        Text(stringResource(R.string.ui_txt_compare))
                     }
                 }
 
@@ -299,9 +327,17 @@ internal fun TrackedLoanDetailScreen(
                         Icon(Icons.Outlined.Autorenew, contentDescription = null, tint = PrincipalEmerald)
                         Spacer(Modifier.width(10.dp))
                         Column {
-                            Text("Auto-Debit / NACH Mandate", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                             Text(
-                                if (loan.autoDebitNach) "Active — keep account funded before day ${loan.emiDayOfMonth}" else "Manual EMI payment mode",
+                                stringResource(R.string.ui_txt_auto_debit_nach_mandate),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                if (loan.autoDebitNach) {
+                                    "Active — keep account funded before day ${loan.emiDayOfMonth}"
+                                } else {
+                                    "Manual EMI payment mode"
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -331,16 +367,20 @@ internal fun TrackedLoanDetailScreen(
                         Icon(Icons.Outlined.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.width(10.dp))
                         Column {
-                            Text("Monthly EMI Due Date", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                             Text(
-                                "Day ${loan.emiDayOfMonth} of every month (tap to change)",
+                                stringResource(R.string.ui_txt_monthly_emi_due_date),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                stringResource(R.string.ui_txt_day_of_every_month_tap_to_change, loan.emiDayOfMonth),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
                     TextButton(onClick = { showEmiDayDialog = true }) {
-                        Text("Edit")
+                        Text(stringResource(R.string.ui_txt_edit))
                     }
                 }
 
@@ -357,9 +397,13 @@ internal fun TrackedLoanDetailScreen(
                         Icon(Icons.Outlined.NotificationsActive, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.width(10.dp))
                         Column {
-                            Text("Next-Due Alert Notification", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                             Text(
-                                "Local alert ${loan.entity.reminderDaysBefore} days before due date (exact-alarm fallback enabled)",
+                                stringResource(R.string.ui_txt_next_due_alert_notification),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                stringResource(R.string.ui_txt_local_alert_days_before_due_date_e, loan.entity.reminderDaysBefore),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -434,19 +478,28 @@ internal fun TrackedLoanDetailScreen(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "M#${row.monthNumber} • ${row.monthLabel} (${row.phaseLabel})",
+                                stringResource(R.string.ui_txt_m_dea6f6, row.monthNumber, row.monthLabel, row.phaseLabel),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = if (isPaid) SavingsGreen else MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "P: ${CurrencyFormatter.format(row.principalPaid, currency)} • I: ${CurrencyFormatter.format(row.interestPaid, currency)} • Rate: ${String.format("%.2f", row.activeRate)}%",
+                                stringResource(
+                                    R.string.ui_txt_p_i_rate,
+                                    CurrencyFormatter.format(row.principalPaid, currency),
+                                    CurrencyFormatter.format(row.interestPaid, currency),
+                                    String.format("%.2f", row.activeRate)
+                                ),
                                 style = MonoSmallStyle,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Text(CurrencyFormatter.format(row.emiPaid, currency), style = MonoSmallStyle, fontWeight = FontWeight.Bold)
-                            Text("Bal: ${CurrencyFormatter.formatCompact(row.closingBalance, currency)}", style = MonoSmallStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                stringResource(R.string.ui_txt_bal, CurrencyFormatter.formatCompact(row.closingBalance, currency)),
+                                style = MonoSmallStyle,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -459,7 +512,7 @@ internal fun TrackedLoanDetailScreen(
                             .fillMaxWidth()
                             .minimumInteractiveComponentSize()
                     ) {
-                        Text("Load More Months (${loan.result.schedule.size - visibleMonths} left)")
+                        Text(stringResource(R.string.ui_txt_load_more_months_left, loan.result.schedule.size - visibleMonths))
                     }
                 }
             }
@@ -467,94 +520,35 @@ internal fun TrackedLoanDetailScreen(
     }
 
     if (showPrepayDialog) {
-        var amountText by remember { mutableStateOf("100000") }
-        var monthText by remember { mutableStateOf((loan.nextDueMonthNumber ?: 1).toString()) }
-        var reduceTenure by remember { mutableStateOf(true) }
-
-        AlertDialog(
-            onDismissRequest = { showPrepayDialog = false },
-            title = { Text("Log Actual Prepayment") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    NumericInputField("Prepayment Amount (${currency.symbol})", amountText, { amountText = it })
-                    NumericInputField("Applied in Month #", monthText, { monthText = it })
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(selected = reduceTenure, onClick = { reduceTenure = true }, label = { Text("Reduce Tenure") })
-                        FilterChip(selected = !reduceTenure, onClick = { reduceTenure = false }, label = { Text("Reduce EMI") })
-                    }
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    val amt = amountText.toDoubleOrNull() ?: 0.0
-                    val m = monthText.toIntOrNull() ?: (loan.nextDueMonthNumber ?: 1)
-                    showPrepayDialog = false
-                    onLogPrepayment(m, amt, reduceTenure)
-                }) { Text("Recalculate") }
-            },
-            dismissButton = { TextButton(onClick = { showPrepayDialog = false }) { Text("Cancel") } }
+        TrackedLoanPrepayDialog(
+            loan = loan,
+            currency = currency,
+            onDismiss = { showPrepayDialog = false },
+            onConfirm = onLogPrepayment
         )
     }
 
     if (showRateDialog) {
-        var rateText by remember { mutableStateOf(loan.input.annualRate.toString()) }
-        var afterMonthText by remember { mutableStateOf(((loan.nextDueMonthNumber ?: 1) - 1).coerceAtLeast(1).toString()) }
-
-        AlertDialog(
-            onDismissRequest = { showRateDialog = false },
-            title = { Text("Log Floating-Rate Reset") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    NumericInputField("New Annual Interest Rate (%)", rateText, { rateText = it })
-                    NumericInputField("Effective After Month #", afterMonthText, { afterMonthText = it })
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    val r = rateText.toDoubleOrNull() ?: loan.input.annualRate
-                    val m = afterMonthText.toIntOrNull() ?: 1
-                    showRateDialog = false
-                    onLogRateChange(m, r)
-                }) { Text("Apply Rate") }
-            },
-            dismissButton = { TextButton(onClick = { showRateDialog = false }) { Text("Cancel") } }
+        TrackedLoanRateDialog(
+            loan = loan,
+            onDismiss = { showRateDialog = false },
+            onConfirm = onLogRateChange
         )
     }
 
     if (showEmiDayDialog) {
-        var dayText by remember { mutableStateOf(loan.emiDayOfMonth.toString()) }
-        AlertDialog(
-            onDismissRequest = { showEmiDayDialog = false },
-            title = { Text("Monthly EMI Due Day") },
-            text = {
-                NumericInputField("Day of Month (1–28)", dayText, { dayText = it.filter { ch -> ch.isDigit() }.take(2) })
-            },
-            confirmButton = {
-                Button(onClick = {
-                    val day = (dayText.toIntOrNull() ?: loan.emiDayOfMonth).coerceIn(1, 28)
-                    showEmiDayDialog = false
-                    onUpdateEmiDay(day)
-                }) { Text("Update") }
-            },
-            dismissButton = { TextButton(onClick = { showEmiDayDialog = false }) { Text("Cancel") } }
+        TrackedLoanEmiDayDialog(
+            loan = loan,
+            onDismiss = { showEmiDayDialog = false },
+            onConfirm = onUpdateEmiDay
         )
     }
 
     if (showDeleteConfirm) {
-        AlertDialog(
-            onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Delete Saved Loan?") },
-            text = { Text("Remove \"${loan.entity.nickname}\" and cancel any scheduled reminders?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showDeleteConfirm = false
-                        onDelete()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = DangerRed)
-                ) { Text("Delete") }
-            },
-            dismissButton = { TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancel") } }
+        TrackedLoanDeleteDialog(
+            nickname = loan.entity.nickname,
+            onDismiss = { showDeleteConfirm = false },
+            onConfirm = onDelete
         )
     }
 }

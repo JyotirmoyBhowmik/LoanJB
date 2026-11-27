@@ -23,7 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.CompareArrows
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
@@ -33,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -234,7 +234,7 @@ fun BankStaffLoanScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "STAFF MONTHLY EMI",
+                                    text = stringResource(R.string.ui_txt_staff_monthly_emi),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFFA7F3E8)
                                 )
@@ -249,7 +249,7 @@ fun BankStaffLoanScreen(
                                 shape = RoundedCornerShape(10.dp)
                             ) {
                                 Text(
-                                    text = "Save ${CurrencyFormatter.format(uiState.monthlyEmiSaved, cur)}/mo",
+                                    text = stringResource(R.string.ui_txt_save_mo, CurrencyFormatter.format(uiState.monthlyEmiSaved, cur)),
                                     style = MonoSmallStyle,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF86EFAC),
@@ -263,7 +263,11 @@ fun BankStaffLoanScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text("STAFF INTEREST", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                                Text(
+                                    stringResource(R.string.ui_txt_staff_interest),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
                                 Text(
                                     CurrencyFormatter.format(uiState.staffResult.totalInterest, cur),
                                     style = MonoMediumStyle,
@@ -271,7 +275,11 @@ fun BankStaffLoanScreen(
                                 )
                             }
                             Column {
-                                Text("MARKET INTEREST", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                                Text(
+                                    stringResource(R.string.ui_txt_market_interest),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
                                 Text(
                                     CurrencyFormatter.format(uiState.marketResult.totalInterest, cur),
                                     style = MonoMediumStyle,
@@ -279,7 +287,11 @@ fun BankStaffLoanScreen(
                                 )
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                Text("TOTAL SAVED", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                                Text(
+                                    stringResource(R.string.ui_txt_total_saved),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
                                 Text(
                                     CurrencyFormatter.formatCompact(uiState.totalInterestSaved, cur),
                                     style = MonoMediumStyle,
@@ -303,7 +315,7 @@ fun BankStaffLoanScreen(
                             .height(50.dp)
                             .testTag("staff_view_schedule_btn")
                     ) {
-                        Text("Open Full Amortization Schedule", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.ui_txt_open_full_amortization_schedule), fontWeight = FontWeight.Bold)
                         Spacer(Modifier.width(8.dp))
                         Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
@@ -320,7 +332,7 @@ fun BankStaffLoanScreen(
                         ) {
                             Icon(Icons.Outlined.BookmarkAdd, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Save Loan")
+                            Text(stringResource(R.string.ui_txt_save_loan))
                         }
                         OutlinedButton(
                             onClick = onCompareWithMarket,
@@ -331,7 +343,7 @@ fun BankStaffLoanScreen(
                         ) {
                             Icon(Icons.Outlined.CompareArrows, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Compare vs Market")
+                            Text(stringResource(R.string.ui_txt_compare_vs_market))
                         }
                     }
                 }

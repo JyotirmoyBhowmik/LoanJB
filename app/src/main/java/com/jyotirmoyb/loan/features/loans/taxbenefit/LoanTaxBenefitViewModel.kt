@@ -35,7 +35,8 @@ data class LoanTaxBenefitUiState(
     val snackbarMessage: String? = null
 )
 
-class LoanTaxBenefitViewModel(application: Application) : AndroidViewModel(application),
+class LoanTaxBenefitViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<LoanTaxBenefitInput, LoanTaxBenefitResult> {
 
     override val id: String = "loan_tax_benefit"
@@ -69,8 +70,7 @@ class LoanTaxBenefitViewModel(application: Application) : AndroidViewModel(appli
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LoanTaxBenefitUiState())
 
-    override fun compute(input: LoanTaxBenefitInput): LoanTaxBenefitResult =
-        LoanTaxBenefitEngine.calculate(input, latestConfig)
+    override fun compute(input: LoanTaxBenefitInput): LoanTaxBenefitResult = LoanTaxBenefitEngine.calculate(input, latestConfig)
 
     fun updateInput(transform: (LoanTaxBenefitInput) -> LoanTaxBenefitInput) {
         _input.value = transform(_input.value)

@@ -7,15 +7,15 @@ import com.jyotirmoyb.loan.data.remote.RatesRepository
 import com.jyotirmoyb.loan.domain.MarketQuoteSample
 import com.jyotirmoyb.loan.domain.MarketSourceType
 import com.jyotirmoyb.loan.domain.MarketStalenessEvaluator
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.util.concurrent.TimeUnit
 
 /**
  * Pluggable data provider contract for Market metrics.
@@ -36,9 +36,7 @@ interface MarketDataProvider {
 /**
  * (a) Primary provider backed by RemoteConfig (`rates.json` & `schemes.json`).
  */
-class RemoteConfigMarketProvider(
-    private val ratesRepository: RatesRepository
-) : MarketDataProvider {
+class RemoteConfigMarketProvider(private val ratesRepository: RatesRepository) : MarketDataProvider {
 
     override val providerId: String = "remote_config_primary"
     override val displayName: String = "LoanJB Remote Config (rates.json)"
@@ -54,10 +52,10 @@ class RemoteConfigMarketProvider(
             val item = resolvedMap[key] ?: continue
             val numeric = item.numericValue ?: continue
             if (item.source == ConfigValueSource.MANUAL) continue // Manual provider handles overrides
-            val srcType = if (item.source == ConfigValueSource.ONLINE) {
-                MarketSourceType.ONLINE
-            } else {
-                MarketSourceType.BUILT_IN
+            val srcType = when (item.source) {
+                ConfigValueSource.IMPORTED -> MarketSourceType.IMPORTED
+                ConfigValueSource.ONLINE -> MarketSourceType.ONLINE
+                else -> MarketSourceType.BUILT_IN
             }
             val parsedMillis = MarketStalenessEvaluator.parseIsoDateToMillis(item.effectiveFrom)
             result[key] = MarketQuoteSample(
@@ -101,10 +99,8 @@ class RemoteConfigMarketProvider(
  * (b-1) Optional pluggable public API provider for USD–INR using user's own ExchangeRate-API key
  * stored in EncryptedSharedPreferences. Skipped cleanly if no key is configured.
  */
-class ExchangeRateApiProvider(
-    private val keyStore: SecureApiKeyStore,
-    private val client: OkHttpClient = createSafeMarketHttpClient()
-) : MarketDataProvider {
+class ExchangeRateApiProvider(private val keyStore: SecureApiKeyStore, private val client: OkHttpClient = createSafeMarketHttpClient()) :
+    MarketDataProvider {
 
     override val providerId: String = "api_exchangerate_fx"
     override val displayName: String = "ExchangeRate-API (USD–INR)"
@@ -160,10 +156,8 @@ class ExchangeRateApiProvider(
  * (b-2) Optional pluggable public API provider for Gold (24K/22K per 10g) & Silver (per kg) in INR
  * using user's own MetalpriceAPI key stored in EncryptedSharedPreferences.
  */
-class MetalsApiProvider(
-    private val keyStore: SecureApiKeyStore,
-    private val client: OkHttpClient = createSafeMarketHttpClient()
-) : MarketDataProvider {
+class MetalsApiProvider(private val keyStore: SecureApiKeyStore, private val client: OkHttpClient = createSafeMarketHttpClient()) :
+    MarketDataProvider {
 
     override val providerId: String = "api_metalprice_bullion"
     override val displayName: String = "MetalpriceAPI (Gold & Silver)"
@@ -256,10 +250,8 @@ class MetalsApiProvider(
 /**
  * (b-3) Optional pluggable public API provider for BSE Sensex & NSE Nifty 50 via Twelve Data.
  */
-class EquityIndexApiProvider(
-    private val keyStore: SecureApiKeyStore,
-    private val client: OkHttpClient = createSafeMarketHttpClient()
-) : MarketDataProvider {
+class EquityIndexApiProvider(private val keyStore: SecureApiKeyStore, private val client: OkHttpClient = createSafeMarketHttpClient()) :
+    MarketDataProvider {
 
     override val providerId: String = "api_twelvedata_indices"
     override val displayName: String = "Twelve Data (Sensex & Nifty)"
@@ -319,9 +311,7 @@ class EquityIndexApiProvider(
 /**
  * (c) Manual entry provider backed by user-entered Room overrides.
  */
-class ManualEntryMarketProvider(
-    private val marketDao: MarketDao
-) : MarketDataProvider {
+class ManualEntryMarketProvider(private val marketDao: MarketDao) : MarketDataProvider {
 
     override val providerId: String = "manual_entry"
     override val displayName: String = "Manual User Entry"

@@ -60,7 +60,7 @@ fun RateField(
             label = { Text(stringResource(R.string.emi_rate_label)) },
             trailingIcon = {
                 Text(
-                    text = "%",
+                    text = stringResource(R.string.ui_txt_fmt_0bcef9),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -101,10 +101,8 @@ fun RateField(
     }
 }
 
-private fun formatRateText(rate: Double): String {
-    return if (rate % 1.0 == 0.0) {
-        String.format("%.1f", rate)
-    } else {
-        String.format("%.2f", rate).trimEnd('0').trimEnd('.')
-    }
+private fun formatRateText(rate: Double): String = if (rate % 1.0 == 0.0) {
+    String.format("%.1f", rate)
+} else {
+    String.format("%.2f", rate).trimEnd('0').trimEnd('.')
 }

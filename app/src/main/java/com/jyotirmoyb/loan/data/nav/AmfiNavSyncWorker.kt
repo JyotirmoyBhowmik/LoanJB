@@ -14,10 +14,7 @@ import androidx.work.WorkerParameters
 import com.jyotirmoyb.loan.data.AppContainer
 import java.util.concurrent.TimeUnit
 
-class AmfiNavSyncWorker(
-    appContext: Context,
-    params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+class AmfiNavSyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
         val repo = AppContainer.provideAmfiNavRepository(applicationContext)

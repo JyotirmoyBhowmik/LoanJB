@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -64,11 +63,7 @@ private sealed interface MonthlyListItem {
 }
 
 @Composable
-fun MonthlyScheduleTab(
-    result: CalculationResult,
-    currency: CurrencyCode,
-    modifier: Modifier = Modifier
-) {
+fun MonthlyScheduleTab(result: CalculationResult, currency: CurrencyCode, modifier: Modifier = Modifier) {
     val isDark = LocalIsDarkTheme.current
     val prepayBg = if (isDark) PrepaymentHighlightDark else PrepaymentHighlightLight
 
@@ -195,7 +190,7 @@ fun MonthlyScheduleTab(
                                 )
                                 if (hasPrepayment) {
                                     Text(
-                                        text = "+Prepay",
+                                        text = stringResource(R.string.ui_txt_prepay),
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = TealPrimaryDark

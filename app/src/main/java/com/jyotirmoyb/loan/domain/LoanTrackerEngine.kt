@@ -38,12 +38,7 @@ object LoanTrackerEngine {
         "Submit Form 35 on Parivahan / Regional RTO & collect updated RC without hypothecation"
     )
 
-    fun applyPrepayment(
-        input: CalculationInput,
-        monthNumber: Int,
-        amount: Double,
-        reduceTenure: Boolean
-    ): CalculationInput {
+    fun applyPrepayment(input: CalculationInput, monthNumber: Int, amount: Double, reduceTenure: Boolean): CalculationInput {
         if (amount <= 0.0) return input
         val rule = PrepaymentRule(
             startMonth = monthNumber.coerceAtLeast(1),
@@ -57,19 +52,21 @@ object LoanTrackerEngine {
         )
     }
 
-    fun applyRateChange(
-        input: CalculationInput,
-        afterMonth: Int,
-        newAnnualRate: Double
-    ): CalculationInput {
+    fun applyRateChange(input: CalculationInput, afterMonth: Int, newAnnualRate: Double): CalculationInput {
         val clampedRate = newAnnualRate.coerceIn(0.0, 40.0)
         val clampedMonth = afterMonth.coerceAtLeast(0)
         val flags = input.ruleFlags.toMutableList()
-        if (!flags.contains("RATE_FLOATING") && !flags.contains("RATE_HYBRID") && !flags.contains("RATE_EBLR") && !flags.contains("RATE_MCLR")) {
+        if (!flags.contains("RATE_FLOATING") &&
+            !flags.contains("RATE_HYBRID") &&
+            !flags.contains("RATE_EBLR") &&
+            !flags.contains("RATE_MCLR")
+        ) {
             flags.add("RATE_FLOATING")
         }
-        val updatedEvents = (input.rateChanges.filterNot { it.afterMonth == clampedMonth } +
-            RateChangeEvent(afterMonth = clampedMonth, newAnnualRate = clampedRate))
+        val updatedEvents = (
+            input.rateChanges.filterNot { it.afterMonth == clampedMonth } +
+                RateChangeEvent(afterMonth = clampedMonth, newAnnualRate = clampedRate)
+            )
             .sortedBy { it.afterMonth }
         return input.copy(
             ruleFlags = flags,
@@ -113,17 +110,14 @@ object LoanTrackerEngine {
         return result.toList()
     }
 
-    fun evaluateTrackedLoan(
-        entity: SavedLoanEntity,
-        input: CalculationInput,
-        category: LoanCategory? = null
-    ): TrackedLoanSummary {
+    fun evaluateTrackedLoan(entity: SavedLoanEntity, input: CalculationInput, category: LoanCategory? = null): TrackedLoanSummary {
         val effectiveEmiDay = entity.emiDayOfMonth.coerceIn(1, 28)
         val activeInput = input.copy(emiDayOfMonth = effectiveEmiDay)
         val result = LoanCalculationEngine.calculate(activeInput, category)
 
         // Baseline schedule without prepayments or floating rate resets to measure interest & months saved
-        val hasAdjustments = activeInput.prepaymentEnabled && activeInput.prepayments.isNotEmpty() ||
+        val hasAdjustments = activeInput.prepaymentEnabled &&
+            activeInput.prepayments.isNotEmpty() ||
             activeInput.rateChanges.isNotEmpty()
         val baselineResult = if (hasAdjustments) {
             LoanCalculationEngine.calculate(
@@ -157,7 +151,9 @@ object LoanTrackerEngine {
         val outstanding = LoanCalculationEngine.roundPaisa(max(0.0, result.totalPrincipal - paidPrincipal))
         val progress = if (result.schedule.isNotEmpty()) {
             (paidSet.size.toFloat() / result.schedule.size.toFloat()).coerceIn(0f, 1f)
-        } else 0f
+        } else {
+            0f
+        }
 
         val nextRow = result.schedule.firstOrNull { !paidSet.contains(it.monthNumber) }
         val nextNum = nextRow?.monthNumber
@@ -194,10 +190,7 @@ object LoanTrackerEngine {
         )
     }
 
-    fun computePortfolioMetrics(
-        loans: List<TrackedLoanSummary>,
-        monthlyIncome: Double
-    ): PortfolioMetrics {
+    fun computePortfolioMetrics(loans: List<TrackedLoanSummary>, monthlyIncome: Double): PortfolioMetrics {
         val totalDebt = loans.sumOf { it.outstandingPrincipal }
         val activeLoans = loans.filter { it.outstandingPrincipal > 0.01 && it.nextDueMonthNumber != null }
         val activeEmi = activeLoans.sumOf { summary ->
@@ -217,10 +210,7 @@ object LoanTrackerEngine {
         )
     }
 
-    fun selectNextEmiWidgetData(
-        loans: List<TrackedLoanSummary>,
-        currency: CurrencyCode
-    ): NextEmiWidgetData {
+    fun selectNextEmiWidgetData(loans: List<TrackedLoanSummary>, currency: CurrencyCode): NextEmiWidgetData {
         val activeLoans = loans.filter { it.nextDueMonthNumber != null && it.outstandingPrincipal > 0.01 }
         if (activeLoans.isEmpty()) {
             return NextEmiWidgetData(hasActiveLoan = false)

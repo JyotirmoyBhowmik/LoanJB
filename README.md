@@ -1,6 +1,6 @@
 # LoanJB — Offline-First Indian Personal Finance, Loan & Tax Planner
 
-**LoanJB** (`com.jyotirmoyb.loan`) is a production-grade, 100% offline-first Android application built with **Kotlin**, **Jetpack Compose (Material 3)**, **Room (v5)**, **DataStore**, **Moshi**, **WorkManager**, and **AndroidX Security Crypto**.
+**LoanJB** (`com.jyotirmoyb.loan`) is a production-grade, 100% offline-first Android application built with **Kotlin**, **Jetpack Compose (Material 3)**, **Room (v5)**, **DataStore**, **Moshi**, **WorkManager**, and **Android Keystore AES-256-GCM**.
 
 It provides deterministic `BigDecimal` financial calculations for Indian loans, bank & post-office deposits, mutual funds (with streaming AMFI NAV caching), income tax & GST, retirement schemes, and multi-goal planning—with **zero hardcoded rates or slabs** and **zero analytics or cloud user-data collection**.
 
@@ -114,38 +114,107 @@ All financial rates and tax laws are stored in versioned JSON files under `app/s
 
 ---
 
-## 4. How to Verify and Publish New Rates
+## 4. Updating Data with an AI Tool
 
-Before publishing an updated JSON bundle (either via an app update or your remote-config HTTPS endpoint):
+You can keep LoanJB's RBI policy rates, bank FD bands, small-savings schemes, and income-tax slabs up to date without waiting for an app release by importing a validated JSON update bundle on-device.
 
-1. **Validate Schema & Bounds via Unit Tests:**
-   ```bash
-   gradle :app:testDebugUnitTest --tests "com.jyotirmoyb.loan.data.ConfigResolverAndSchemaTest" --console=plain
-   ```
-   This test parses `rates.json`, `schemes.json`, and `taxslabs.json`, verifies that every required key exists, checks min/max bounds, and confirms that the 4-tier resolver (`USER_OVERRIDE` > `REMOTE_CACHED` > `BUNDLED_DEFAULT` > `FALLBACK`) resolves every item cleanly.
-2. **Validate Tax Slab Boundaries & Rebate Edge Cases:**
-   ```bash
-   gradle :app:testDebugUnitTest --tests "com.jyotirmoyb.loan.features.tax.TaxCalculationEnginesTest" --console=plain
-   ```
-3. **In-App Inspection:**
-   Open **Profile → Data & Rates** (or tap the Data & Rates icon in the top bar) to inspect every rate grouped by category (`Loans`, `Bank Deposits`, `Govt Schemes`, `Tax`, `Macro & Gold`), verify its `"As of"` date and source chip, and test `"Check for updated rates"`.
+### Step-by-Step Workflow
+1. **Upload the brief to your AI tool:** Open your preferred AI assistant with web browsing enabled and upload **`LoanJB_Data_Update_Brief.md`** (which lists every tracked config key, expected unit, and official RBI / CBDT / India Post / DEA / PFRDA sources). Ask it to verify current official values and output a JSON file matching the LoanJB update-bundle format below.
+2. **Import the JSON file on your phone:** Save the generated `.json` file (max **1 MB**) to your device, open LoanJB, and navigate to **Profile → Data & Rates → Import update file**.
+3. **Preview every change before saving:** LoanJB validates every key, numeric type, unit, HTTPS `sourceUrl`, `effectiveFrom`, `lastVerified` (`YYYY-MM-DD`, rejecting `"UNVERIFIED"`), and tax-slab ordering before showing the **Preview Data Update** dialog:
+   - Each rate change is shown as **`Label: old → new`**, along with its effective date and source name.
+   - Untick any individual change or table you do not want to apply.
+   - Inspect **Unresolved keys**, **Suggested new keys** (review-only), and **Update notes**.
+4. **Apply (or Undo):** Tap **Apply all** (or **Apply selected**) to merge the updates into the local cache with source **`Imported`** (precedence: `Manual override` > `Imported / Online with newest dataVersion` > `Built-in`).
+   - **Multi-part updates:** Large updates split into files named `PART 1/2`, `PART 2/2`, etc. (or marked in `notes` / `dataVersion`) can be imported one after another; each part merges cleanly on top of the previous part.
+   - **Undo:** LoanJB retains the last **5** imports so you can revert with **Undo last import** at any time.
+
+### Update-Bundle JSON Format
+All top-level sections (`rates`, `taxslabs`, `schemes`, `confirmedUnchanged`, `unresolved`, `suggestedNewKeys`, `notes`) are optional; include only what changed or was verified:
+
+```json
+{
+  "bundleVersion": 1,
+  "generatedOn": "2026-11-27",
+  "generatedBy": "Verified against RBI / DEA / CBDT",
+  "dataVersion": "2026.11.27",
+  "rates": {
+    "items": [
+      {
+        "key": "rbi.repo_rate",
+        "value": 5.5,
+        "previousValue": 6.5,
+        "unit": "% p.a.",
+        "effectiveFrom": "2026-06-06",
+        "sourceName": "RBI Monetary Policy Statement",
+        "sourceUrl": "https://www.rbi.org.in/",
+        "lastVerified": "2026-11-27"
+      }
+    ],
+    "bankFdRates": [
+      {
+        "bankId": "sbi",
+        "bankName": "State Bank of India (SBI)",
+        "generalRate": 6.8,
+        "seniorRate": 7.3,
+        "tenureLabel": "2–3 yrs"
+      }
+    ]
+  },
+  "taxslabs": {
+    "items": [],
+    "taxYears": [],
+    "gstSlabs": [0, 5, 12, 18, 28],
+    "advanceTaxThreshold": 10000
+  },
+  "schemes": {
+    "items": [],
+    "seniorPensionSchemes": [],
+    "apyTable": [],
+    "pmsymTable": []
+  },
+  "confirmedUnchanged": ["scheme.ppf.rate", "tax.new.rebate_limit"],
+  "unresolved": [
+    { "key": "market.gold.24k_10g", "reason": "Intraday bullion quote varies by city" }
+  ],
+  "suggestedNewKeys": ["tax.fy2026_27.example_key"],
+  "notes": ["PART 1/1: Verified RBI repo, SDF, MSF, CRR and SBI FD card rates."]
+}
+```
 
 ---
 
-## 5. How to Build, Test, and Release
+## 5. How to Verify and Publish New Rates
+
+Before publishing an updated JSON bundle (either via an app update or your remote-config HTTPS endpoint):
+
+1. **Validate Schema, Bounds & Update-Bundle Rules via Unit Tests:**
+   ```bash
+   ./gradlew :app:testDebugUnitTest --tests "com.jyotirmoyb.loan.data.remote.*" --console=plain
+   ```
+2. **Validate Tax Slab Boundaries & Rebate Edge Cases:**
+   ```bash
+   ./gradlew :app:testDebugUnitTest --tests "com.jyotirmoyb.loan.domain.TaxSuiteEnginesTest" --console=plain
+   ```
+3. **In-App Inspection:**
+   Open **Profile → Data & Rates** (or tap the Data & Rates icon in the top bar) to inspect every rate grouped by category, verify its compact source & verification line (tap any badge to view the official link and legend), and test **Import update file** or **Check for updated rates**.
+
+---
+
+## 6. How to Build, Test, and Release
 
 ### Prerequisites
 - **JDK 17**
 - **Android SDK 36** (`minSdk = 26`, `targetSdk = 36`)
 
-### Run Full Unit, Robolectric UI, Room Migration & Performance Benchmark Suite
+### Run Static Analysis, Unit/UI Tests, Lint & Builds
 ```bash
-gradle :app:testDebugUnitTest --console=plain
+./gradlew :app:ktlintCheck :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
 ```
 
 ### Generate JaCoCo Code Coverage Report
 ```bash
-gradle :app:jacocoTestReport --console=plain
+./gradlew :app:jacocoTestReport --console=plain
 ```
 Reports are generated at:
 - HTML: `app/build/reports/jacoco/jacocoTestReport/html/index.html`
@@ -153,7 +222,7 @@ Reports are generated at:
 
 ### Verify R8 Minification & ProGuard Rules
 ```bash
-gradle :app:minifyReleaseWithR8 --console=plain
+./gradlew :app:minifyReleaseWithR8 --console=plain
 ```
 
 ### Build Signed Release AAB / APK
@@ -164,7 +233,7 @@ export KEYSTORE_PATH="/secure/path/to/upload-keystore.jks"
 export STORE_PASSWORD="your_keystore_password"
 export KEY_PASSWORD="your_key_password"
 
-gradle :app:bundleRelease --console=plain
+./gradlew :app:bundleRelease --console=plain
 ```
 
-See **[`RELEASE.md`](RELEASE.md)** for the complete pre-release verification checklist and **[`PLAY_DATA_SAFETY.md`](PLAY_DATA_SAFETY.md)** for the Google Play Data Safety documentation.
+See **[`RELEASE.md`](RELEASE.md)** for the complete pre-release verification & GitHub Pages checklist, **[`docs/privacy-policy.md`](docs/privacy-policy.md)**, **[`docs/terms.md`](docs/terms.md)**, and **[`PLAY_DATA_SAFETY.md`](PLAY_DATA_SAFETY.md)**.

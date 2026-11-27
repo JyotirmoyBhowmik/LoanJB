@@ -10,13 +10,13 @@ import com.jyotirmoyb.loan.data.remote.RemoteConfigDocument
 import com.jyotirmoyb.loan.data.remote.RemoteConfigItem
 import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
 import com.jyotirmoyb.loan.features.bankstaff.resolveStaffPresets
+import kotlin.math.abs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.math.abs
 
 class LoansSuiteEnginesTest {
 
@@ -31,9 +31,30 @@ class LoansSuiteEnginesTest {
             gstRatePercent = 18.0
         )
         val offers = listOf(
-            ComparisonScenarioInput(1L, "Bank A (8.4%)", "home", "Home", "Floating", base.copy(annualRate = 8.40, processingFeePercent = 0.25)),
-            ComparisonScenarioInput(2L, "Bank B (8.9%)", "home", "Home", "Floating", base.copy(annualRate = 8.90, processingFeePercent = 0.50)),
-            ComparisonScenarioInput(3L, "Bank C (8.6%, 15y)", "home", "Home", "Shorter Tenure", base.copy(annualRate = 8.60, tenureMonths = 180, processingFeePercent = 0.50)),
+            ComparisonScenarioInput(
+                1L,
+                "Bank A (8.4%)",
+                "home",
+                "Home",
+                "Floating",
+                base.copy(annualRate = 8.40, processingFeePercent = 0.25)
+            ),
+            ComparisonScenarioInput(
+                2L,
+                "Bank B (8.9%)",
+                "home",
+                "Home",
+                "Floating",
+                base.copy(annualRate = 8.90, processingFeePercent = 0.50)
+            ),
+            ComparisonScenarioInput(
+                3L,
+                "Bank C (8.6%, 15y)",
+                "home",
+                "Home",
+                "Shorter Tenure",
+                base.copy(annualRate = 8.60, tenureMonths = 180, processingFeePercent = 0.50)
+            ),
             ComparisonScenarioInput(4L, "Bank D (Ignored 4th)", "home", "Home", "Ignored", base.copy(annualRate = 7.50))
         )
 

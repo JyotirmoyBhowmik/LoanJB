@@ -21,11 +21,7 @@ import kotlinx.coroutines.launch
 
 class NextEmiWidgetProvider : AppWidgetProvider() {
 
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
-    ) {
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         val pendingResult = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
@@ -74,12 +70,7 @@ object NextEmiWidgetUpdater {
         return LoanTrackerEngine.selectNextEmiWidgetData(summaries, prefs.currency)
     }
 
-    internal fun applyToWidget(
-        context: Context,
-        manager: AppWidgetManager,
-        appWidgetId: Int,
-        data: NextEmiWidgetData
-    ) {
+    internal fun applyToWidget(context: Context, manager: AppWidgetManager, appWidgetId: Int, data: NextEmiWidgetData) {
         val views = RemoteViews(context.packageName, R.layout.widget_next_emi)
         val launchIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP

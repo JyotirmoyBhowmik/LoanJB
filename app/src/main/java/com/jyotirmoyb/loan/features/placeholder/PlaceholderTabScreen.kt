@@ -103,7 +103,7 @@ fun PlaceholderTabScreen(
                         .fillMaxWidth()
                         .height(48.dp)
                 ) {
-                    Text("Open Loan (EMI) Calculator")
+                    Text(stringResource(R.string.ui_txt_open_loan_emi_calculator))
                 }
             }
         }

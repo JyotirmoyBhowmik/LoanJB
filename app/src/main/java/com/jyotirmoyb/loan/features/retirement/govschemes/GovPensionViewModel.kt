@@ -55,10 +55,7 @@ data class GovPensionUiState(
     }
 }
 
-class GovPensionViewModel(
-    prefsRepo: UserPreferencesRepository,
-    ratesRepo: RatesRepository
-) : ViewModel() {
+class GovPensionViewModel(prefsRepo: UserPreferencesRepository, ratesRepo: RatesRepository) : ViewModel() {
 
     private data class Draft(
         val apyEntryAge: Int = 25,
@@ -134,12 +131,8 @@ class GovPensionViewModel(
         draft.update { it.copy(seniorInvestmentAmount = amount.coerceAtLeast(0.0)) }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepo: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepo: RatesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            GovPensionViewModel(prefsRepo, ratesRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = GovPensionViewModel(prefsRepo, ratesRepo) as T
     }
 }

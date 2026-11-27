@@ -12,13 +12,7 @@ interface CalculatorEngineContract<I, O> {
     fun compute(input: I): O
 }
 
-enum class CalculatorSection(
-    val title: String,
-    val tag: String,
-    val tagBgColor: Color,
-    val tagTextColor: Color,
-    val iconKey: String
-) {
+enum class CalculatorSection(val title: String, val tag: String, val tagBgColor: Color, val tagTextColor: Color, val iconKey: String) {
     WEALTH_PLANNERS(
         title = "WEALTH & LIFE PLANNERS",
         tag = "FEATURED",

@@ -13,12 +13,12 @@ import com.jyotirmoyb.loan.domain.GoalSipInput
 import com.jyotirmoyb.loan.domain.GoalSipResult
 import com.jyotirmoyb.loan.domain.SipLumpsumEngine
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import java.util.Calendar
 
 data class GoalSipUiState(
     val input: GoalSipInput = defaultGoalInput(),
@@ -43,7 +43,8 @@ private fun defaultGoalInput(): GoalSipInput {
     )
 }
 
-class GoalSipViewModel(application: Application) : AndroidViewModel(application),
+class GoalSipViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<GoalSipInput, GoalSipResult> {
 
     override val id: String = "mf_goal"
@@ -75,6 +76,7 @@ class GoalSipViewModel(application: Application) : AndroidViewModel(application)
         val customRet = arr[4] as Boolean
         val customInf = arr[5] as Boolean
         val prefs = arr[6] as UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolved = arr[7] as Map<String, ResolvedConfigItem>
 
@@ -128,6 +130,5 @@ class GoalSipViewModel(application: Application) : AndroidViewModel(application)
         _input.value = _input.value.copy(annualStepUpPercent = v.coerceIn(0.0, 50.0))
     }
 
-    private fun fmt(v: Double): String =
-        if (v % 1.0 == 0.0) "${v.toInt()}" else "%.2f".format(v).trimEnd('0').trimEnd('.')
+    private fun fmt(v: Double): String = if (v % 1.0 == 0.0) "${v.toInt()}" else "%.2f".format(v).trimEnd('0').trimEnd('.')
 }

@@ -1,7 +1,6 @@
 package com.jyotirmoyb.loan.features.mutualfund.swp
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -163,7 +162,7 @@ fun SwpScreen(
                         .fillMaxWidth()
                         .testTag("mf_swp_apply_sustainable_btn")
                 ) {
-                    Text("Set Monthly Withdrawal to Sustainable Payout", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.ui_txt_set_monthly_withdrawal_to_sustaina), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -226,7 +225,7 @@ fun SwpScreen(
                         FilterChip(
                             selected = input.tenureYears == yr,
                             onClick = { onUpdateTenureYears(yr) },
-                            label = { Text("${yr}Y") },
+                            label = { Text(stringResource(R.string.ui_txt_y_3e961f, yr)) },
                             modifier = Modifier.testTag("mf_swp_yr_$yr")
                         )
                     }
@@ -264,10 +263,33 @@ fun SwpScreen(
                                     .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                                     .padding(horizontal = 8.dp, vertical = 6.dp)
                             ) {
-                                Text("Yr", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.7f))
-                                Text("Withdrawn", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
-                                Text("Returns", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                                Text("Balance", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
+                                Text(
+                                    stringResource(R.string.ui_txt_yr_173ac6),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(0.7f)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_withdrawn),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(1.1f)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_returns),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_balance),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.weight(1.1f)
+                                )
                             }
                             Spacer(Modifier.height(4.dp))
                             result.yearlyRows.forEachIndexed { idx, row ->
@@ -276,9 +298,25 @@ fun SwpScreen(
                                         .fillMaxWidth()
                                         .padding(horizontal = 8.dp, vertical = 6.dp)
                                 ) {
-                                    Text("Y${row.yearIndex}", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(0.7f))
-                                    Text(CurrencyFormatter.formatCompact(row.withdrawnInYear, currency), style = MonoSmallStyle, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
-                                    Text(CurrencyFormatter.formatCompact(row.returnsEarned, currency), style = MonoSmallStyle, color = SavingsGreen, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                                    Text(
+                                        stringResource(R.string.ui_txt_y_be9cd4, row.yearIndex),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.weight(0.7f)
+                                    )
+                                    Text(
+                                        CurrencyFormatter.formatCompact(row.withdrawnInYear, currency),
+                                        style = MonoSmallStyle,
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.weight(1.1f)
+                                    )
+                                    Text(
+                                        CurrencyFormatter.formatCompact(row.returnsEarned, currency),
+                                        style = MonoSmallStyle,
+                                        color = SavingsGreen,
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.weight(1f)
+                                    )
                                     Text(
                                         CurrencyFormatter.formatCompact(row.closingBalance, currency),
                                         style = MonoSmallStyle,

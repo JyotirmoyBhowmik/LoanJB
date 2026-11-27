@@ -151,7 +151,7 @@ fun PrivacySecurityScreen(
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.testTag("security_clear_pin_btn")
                         ) {
-                            Text("Remove PIN", color = DangerRed)
+                            Text(stringResource(R.string.ui_txt_remove_pin), color = DangerRed)
                         }
                     }
                 }
@@ -209,13 +209,13 @@ fun PrivacySecurityScreen(
                 PrivacyBulletRow(
                     icon = Icons.Outlined.CloudOff,
                     title = "100% On-Device Financial Storage & Auto Backup Exclusions",
-                    body = "Saved loans, EMI ledgers, income, and preferences live strictly on this device. Android Auto Backup & cloud extraction rules explicitly exclude the Room database (loanjb_offline.db) and Android Keystore-backed EncryptedSharedPreferences so your financial data is never silently uploaded to cloud backup."
+                    body = "Saved loans, EMI ledgers, income, and preferences live strictly on this device. Android Auto Backup & cloud extraction rules explicitly exclude the Room database (loanjb_offline.db) and Android Keystore AES-256-GCM encrypted preferences so your financial data is never silently uploaded to cloud backup."
                 )
                 Spacer(Modifier.height(10.dp))
                 PrivacyBulletRow(
                     icon = Icons.Outlined.EnhancedEncryption,
                     title = "AES-256-GCM Encrypted Backups & Hardware-Backed Keystore",
-                    body = "Manual JSON backups are encrypted with your password using PBKDF2-HMAC-SHA256 (120,000 iterations, unique random salt) and AES-256-GCM authenticated encryption. Optional PIN hashes and optional Market API keys are stored strictly in EncryptedSharedPreferences."
+                    body = "Manual JSON backups are encrypted with your password using PBKDF2-HMAC-SHA256 (120,000 iterations, unique random salt) and AES-256-GCM authenticated encryption. Optional PIN hashes and optional Market API keys are stored strictly in Android Keystore AES-256-GCM storage."
                 )
             }
         }
@@ -230,7 +230,7 @@ fun PrivacySecurityScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "No user financial data ever leaves your device. When you opt into online refresh, LoanJB only performs read-only HTTPS GET requests to fetch public reference data:",
+                    stringResource(R.string.ui_txt_no_user_financial_data_ever_leaves),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -287,11 +287,7 @@ fun PrivacySecurityScreen(
 }
 
 @Composable
-private fun PrivacyBulletRow(
-    icon: ImageVector,
-    title: String,
-    body: String
-) {
+private fun PrivacyBulletRow(icon: ImageVector, title: String, body: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -316,10 +312,7 @@ private fun PrivacyBulletRow(
 }
 
 @Composable
-private fun NetworkEndpointRow(
-    title: String,
-    detail: String
-) {
+private fun NetworkEndpointRow(title: String, detail: String) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
         Text(
@@ -331,28 +324,28 @@ private fun NetworkEndpointRow(
 }
 
 @Composable
-private fun SetAppPinDialog(
-    onDismiss: () -> Unit,
-    onSavePin: (String) -> Result<Unit>
-) {
+private fun SetAppPinDialog(onDismiss: () -> Unit, onSavePin: (String) -> Result<Unit>) {
     var pin by remember { mutableStateOf("") }
     var confirmPin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Set App Lock PIN", fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.ui_txt_set_app_lock_pin), fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Enter a 4 to 6 digit numeric PIN. Your PIN is hashed with salted PBKDF2-SHA256 in Android EncryptedSharedPreferences and never stored in plain text.",
+                    stringResource(R.string.ui_txt_enter_a_4_to_6_digit_numeric_pin_y),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 OutlinedTextField(
                     value = pin,
-                    onValueChange = { pin = it.filter { ch -> ch.isDigit() }.take(6); error = null },
-                    label = { Text("New PIN (4–6 digits)") },
+                    onValueChange = {
+                        pin = it.filter { ch -> ch.isDigit() }.take(6)
+                        error = null
+                    },
+                    label = { Text(stringResource(R.string.ui_txt_new_pin_4_6_digits)) },
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -360,8 +353,11 @@ private fun SetAppPinDialog(
                 )
                 OutlinedTextField(
                     value = confirmPin,
-                    onValueChange = { confirmPin = it.filter { ch -> ch.isDigit() }.take(6); error = null },
-                    label = { Text("Confirm PIN") },
+                    onValueChange = {
+                        confirmPin = it.filter { ch -> ch.isDigit() }.take(6)
+                        error = null
+                    },
+                    label = { Text(stringResource(R.string.ui_txt_confirm_pin)) },
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -382,11 +378,11 @@ private fun SetAppPinDialog(
                     }
                 }
             ) {
-                Text("Save PIN", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.ui_txt_save_pin), fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.ui_txt_cancel)) }
         }
     )
 }

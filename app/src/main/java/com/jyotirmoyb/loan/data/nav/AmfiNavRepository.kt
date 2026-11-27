@@ -4,6 +4,10 @@ import com.jyotirmoyb.loan.data.AmfiNavDao
 import com.jyotirmoyb.loan.data.AmfiNavEntity
 import com.jyotirmoyb.loan.data.AmfiNavSyncEntity
 import com.jyotirmoyb.loan.domain.AmfiNavParser
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,27 +17,15 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 
-data class AmfiSyncOutcome(
-    val success: Boolean,
-    val totalParsed: Int,
-    val latestNavDate: String,
-    val message: String
-)
+data class AmfiSyncOutcome(val success: Boolean, val totalParsed: Int, val latestNavDate: String, val message: String)
 
 /**
  * Offline-first repository for AMFI India's public NAVAll.txt feed.
  * Streams the multi-MB text file directly from OkHttp's byteStream() through [AmfiNavParser]
  * in small chunks into Room — never loading the entire file into memory.
  */
-class AmfiNavRepository(
-    private val dao: AmfiNavDao,
-    private val client: OkHttpClient = defaultClient()
-) {
+class AmfiNavRepository(private val dao: AmfiNavDao, private val client: OkHttpClient = defaultClient()) {
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
 
@@ -141,7 +133,12 @@ class AmfiNavRepository(
                     lastSuccess = false
                 )
             )
-            AmfiSyncOutcome(false, existingMeta?.totalSchemes ?: 0, existingMeta?.latestNavDate.orEmpty(), "Offline — showing cached NAVs ($lastError)")
+            AmfiSyncOutcome(
+                false,
+                existingMeta?.totalSchemes ?: 0,
+                existingMeta?.latestNavDate.orEmpty(),
+                "Offline — showing cached NAVs ($lastError)"
+            )
         } finally {
             _isSyncing.value = false
         }

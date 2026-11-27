@@ -146,8 +146,16 @@ internal fun InsuranceCoverSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Term Cover Multiplier", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                Text("${uiState.termIncomeMultiplier.toInt()}x Annual Income", style = MonoSmallStyle, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.ui_txt_term_cover_multiplier),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    stringResource(R.string.ui_txt_x_annual_income, uiState.termIncomeMultiplier.toInt()),
+                    style = MonoSmallStyle,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
             Slider(
                 value = uiState.termIncomeMultiplier.toFloat(),
@@ -165,7 +173,11 @@ internal fun InsuranceCoverSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Metro / Tier-1 City", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        stringResource(R.string.ui_txt_metro_tier_1_city),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Text(
                         text = if (uiState.isMetroCity) "Higher hospitalisation cost base" else "Non-metro base cover",
                         style = MaterialTheme.typography.bodySmall,
@@ -183,8 +195,16 @@ internal fun InsuranceCoverSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Family Members Covered", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                Text("${uiState.familyMembersCount} member(s)", style = MonoSmallStyle, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.ui_txt_family_members_covered),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    stringResource(R.string.ui_txt_member_s, uiState.familyMembersCount),
+                    style = MonoSmallStyle,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
             Slider(
                 value = uiState.familyMembersCount.toFloat(),
@@ -268,13 +288,7 @@ internal fun CoverComparisonBar(
 }
 
 @Composable
-internal fun SplitSliderRow(
-    label: String,
-    percent: Int,
-    color: Color,
-    onPercentChange: (Int) -> Unit,
-    testTag: String
-) {
+internal fun SplitSliderRow(label: String, percent: Int, color: Color, onPercentChange: (Int) -> Unit, testTag: String) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -282,7 +296,7 @@ internal fun SplitSliderRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ChartLegendDot(color = color, label = label)
-            Text("$percent%", style = MonoSmallStyle, fontWeight = FontWeight.Bold, color = color)
+            Text(stringResource(R.string.ui_txt_fmt_361cec, percent), style = MonoSmallStyle, fontWeight = FontWeight.Bold, color = color)
         }
         Slider(
             value = percent.toFloat(),
@@ -294,12 +308,7 @@ internal fun SplitSliderRow(
 }
 
 @Composable
-internal fun BucketLegendRow(
-    color: Color,
-    title: String,
-    monthly: String,
-    annual: String
-) {
+internal fun BucketLegendRow(color: Color, title: String, monthly: String, annual: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,

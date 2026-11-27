@@ -45,8 +45,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.LoanCatalog
 import com.jyotirmoyb.loan.domain.LoanCategory
 import com.jyotirmoyb.loan.domain.LoanVariant
@@ -86,12 +88,16 @@ fun CatalogEditorScreen(
                 IconButton(onClick = onBack, modifier = Modifier.testTag("catalog_editor_back_btn")) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back to Settings")
                 }
-                Text("Edit Loan Catalog", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.ui_txt_edit_loan_catalog),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
             TextButton(onClick = onResetDefault) {
                 Icon(Icons.Outlined.RestartAlt, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Reset Seed")
+                Text(stringResource(R.string.ui_txt_reset_seed))
             }
         }
 
@@ -113,7 +119,7 @@ fun CatalogEditorScreen(
                         .background(if (sel) MaterialTheme.colorScheme.surface else Color.Transparent)
                         .clickable { editorTab = idx }
                         .padding(vertical = 8.dp)
-                        .testTag("catalog_tab_${idx}"),
+                        .testTag("catalog_tab_$idx"),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -148,7 +154,15 @@ fun CatalogEditorScreen(
                                 onValueChange = { t ->
                                     val v = t.toDoubleOrNull() ?: cat.rateRangeMin
                                     workingCatalog = workingCatalog.copy(
-                                        categories = workingCatalog.categories.mapIndexed { i, c -> if (i == catIdx) c.copy(rateRangeMin = v) else c }
+                                        categories = workingCatalog.categories.mapIndexed { i, c ->
+                                            if (i ==
+                                                catIdx
+                                            ) {
+                                                c.copy(rateRangeMin = v)
+                                            } else {
+                                                c
+                                            }
+                                        }
                                     )
                                 },
                                 modifier = Modifier.weight(1f)
@@ -159,7 +173,15 @@ fun CatalogEditorScreen(
                                 onValueChange = { t ->
                                     val v = t.toDoubleOrNull() ?: cat.rateRangeMax
                                     workingCatalog = workingCatalog.copy(
-                                        categories = workingCatalog.categories.mapIndexed { i, c -> if (i == catIdx) c.copy(rateRangeMax = v) else c }
+                                        categories = workingCatalog.categories.mapIndexed { i, c ->
+                                            if (i ==
+                                                catIdx
+                                            ) {
+                                                c.copy(rateRangeMax = v)
+                                            } else {
+                                                c
+                                            }
+                                        }
                                     )
                                 },
                                 modifier = Modifier.weight(1f)
@@ -173,7 +195,15 @@ fun CatalogEditorScreen(
                                 onValueChange = { t ->
                                     val v = t.toIntOrNull() ?: cat.tenureMinMonths
                                     workingCatalog = workingCatalog.copy(
-                                        categories = workingCatalog.categories.mapIndexed { i, c -> if (i == catIdx) c.copy(tenureMinMonths = v) else c }
+                                        categories = workingCatalog.categories.mapIndexed { i, c ->
+                                            if (i ==
+                                                catIdx
+                                            ) {
+                                                c.copy(tenureMinMonths = v)
+                                            } else {
+                                                c
+                                            }
+                                        }
                                     )
                                 },
                                 modifier = Modifier.weight(1f)
@@ -184,7 +214,15 @@ fun CatalogEditorScreen(
                                 onValueChange = { t ->
                                     val v = t.toIntOrNull() ?: cat.tenureMaxMonths
                                     workingCatalog = workingCatalog.copy(
-                                        categories = workingCatalog.categories.mapIndexed { i, c -> if (i == catIdx) c.copy(tenureMaxMonths = v) else c }
+                                        categories = workingCatalog.categories.mapIndexed { i, c ->
+                                            if (i ==
+                                                catIdx
+                                            ) {
+                                                c.copy(tenureMaxMonths = v)
+                                            } else {
+                                                c
+                                            }
+                                        }
                                     )
                                 },
                                 modifier = Modifier.weight(1f)
@@ -195,7 +233,15 @@ fun CatalogEditorScreen(
                                 onValueChange = { t ->
                                     val v = t.toDoubleOrNull() ?: cat.ltvMaxPercent
                                     workingCatalog = workingCatalog.copy(
-                                        categories = workingCatalog.categories.mapIndexed { i, c -> if (i == catIdx) c.copy(ltvMaxPercent = v) else c }
+                                        categories = workingCatalog.categories.mapIndexed { i, c ->
+                                            if (i ==
+                                                catIdx
+                                            ) {
+                                                c.copy(ltvMaxPercent = v)
+                                            } else {
+                                                c
+                                            }
+                                        }
                                     )
                                 },
                                 modifier = Modifier.weight(1f)
@@ -209,7 +255,7 @@ fun CatalogEditorScreen(
                         ) {
                             Icon(Icons.Outlined.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Add Custom Variant to ${cat.shortName}")
+                            Text(stringResource(R.string.ui_txt_add_custom_variant_to, cat.shortName))
                         }
                     }
                 }
@@ -222,7 +268,7 @@ fun CatalogEditorScreen(
                     ) {
                         Icon(Icons.Outlined.Add, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text("Add New Loan Category")
+                        Text(stringResource(R.string.ui_txt_add_new_loan_category))
                     }
                 }
             }
@@ -241,7 +287,7 @@ fun CatalogEditorScreen(
                 ) {
                     Icon(Icons.Outlined.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Save Catalog Changes")
+                    Text(stringResource(R.string.ui_txt_save_catalog_changes))
                 }
             }
         } else {
@@ -252,7 +298,7 @@ fun CatalogEditorScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    "Edit the complete catalog.json configuration directly. Changes persist offline in Room.",
+                    stringResource(R.string.ui_txt_edit_the_complete_catalog_json_con),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -275,7 +321,7 @@ fun CatalogEditorScreen(
                 ) {
                     Icon(Icons.Outlined.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Validate & Save JSON")
+                    Text(stringResource(R.string.ui_txt_validate_save_json))
                 }
             }
         }
@@ -288,10 +334,12 @@ fun CatalogEditorScreen(
 
         AlertDialog(
             onDismissRequest = { showAddCategoryDialog = false },
-            title = { Text("Add Loan Category") },
+            title = { Text(stringResource(R.string.ui_txt_add_loan_category)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Category Name") }, singleLine = true)
+                    OutlinedTextField(value = name, onValueChange = {
+                        name = it
+                    }, label = { Text(stringResource(R.string.ui_txt_category_name)) }, singleLine = true)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         NumericInputField("Min Rate %", minRate, { minRate = it }, modifier = Modifier.weight(1f))
                         NumericInputField("Max Rate %", maxRate, { maxRate = it }, modifier = Modifier.weight(1f))
@@ -331,9 +379,9 @@ fun CatalogEditorScreen(
                         workingCatalog = workingCatalog.copy(categories = workingCatalog.categories + newCat)
                     }
                     showAddCategoryDialog = false
-                }) { Text("Add") }
+                }) { Text(stringResource(R.string.ui_txt_add)) }
             },
-            dismissButton = { TextButton(onClick = { showAddCategoryDialog = false }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { showAddCategoryDialog = false }) { Text(stringResource(R.string.ui_txt_cancel)) } }
         )
     }
 
@@ -347,13 +395,21 @@ fun CatalogEditorScreen(
 
             AlertDialog(
                 onDismissRequest = { addVariantTargetCategoryIndex = null },
-                title = { Text("Add Variant to ${targetCat.name}") },
+                title = { Text(stringResource(R.string.ui_txt_add_variant_to, targetCat.name)) },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedTextField(value = vName, onValueChange = { vName = it }, label = { Text("Variant Name") }, singleLine = true)
-                        OutlinedTextField(value = vHow, onValueChange = { vHow = it }, label = { Text("How it works") })
-                        OutlinedTextField(value = vBest, onValueChange = { vBest = it }, label = { Text("Best for") })
-                        OutlinedTextField(value = vFlag, onValueChange = { vFlag = it }, label = { Text("Rule Flag (e.g. RATE_FLOATING, EMI_STEP_UP)") }, singleLine = true)
+                        OutlinedTextField(value = vName, onValueChange = {
+                            vName = it
+                        }, label = { Text(stringResource(R.string.ui_txt_variant_name)) }, singleLine = true)
+                        OutlinedTextField(value = vHow, onValueChange = {
+                            vHow = it
+                        }, label = { Text(stringResource(R.string.ui_txt_how_it_works)) })
+                        OutlinedTextField(value = vBest, onValueChange = {
+                            vBest = it
+                        }, label = { Text(stringResource(R.string.ui_txt_best_for)) })
+                        OutlinedTextField(value = vFlag, onValueChange = {
+                            vFlag = it
+                        }, label = { Text(stringResource(R.string.ui_txt_rule_flag_e_g_rate_floating_emi_st)) }, singleLine = true)
                     }
                 },
                 confirmButton = {
@@ -379,9 +435,11 @@ fun CatalogEditorScreen(
                             )
                         }
                         addVariantTargetCategoryIndex = null
-                    }) { Text("Add Variant") }
+                    }) { Text(stringResource(R.string.ui_txt_add_variant)) }
                 },
-                dismissButton = { TextButton(onClick = { addVariantTargetCategoryIndex = null }) { Text("Cancel") } }
+                dismissButton = {
+                    TextButton(onClick = { addVariantTargetCategoryIndex = null }) { Text(stringResource(R.string.ui_txt_cancel)) }
+                }
             )
         }
     }

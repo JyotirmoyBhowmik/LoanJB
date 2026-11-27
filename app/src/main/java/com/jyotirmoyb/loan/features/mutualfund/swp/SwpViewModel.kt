@@ -10,12 +10,12 @@ import com.jyotirmoyb.loan.domain.SwpEngine
 import com.jyotirmoyb.loan.domain.SwpInput
 import com.jyotirmoyb.loan.domain.SwpResult
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import java.util.Calendar
 
 data class SwpUiState(
     val input: SwpInput = defaultSwpInput(),
@@ -38,7 +38,8 @@ private fun defaultSwpInput(): SwpInput {
     )
 }
 
-class SwpViewModel(application: Application) : AndroidViewModel(application),
+class SwpViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<SwpInput, SwpResult> {
 
     override val id: String = "swp"

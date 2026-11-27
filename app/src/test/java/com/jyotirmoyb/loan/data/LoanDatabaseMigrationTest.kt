@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.core.app.ApplicationProvider
+import java.io.File
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -16,7 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.io.File
 
 /**
  * Room migration (v1 -> v2 -> v3 -> v4 -> v5), schema export verification,
@@ -177,5 +177,137 @@ class LoanDatabaseMigrationTest {
                 assertTrue(text.contains("article_bookmarks"))
             }
         }
+    }
+
+    @Test
+    fun `individual Room migrations 1-2, 2-3, 3-4, and 4-5 each preserve rows and create expected schema`() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+
+        fun openDb(name: String, version: Int, init: (SupportSQLiteDatabase) -> Unit): SupportSQLiteOpenHelper =
+            FrameworkSQLiteOpenHelperFactory().create(
+                SupportSQLiteOpenHelper.Configuration.builder(context)
+                    .name(name)
+                    .callback(
+                        object : SupportSQLiteOpenHelper.Callback(version) {
+                            override fun onCreate(db: SupportSQLiteDatabase) = init(db)
+                            override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+                        }
+                    )
+                    .build()
+            )
+
+        fun createV1(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `saved_loans` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `nickname` TEXT NOT NULL, `lender` TEXT NOT NULL, `categoryId` TEXT NOT NULL,
+                    `categoryName` TEXT NOT NULL, `variantSummary` TEXT NOT NULL, `inputJson` TEXT NOT NULL,
+                    `paidMonthsCsv` TEXT NOT NULL, `completedChecklistCsv` TEXT NOT NULL,
+                    `reminderEnabled` INTEGER NOT NULL, `reminderDaysBefore` INTEGER NOT NULL,
+                    `createdAtMillis` INTEGER NOT NULL
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `compare_scenarios` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `label` TEXT NOT NULL,
+                    `categoryId` TEXT NOT NULL, `variantSummary` TEXT NOT NULL,
+                    `inputJson` TEXT NOT NULL, `createdAtMillis` INTEGER NOT NULL
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `catalog_override` (
+                    `id` INTEGER NOT NULL, `catalogJson` TEXT NOT NULL, `updatedAtMillis` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+        }
+
+        fun hasTable(db: SupportSQLiteDatabase, table: String): Boolean =
+            db.query("SELECT name FROM sqlite_master WHERE type='table' AND name=?", arrayOf(table)).use { it.moveToFirst() }
+
+        // Step 1 -> 2
+        val db12 = "step-1-2-${System.currentTimeMillis()}.db"
+        val h12 = openDb(db12, 1) { createV1(it) }
+        LoanDatabase.MIGRATION_1_2.migrate(h12.writableDatabase)
+        assertTrue(hasTable(h12.writableDatabase, "remote_config_cache"))
+        assertTrue(hasTable(h12.writableDatabase, "manual_overrides"))
+        assertTrue(hasTable(h12.writableDatabase, "sync_metadata"))
+        h12.close()
+        context.deleteDatabase(db12)
+
+        // Step 2 -> 3
+        val db23 = "step-2-3-${System.currentTimeMillis()}.db"
+        val h23 = openDb(db23, 2) {
+            createV1(it)
+            LoanDatabase.MIGRATION_1_2.migrate(it)
+        }
+        LoanDatabase.MIGRATION_2_3.migrate(h23.writableDatabase)
+        assertTrue(hasTable(h23.writableDatabase, "amfi_nav_schemes"))
+        assertTrue(hasTable(h23.writableDatabase, "amfi_nav_sync"))
+        h23.close()
+        context.deleteDatabase(db23)
+
+        // Step 3 -> 4
+        val db34 = "step-3-4-${System.currentTimeMillis()}.db"
+        val h34 = openDb(db34, 3) {
+            createV1(it)
+            LoanDatabase.MIGRATION_1_2.migrate(it)
+            LoanDatabase.MIGRATION_2_3.migrate(it)
+        }
+        LoanDatabase.MIGRATION_3_4.migrate(h34.writableDatabase)
+        assertTrue(hasTable(h34.writableDatabase, "market_quotes_cache"))
+        assertTrue(hasTable(h34.writableDatabase, "market_history"))
+        assertTrue(hasTable(h34.writableDatabase, "bank_fd_rates"))
+        assertTrue(hasTable(h34.writableDatabase, "article_bookmarks"))
+        h34.close()
+        context.deleteDatabase(db34)
+
+        // Step 4 -> 5 via Room schema validation
+        val db45 = "step-4-5-${System.currentTimeMillis()}.db"
+        val h45 = openDb(db45, 4) { db ->
+            createV1(db)
+            LoanDatabase.MIGRATION_1_2.migrate(db)
+            LoanDatabase.MIGRATION_2_3.migrate(db)
+            LoanDatabase.MIGRATION_3_4.migrate(db)
+            db.insert(
+                "saved_loans",
+                SQLiteDatabase.CONFLICT_REPLACE,
+                ContentValues().apply {
+                    put("nickname", "V4 Loan")
+                    put("lender", "HDFC")
+                    put("categoryId", "home")
+                    put("categoryName", "Home Loan")
+                    put("variantSummary", "Floating")
+                    put("inputJson", "{}")
+                    put("paidMonthsCsv", "1")
+                    put("completedChecklistCsv", "")
+                    put("reminderEnabled", 0)
+                    put("reminderDaysBefore", 3)
+                    put("createdAtMillis", 1740000000000L)
+                }
+            )
+        }
+        h45.writableDatabase.close()
+        h45.close()
+
+        val room45 = Room.databaseBuilder(context, LoanDatabase::class.java, db45)
+            .addMigrations(LoanDatabase.MIGRATION_4_5)
+            .allowMainThreadQueries()
+            .build()
+        runTest {
+            val loans = room45.loanDao().getAllSavedLoansOnce()
+            assertEquals(1, loans.size)
+            assertEquals("V4 Loan", loans.first().nickname)
+            assertEquals(false, loans.first().autoDebitNach)
+            assertEquals(5, loans.first().emiDayOfMonth)
+        }
+        room45.close()
+        context.deleteDatabase(db45)
     }
 }

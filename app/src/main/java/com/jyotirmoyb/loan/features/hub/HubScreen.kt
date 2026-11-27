@@ -22,24 +22,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.automirrored.outlined.TrendingUp
-import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.BeachAccess
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.CompareArrows
-import androidx.compose.material.icons.outlined.Elderly
-import androidx.compose.material.icons.outlined.Lightbulb
-import androidx.compose.material.icons.outlined.ReceiptLong
-import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Speed
-import androidx.compose.material.icons.outlined.Stars
-import androidx.compose.material.icons.outlined.SwapHoriz
-import androidx.compose.material.icons.outlined.TrackChanges
-import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,17 +49,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.features.CalculatorModule
-import com.jyotirmoyb.loan.features.CalculatorSection
 import com.jyotirmoyb.loan.ui.components.DisclaimerBanner
 import com.jyotirmoyb.loan.ui.components.FintechCard
-import com.jyotirmoyb.loan.ui.theme.InfoBlue
-import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.LocalIsDarkTheme
-import com.jyotirmoyb.loan.ui.theme.PurpleAccent
 import com.jyotirmoyb.loan.ui.theme.SageGreen
 import com.jyotirmoyb.loan.ui.theme.SageGreenDark
 import com.jyotirmoyb.loan.ui.theme.SoftMintTile
-import com.jyotirmoyb.loan.ui.theme.TealPrimaryDark
 
 @Composable
 fun HubScreen(
@@ -84,6 +64,7 @@ fun HubScreen(
     onModuleClick: (CalculatorModule) -> Unit,
     onOpenSavedLoans: () -> Unit,
     onOpenLoanGuide: () -> Unit,
+    onOpenDataAndRates: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -131,6 +112,12 @@ fun HubScreen(
                         .fillMaxWidth()
                         .testTag("hub_search_input")
                 )
+            }
+        }
+
+        if (uiState.showStaleDataWarning) {
+            item(key = "hub_stale_data_banner") {
+                HubStaleDataBanner(onClick = onOpenDataAndRates)
             }
         }
 
@@ -194,10 +181,7 @@ fun HubScreen(
 }
 
 @Composable
-private fun HubSectionCard(
-    group: HubSectionGroup,
-    onModuleClick: (CalculatorModule) -> Unit
-) {
+private fun HubSectionCard(group: HubSectionGroup, onModuleClick: (CalculatorModule) -> Unit) {
     val section = group.section
     FintechCard(
         modifier = Modifier.testTag("hub_section_${section.name.lowercase()}")
@@ -278,11 +262,7 @@ private fun HubSectionCard(
 }
 
 @Composable
-private fun HubModuleTile(
-    module: CalculatorModule,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun HubModuleTile(module: CalculatorModule, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val iconTint = moduleTintColor(module)
     val contentDesc = if (module.enabled) {
         "${module.title}. ${module.subtitle}"
@@ -371,12 +351,7 @@ private fun HubModuleTile(
 }
 
 @Composable
-private fun HubWorkspaceCard(
-    savedLoansCount: Int,
-    categoriesCount: Int,
-    onOpenSavedLoans: () -> Unit,
-    onOpenLoanGuide: () -> Unit
-) {
+private fun HubWorkspaceCard(savedLoansCount: Int, categoriesCount: Int, onOpenSavedLoans: () -> Unit, onOpenLoanGuide: () -> Unit) {
     FintechCard(
         modifier = Modifier.testTag("hub_workspace_card")
     ) {
@@ -500,58 +475,4 @@ private fun WorkspaceTile(
             }
         }
     }
-}
-
-private fun sectionHeaderIcon(iconKey: String): ImageVector = when (iconKey) {
-    "featured" -> Icons.Outlined.Stars
-    "loans" -> Icons.Outlined.AccountBalance
-    "deposits" -> Icons.Outlined.Savings
-    "mutual" -> Icons.AutoMirrored.Outlined.TrendingUp
-    "tax" -> Icons.Outlined.ReceiptLong
-    "pension" -> Icons.Outlined.Elderly
-    else -> Icons.Outlined.AccountBalance
-}
-
-private fun moduleIcon(icon: String): ImageVector = when (icon) {
-    "target" -> Icons.Outlined.TrackChanges
-    "umbrella" -> Icons.Outlined.BeachAccess
-    "sparkles" -> Icons.Outlined.AutoAwesome
-    "lightbulb" -> Icons.Outlined.Lightbulb
-    "compare" -> Icons.Outlined.CompareArrows
-    "eligibility" -> Icons.Outlined.Speed
-    "balance_transfer" -> Icons.Outlined.SwapHoriz
-    "tax_benefit" -> Icons.Outlined.ReceiptLong
-    "part_payment" -> Icons.Outlined.EventAvailable
-    "staff" -> Icons.Outlined.Badge
-    "small_savings" -> Icons.Outlined.AccountBalance
-    "deposit_compare" -> Icons.Outlined.CompareArrows
-    "lumpsum" -> Icons.Outlined.Savings
-    "pension" -> Icons.Outlined.Elderly
-    else -> Icons.Outlined.AccountBalance
-}
-
-private fun moduleTintColor(module: CalculatorModule): Color = when (module.icon) {
-    "target" -> SageGreen
-    "umbrella" -> PurpleAccent
-    "sparkles" -> InfoBlue
-    "lightbulb" -> InterestAmber
-    "compare" -> InfoBlue
-    "eligibility" -> SageGreenDark
-    "balance_transfer" -> TealPrimaryDark
-    "tax_benefit" -> InterestAmber
-    "part_payment" -> SageGreen
-    "small_savings" -> SageGreenDark
-    "deposit_compare" -> InfoBlue
-    "xirr" -> PurpleAccent
-    "live_nav" -> SageGreen
-    "lumpsum" -> InterestAmber
-    "tax" -> InterestAmber
-    "hra" -> SageGreenDark
-    "gst" -> InfoBlue
-    "advance_tax" -> PurpleAccent
-    "rp" -> PurpleAccent
-    "nps" -> InfoBlue
-    "epf" -> SageGreenDark
-    "pension" -> PurpleAccent
-    else -> TealPrimaryDark
 }

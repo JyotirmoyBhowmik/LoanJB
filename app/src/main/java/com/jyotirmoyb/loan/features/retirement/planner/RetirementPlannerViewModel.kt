@@ -31,10 +31,7 @@ data class RetirementPlannerUiState(
     val hasCustomPostReturn: Boolean = false
 )
 
-class RetirementPlannerViewModel(
-    prefsRepo: UserPreferencesRepository,
-    ratesRepo: RatesRepository
-) : ViewModel() {
+class RetirementPlannerViewModel(prefsRepo: UserPreferencesRepository, ratesRepo: RatesRepository) : ViewModel() {
 
     private data class DraftState(
         val input: RetirementPlannerInput = RetirementPlannerInput(),
@@ -161,12 +158,8 @@ class RetirementPlannerViewModel(
         }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepo: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepo: RatesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            RetirementPlannerViewModel(prefsRepo, ratesRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = RetirementPlannerViewModel(prefsRepo, ratesRepo) as T
     }
 }

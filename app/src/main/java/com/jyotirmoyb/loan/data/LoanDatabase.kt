@@ -139,7 +139,9 @@ abstract class LoanDatabase : RoomDatabase() {
                     )
                     """.trimIndent()
                 )
-                db.execSQL("CREATE INDEX IF NOT EXISTS `index_market_history_metricKey_recordedAtMillis` ON `market_history` (`metricKey`, `recordedAtMillis`)")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_market_history_metricKey_recordedAtMillis` ON `market_history` (`metricKey`, `recordedAtMillis`)"
+                )
                 db.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS `bank_fd_rates` (
@@ -183,19 +185,16 @@ abstract class LoanDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: LoanDatabase? = null
 
-        fun getInstance(context: Context): LoanDatabase {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    LoanDatabase::class.java,
-                    "loanjb_offline.db"
-                )
-                    .addMigrations(*ALL_MIGRATIONS)
-                    .fallbackToDestructiveMigration(true)
-                    .build()
-                    .also { INSTANCE = it }
-            }
+        fun getInstance(context: Context): LoanDatabase = INSTANCE ?: synchronized(this) {
+            INSTANCE ?: Room.databaseBuilder(
+                context.applicationContext,
+                LoanDatabase::class.java,
+                "loanjb_offline.db"
+            )
+                .addMigrations(*ALL_MIGRATIONS)
+                .fallbackToDestructiveMigration(true)
+                .build()
+                .also { INSTANCE = it }
         }
     }
 }
-

@@ -140,12 +140,20 @@ fun RecurringDepositScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "${stringResource(R.string.rd_effective_yield)}: ${CurrencyFormatter.formatPercent(result.effectiveYieldPercent)}",
+                            text = stringResource(
+                                R.string.ui_txt_fmt_6c03a4,
+                                stringResource(R.string.rd_effective_yield),
+                                CurrencyFormatter.formatPercent(result.effectiveYieldPercent)
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White.copy(alpha = 0.85f)
                         )
                         Text(
-                            text = "${stringResource(R.string.fd_post_tax_maturity)}: ${CurrencyFormatter.formatCompact(result.postTaxMaturityAmount, currency)}",
+                            text = stringResource(
+                                R.string.ui_txt_fmt_6c03a4,
+                                stringResource(R.string.fd_post_tax_maturity),
+                                CurrencyFormatter.formatCompact(result.postTaxMaturityAmount, currency)
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = PrincipalEmerald,
                             fontWeight = FontWeight.Bold
@@ -312,7 +320,7 @@ fun RecurringDepositScreen(
                         FilterChip(
                             selected = input.taxSlabPercent == slab,
                             onClick = { onSetTaxSlab(slab) },
-                            label = { Text("${slab.toInt()}%") },
+                            label = { Text(stringResource(R.string.ui_txt_fmt_361cec, slab.toInt())) },
                             modifier = Modifier.testTag("rd_slab_${slab.toInt()}")
                         )
                     }

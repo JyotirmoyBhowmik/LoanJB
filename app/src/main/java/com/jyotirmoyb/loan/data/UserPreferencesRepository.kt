@@ -28,7 +28,8 @@ data class UserPreferences(
     val flagSecureEnabled: Boolean = false,
     val onboardingCompleted: Boolean = false,
     val useOnlineData: Boolean = true,
-    val marketStaleHours: Int = 24
+    val marketStaleHours: Int = 24,
+    val staleDataThresholdDays: Int = 90
 )
 
 class UserPreferencesRepository(private val context: Context) {
@@ -47,6 +48,7 @@ class UserPreferencesRepository(private val context: Context) {
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
         val USE_ONLINE_DATA = booleanPreferencesKey("use_online_data")
         val MARKET_STALE_HOURS = intPreferencesKey("market_stale_hours")
+        val STALE_DATA_THRESHOLD_DAYS = intPreferencesKey("stale_data_threshold_days")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.userPrefsDataStore.data.map { prefs ->
@@ -70,6 +72,7 @@ class UserPreferencesRepository(private val context: Context) {
         val onboarded = prefs[Keys.ONBOARDING_COMPLETED] ?: false
         val useOnlineData = prefs[Keys.USE_ONLINE_DATA] ?: true
         val staleHours = (prefs[Keys.MARKET_STALE_HOURS] ?: 24).coerceIn(1, 720)
+        val staleDays = (prefs[Keys.STALE_DATA_THRESHOLD_DAYS] ?: 90).coerceIn(7, 365)
         UserPreferences(
             region = region,
             currency = currency,
@@ -83,7 +86,8 @@ class UserPreferencesRepository(private val context: Context) {
             flagSecureEnabled = flagSecure,
             onboardingCompleted = onboarded,
             useOnlineData = useOnlineData,
-            marketStaleHours = staleHours
+            marketStaleHours = staleHours,
+            staleDataThresholdDays = staleDays
         )
     }
 
@@ -147,6 +151,10 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun setMarketStaleHours(hours: Int) {
         context.userPrefsDataStore.edit { it[Keys.MARKET_STALE_HOURS] = hours.coerceIn(1, 720) }
+    }
+
+    suspend fun setStaleDataThresholdDays(days: Int) {
+        context.userPrefsDataStore.edit { it[Keys.STALE_DATA_THRESHOLD_DAYS] = days.coerceIn(7, 365) }
     }
 
     suspend fun resetPreferences() {

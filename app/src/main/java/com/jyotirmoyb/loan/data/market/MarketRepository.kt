@@ -5,7 +5,6 @@ import com.jyotirmoyb.loan.data.MarketDao
 import com.jyotirmoyb.loan.data.MarketHistoryEntity
 import com.jyotirmoyb.loan.data.MarketQuoteCacheEntity
 import com.jyotirmoyb.loan.data.UserPreferencesRepository
-import com.jyotirmoyb.loan.data.remote.ConfigKeys
 import com.jyotirmoyb.loan.data.remote.ConfigValueSource
 import com.jyotirmoyb.loan.data.remote.RatesRepository
 import com.jyotirmoyb.loan.domain.BankFdRateItem
@@ -15,16 +14,16 @@ import com.jyotirmoyb.loan.domain.MarketMetricSection
 import com.jyotirmoyb.loan.domain.MarketQuoteSample
 import com.jyotirmoyb.loan.domain.MarketSourceType
 import com.jyotirmoyb.loan.domain.MarketStalenessEvaluator
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.UUID
 
 data class MarketMetricDescriptor(
     val key: String,
@@ -73,14 +72,19 @@ class MarketRepository(
     ) { args ->
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = args[0] as Map<String, com.jyotirmoyb.loan.data.remote.ResolvedConfigItem>
+
         @Suppress("UNCHECKED_CAST")
         val prevMap = args[1] as Map<String, Double>
+
         @Suppress("UNCHECKED_CAST")
         val bankSeeds = args[2] as List<com.jyotirmoyb.loan.data.remote.BankFdRateSeed>
+
         @Suppress("UNCHECKED_CAST")
         val cachedQuotes = args[3] as List<MarketQuoteCacheEntity>
+
         @Suppress("UNCHECKED_CAST")
         val historyEntities = args[4] as List<MarketHistoryEntity>
+
         @Suppress("UNCHECKED_CAST")
         val customBankFds = args[5] as List<BankFdRateEntity>
         val prefs = args[6] as com.jyotirmoyb.loan.data.UserPreferences
@@ -140,14 +144,19 @@ class MarketRepository(
             }
 
             val onlineConfigSample = configItem?.takeIf {
-                it.source == ConfigValueSource.ONLINE && it.numericValue != null
+                (it.source == ConfigValueSource.ONLINE || it.source == ConfigValueSource.IMPORTED) &&
+                    it.numericValue != null
             }?.let {
                 MarketQuoteSample(
                     metricKey = desc.key,
                     value = it.numericValue!!,
                     previousValue = prevMap[desc.key],
                     unit = it.unit,
-                    sourceType = MarketSourceType.ONLINE,
+                    sourceType = if (it.source == ConfigValueSource.IMPORTED) {
+                        MarketSourceType.IMPORTED
+                    } else {
+                        MarketSourceType.ONLINE
+                    },
                     sourceName = it.sourceName,
                     asOfMillis = MarketStalenessEvaluator.parseIsoDateToMillis(it.effectiveFrom)
                         .takeIf { ts -> ts > 0L } ?: nowMillis
@@ -197,6 +206,12 @@ class MarketRepository(
             val asOf = chosen?.asOfMillis ?: 0L
             val stale = MarketStalenessEvaluator.isStale(asOf, nowMillis, prefs.marketStaleHours)
 
+            val chosenSource = chosen?.sourceType ?: MarketSourceType.BUILT_IN
+            val resolvedIsUnverified = when (chosenSource) {
+                MarketSourceType.MANUAL, MarketSourceType.LIVE_API -> false
+                else -> configItem?.isUnverified ?: false
+            }
+
             MarketMetricCardData(
                 key = desc.key,
                 title = desc.title,
@@ -206,11 +221,19 @@ class MarketRepository(
                 unit = chosen?.unit ?: desc.unit,
                 deltaAbs = delta?.absoluteChange,
                 deltaPercent = delta?.percentChange,
-                sourceType = chosen?.sourceType ?: MarketSourceType.BUILT_IN,
+                sourceType = chosenSource,
                 sourceName = chosen?.sourceName ?: "No data",
                 asOfMillis = asOf,
                 isStale = stale,
-                hasManualOverride = manualSample != null
+                hasManualOverride = manualSample != null,
+                sourceUrl = configItem?.sourceUrl.orEmpty(),
+                effectiveFrom = configItem?.effectiveFrom.orEmpty(),
+                lastVerified = when (chosenSource) {
+                    MarketSourceType.MANUAL -> "Manual"
+                    MarketSourceType.LIVE_API -> com.jyotirmoyb.loan.data.remote.DataSourceResolver.formatMillisToCompactDate(asOf)
+                    else -> configItem?.lastVerified.orEmpty()
+                },
+                isUnverified = resolvedIsUnverified
             )
         }
 
@@ -430,11 +453,7 @@ class MarketRepository(
         marketDao.clearAllBankFdRates()
     }
 
-    private suspend fun persistSampleWithHistory(
-        sample: MarketQuoteSample,
-        previousCachedValue: Double?,
-        nowMillis: Long
-    ) {
+    private suspend fun persistSampleWithHistory(sample: MarketQuoteSample, previousCachedValue: Double?, nowMillis: Long) {
         marketDao.upsertQuote(
             MarketQuoteCacheEntity(
                 metricKey = sample.metricKey,
@@ -463,30 +482,6 @@ class MarketRepository(
     }
 
     companion object {
-        val METRIC_CATALOG: List<MarketMetricDescriptor> = listOf(
-            // 1. RBI Policy & Key Benchmarks
-            MarketMetricDescriptor(ConfigKeys.RBI_REPO_RATE, "RBI Policy Repo Rate", "EBLR benchmark for floating loans", "% p.a.", MarketMetricSection.RBI_BENCHMARKS),
-            MarketMetricDescriptor(ConfigKeys.MARKET_RBI_SDF_RATE, "Standing Deposit Facility", "RBI policy floor rate (SDF)", "% p.a.", MarketMetricSection.RBI_BENCHMARKS),
-            MarketMetricDescriptor(ConfigKeys.MARKET_RBI_MSF_RATE, "MSF / Bank Rate", "Marginal Standing Facility ceiling", "% p.a.", MarketMetricSection.RBI_BENCHMARKS),
-            MarketMetricDescriptor(ConfigKeys.MARKET_RBI_CRR, "Cash Reserve Ratio (CRR)", "Mandatory bank reserve ratio", "%", MarketMetricSection.RBI_BENCHMARKS),
-            // 2. Bullion
-            MarketMetricDescriptor(ConfigKeys.MARKET_GOLD_24K_10G, "Gold 24K (999)", "Per 10 grams (India reference)", "INR/10g", MarketMetricSection.BULLION),
-            MarketMetricDescriptor(ConfigKeys.MARKET_GOLD_22K_10G, "Gold 22K (916)", "Per 10 grams (jewellery / loan)", "INR/10g", MarketMetricSection.BULLION),
-            MarketMetricDescriptor(ConfigKeys.MARKET_SILVER_1KG, "Silver (999)", "Per 1 kilogram (India reference)", "INR/kg", MarketMetricSection.BULLION),
-            // 3. FX & Equity Indices
-            MarketMetricDescriptor(ConfigKeys.MARKET_USD_INR, "USD / INR", "US Dollar to Indian Rupee", "INR/USD", MarketMetricSection.FX_INDICES),
-            MarketMetricDescriptor(ConfigKeys.MARKET_SENSEX, "BSE Sensex", "30-stock flagship benchmark", "pts", MarketMetricSection.FX_INDICES),
-            MarketMetricDescriptor(ConfigKeys.MARKET_NIFTY_50, "NSE Nifty 50", "50-stock broad market index", "pts", MarketMetricSection.FX_INDICES),
-            // 4. Sovereign Bond Yields
-            MarketMetricDescriptor(ConfigKeys.MARKET_GSEC_10Y_YIELD, "India 10Y G-Sec Yield", "Sovereign benchmark (sets small-savings rates)", "% p.a.", MarketMetricSection.BONDS),
-            // 5. Current Small-Savings Rates (from schemes.json)
-            MarketMetricDescriptor(ConfigKeys.SCHEME_PPF_RATE, "PPF", "15-yr EEE tax-free compounding", "% p.a.", MarketMetricSection.SMALL_SAVINGS),
-            MarketMetricDescriptor(ConfigKeys.SCHEME_SSY_RATE, "Sukanya Samriddhi (SSY)", "Girl child EEE sovereign scheme", "% p.a.", MarketMetricSection.SMALL_SAVINGS),
-            MarketMetricDescriptor(ConfigKeys.SCHEME_SCSS_RATE, "Senior Citizens' Savings", "Quarterly payout, 5-yr tenure", "% p.a.", MarketMetricSection.SMALL_SAVINGS),
-            MarketMetricDescriptor(ConfigKeys.SCHEME_NSC_RATE, "NSC (VIII Issue)", "5-yr compounded annually", "% p.a.", MarketMetricSection.SMALL_SAVINGS),
-            MarketMetricDescriptor(ConfigKeys.SCHEME_POMIS_RATE, "Post Office MIS", "Monthly sovereign income", "% p.a.", MarketMetricSection.SMALL_SAVINGS),
-            MarketMetricDescriptor(ConfigKeys.SCHEME_POTD_5Y_RATE, "Post Office 5Y TD", "Eligible for Sec 80C (Old Regime)", "% p.a.", MarketMetricSection.SMALL_SAVINGS),
-            MarketMetricDescriptor(ConfigKeys.SCHEME_KVP_RATE, "Kisan Vikas Patra (KVP)", "Guaranteed money doubling", "% p.a.", MarketMetricSection.SMALL_SAVINGS)
-        )
+        val METRIC_CATALOG: List<MarketMetricDescriptor> = DefaultMarketMetricCatalog
     }
 }

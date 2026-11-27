@@ -102,12 +102,17 @@ fun PartPaymentPlannerScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "+${CurrencyFormatter.format(res.extraMonthlyNeeded, cur)}/mo",
+                            text = stringResource(R.string.ui_txt_mo_b3ffed, CurrencyFormatter.format(res.extraMonthlyNeeded, cur)),
                             style = MonoLargeStyle,
                             color = Color(0xFF86EFAC)
                         )
                         Text(
-                            text = "${stringResource(R.string.partpay_new_outlay)}: ${CurrencyFormatter.format(res.totalMonthlyOutlay, cur)}/mo (Base EMI ${CurrencyFormatter.format(res.currentMonthlyEmi, cur)})",
+                            text = stringResource(
+                                R.string.ui_txt_mo_base_emi,
+                                stringResource(R.string.partpay_new_outlay),
+                                CurrencyFormatter.format(res.totalMonthlyOutlay, cur),
+                                CurrencyFormatter.format(res.currentMonthlyEmi, cur)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFFCBD5E1)
                         )
@@ -117,7 +122,11 @@ fun PartPaymentPlannerScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text(stringResource(R.string.partpay_interest_saved), style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                                Text(
+                                    stringResource(R.string.partpay_interest_saved),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
                                 Text(
                                     text = CurrencyFormatter.formatCompact(res.totalInterestSaved, cur),
                                     style = MonoMediumStyle,
@@ -125,9 +134,18 @@ fun PartPaymentPlannerScreen(
                                 )
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                Text(stringResource(R.string.partpay_months_saved), style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
                                 Text(
-                                    text = "${res.monthsSaved} mos (${res.monthsSaved / 12}y ${res.monthsSaved % 12}m)",
+                                    stringResource(R.string.partpay_months_saved),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
+                                Text(
+                                    text = stringResource(
+                                        R.string.ui_txt_mos_y_m,
+                                        res.monthsSaved,
+                                        res.monthsSaved / 12,
+                                        res.monthsSaved % 12
+                                    ),
                                     style = MonoMediumStyle,
                                     color = Color.White
                                 )
@@ -143,8 +161,17 @@ fun PartPaymentPlannerScreen(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Before: ${res.currentLoanFreeDate}", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
-                                Text("Now: ${res.newLoanFreeDate}", style = MaterialTheme.typography.labelSmall, color = Color(0xFF86EFAC), fontWeight = FontWeight.Bold)
+                                Text(
+                                    stringResource(R.string.ui_txt_before, res.currentLoanFreeDate),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
+                                Text(
+                                    stringResource(R.string.ui_txt_now, res.newLoanFreeDate),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF86EFAC),
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }
@@ -273,7 +300,7 @@ fun PartPaymentPlannerScreen(
                     listOf(2, 5, 8).forEach { yrs ->
                         AssistChip(
                             onClick = { onApplyYearsEarlier(yrs) },
-                            label = { Text("$yrs yrs early") },
+                            label = { Text(stringResource(R.string.ui_txt_yrs_early, yrs)) },
                             modifier = Modifier.testTag("partpay_preset_${yrs}y")
                         )
                     }
@@ -300,11 +327,7 @@ fun PartPaymentPlannerScreen(
 }
 
 @Composable
-private fun PartPaymentPayoffCurveCard(
-    baseline: List<Double>,
-    planned: List<Double>,
-    currency: CurrencyCode
-) {
+private fun PartPaymentPayoffCurveCard(baseline: List<Double>, planned: List<Double>, currency: CurrencyCode) {
     val maxBal = (baseline.maxOrNull() ?: 1.0).coerceAtLeast(1.0)
     val maxLen = maxOf(baseline.size, planned.size).coerceAtLeast(2)
 
@@ -314,11 +337,11 @@ private fun PartPaymentPayoffCurveCard(
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 Box(modifier = Modifier.size(9.dp).background(InterestAmber, CircleShape))
-                Text("Regular Schedule", style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.ui_txt_regular_schedule), style = MaterialTheme.typography.labelSmall)
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 Box(modifier = Modifier.size(9.dp).background(SavingsGreen, CircleShape))
-                Text("With Extra Monthly", style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.ui_txt_with_extra_monthly), style = MaterialTheme.typography.labelSmall)
             }
         }
         Spacer(Modifier.height(10.dp))
@@ -354,8 +377,16 @@ private fun PartPaymentPayoffCurveCard(
             drawCurve(planned, SavingsGreen)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Start (${CurrencyFormatter.formatCompact(maxBal, currency)})", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("Year ${maxLen - 1} (₹0)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.ui_txt_start, CurrencyFormatter.formatCompact(maxBal, currency)),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                stringResource(R.string.ui_txt_year_0_da5296, maxLen - 1),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

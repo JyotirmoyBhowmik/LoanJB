@@ -20,9 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.CalculationInput
 import com.jyotirmoyb.loan.domain.CalculationResult
 import com.jyotirmoyb.loan.domain.CurrencyCode
@@ -40,12 +42,7 @@ import com.jyotirmoyb.loan.ui.theme.SavingsGreen
 import com.jyotirmoyb.loan.ui.theme.SlateNavy
 
 @Composable
-fun GraphTab(
-    input: CalculationInput,
-    result: CalculationResult,
-    currency: CurrencyCode,
-    modifier: Modifier = Modifier
-) {
+fun GraphTab(input: CalculationInput, result: CalculationResult, currency: CurrencyCode, modifier: Modifier = Modifier) {
     val insights = result.insights
 
     LazyColumn(
@@ -111,7 +108,11 @@ fun GraphTab(
                     SectionAccentHeader("Offset Account Savings", badge = "ACTIVE", accentColor = PrincipalEmerald)
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Parking ${CurrencyFormatter.format(input.offsetBalance, currency)} in your offset account saves ${CurrencyFormatter.format(insights.offsetInterestSaved, currency)} in total interest.",
+                        text = stringResource(
+                            R.string.ui_txt_parking_in_your_offset_account_sav,
+                            CurrencyFormatter.format(input.offsetBalance, currency),
+                            CurrencyFormatter.format(insights.offsetInterestSaved, currency)
+                        ),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -127,7 +128,11 @@ fun GraphTab(
                     SectionAccentHeader("Compound Moratorium", badge = "+PRINCIPAL", accentColor = InterestAmber)
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Unpaid interest of ${CurrencyFormatter.format(insights.moratoriumExtraInterest, currency)} during the ${input.moratoriumMonths}-month moratorium was capitalized into principal.",
+                        text = stringResource(
+                            R.string.ui_txt_unpaid_interest_of_during_the_mont,
+                            CurrencyFormatter.format(insights.moratoriumExtraInterest, currency),
+                            input.moratoriumMonths
+                        ),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -166,10 +171,32 @@ fun GraphTab(
                             .background(SlateNavy, RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                             .padding(horizontal = 10.dp, vertical = 7.dp)
                     ) {
-                        Text("SHIFT", style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.weight(0.8f))
-                        Text("RATE", style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.weight(0.9f))
-                        Text("EMI", style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.weight(1.2f), textAlign = TextAlign.End)
-                        Text("INT DIFF", style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.weight(1.3f), textAlign = TextAlign.End)
+                        Text(
+                            stringResource(R.string.ui_txt_shift),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.weight(0.8f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_rate),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.weight(0.9f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_emi),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.weight(1.2f),
+                            textAlign = TextAlign.End
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_int_diff),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.weight(1.3f),
+                            textAlign = TextAlign.End
+                        )
                     }
                     insights.sensitivityRows.forEach { row ->
                         val isBase = row.deltaPercent == 0.0
@@ -182,17 +209,42 @@ fun GraphTab(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    if (isBase) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
-                                    else Color.Transparent
+                                    if (isBase) {
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+                                    } else {
+                                        Color.Transparent
+                                    }
                                 )
                                 .padding(horizontal = 10.dp, vertical = 7.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(deltaLabel, style = MonoSmallStyle, fontWeight = if (isBase) FontWeight.Bold else FontWeight.Medium, modifier = Modifier.weight(0.8f))
-                            Text("${String.format("%.2f", row.effectiveRate)}%", style = MonoSmallStyle, modifier = Modifier.weight(0.9f))
-                            Text(CurrencyFormatter.format(row.monthlyEmi, currency), style = MonoSmallStyle, modifier = Modifier.weight(1.2f), textAlign = TextAlign.End)
                             Text(
-                                text = (if (row.interestDiff > 0) "+" else "") + CurrencyFormatter.formatCompact(row.interestDiff, currency),
+                                deltaLabel,
+                                style = MonoSmallStyle,
+                                fontWeight = if (isBase) FontWeight.Bold else FontWeight.Medium,
+                                modifier = Modifier.weight(0.8f)
+                            )
+                            Text(
+                                stringResource(R.string.ui_txt_fmt_361cec, String.format("%.2f", row.effectiveRate)),
+                                style = MonoSmallStyle,
+                                modifier = Modifier.weight(0.9f)
+                            )
+                            Text(
+                                CurrencyFormatter.format(row.monthlyEmi, currency),
+                                style = MonoSmallStyle,
+                                modifier = Modifier.weight(1.2f),
+                                textAlign = TextAlign.End
+                            )
+                            Text(
+                                text = (
+                                    if (row.interestDiff >
+                                        0
+                                    ) {
+                                        "+"
+                                    } else {
+                                        ""
+                                    }
+                                    ) + CurrencyFormatter.formatCompact(row.interestDiff, currency),
                                 style = MonoSmallStyle,
                                 color = when {
                                     row.interestDiff > 0 -> DangerRed
@@ -220,7 +272,11 @@ fun GraphTab(
                     )
                     Spacer(Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        GraphStat("Old → New EMI", "${CurrencyFormatter.format(bt.currentEmi, currency)} → ${CurrencyFormatter.format(bt.newEmi, currency)}", MaterialTheme.colorScheme.onSurface)
+                        GraphStat(
+                            "Old → New EMI",
+                            "${CurrencyFormatter.format(bt.currentEmi, currency)} → ${CurrencyFormatter.format(bt.newEmi, currency)}",
+                            MaterialTheme.colorScheme.onSurface
+                        )
                         GraphStat("Net Savings", CurrencyFormatter.format(bt.netSavings, currency), tint)
                     }
                 }
@@ -244,7 +300,11 @@ fun GraphTab(
         insights.fdNetCost?.let { fd ->
             item(key = "insight_fd") {
                 FintechCard(containerColor = PrincipalEmerald.copy(alpha = 0.07f), borderColor = PrincipalEmerald.copy(alpha = 0.35f)) {
-                    SectionAccentHeader("Loan Against FD — Net Cost", badge = "SPREAD ${String.format("%.2f", fd.effectiveNetRatePercent)}%", accentColor = PrincipalEmerald)
+                    SectionAccentHeader(
+                        "Loan Against FD — Net Cost",
+                        badge = "SPREAD ${String.format("%.2f", fd.effectiveNetRatePercent)}%",
+                        accentColor = PrincipalEmerald
+                    )
                     Spacer(Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         GraphStat("Loan Interest", CurrencyFormatter.format(fd.loanInterestPaid, currency), InterestAmber)
@@ -258,12 +318,20 @@ fun GraphTab(
         insights.billDiscountResult?.let { bd ->
             item(key = "insight_bill") {
                 FintechCard {
-                    SectionAccentHeader("Invoice Discounting Summary", badge = "APR ${String.format("%.1f", bd.effectiveAnnualizedCostPercent)}%", accentColor = InterestAmber)
+                    SectionAccentHeader(
+                        "Invoice Discounting Summary",
+                        badge = "APR ${String.format("%.1f", bd.effectiveAnnualizedCostPercent)}%",
+                        accentColor = InterestAmber
+                    )
                     Spacer(Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         GraphStat("Advance", CurrencyFormatter.format(bd.advanceAmount, currency), PrincipalEmerald)
                         GraphStat("Discount Fee", CurrencyFormatter.format(bd.discountFee, currency), InterestAmber)
-                        GraphStat("Net Upfront", CurrencyFormatter.format(bd.netUpfrontDisbursed, currency), MaterialTheme.colorScheme.onSurface)
+                        GraphStat(
+                            "Net Upfront",
+                            CurrencyFormatter.format(bd.netUpfrontDisbursed, currency),
+                            MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }
@@ -275,15 +343,28 @@ fun GraphTab(
                 FintechCard(containerColor = tint.copy(alpha = 0.08f), borderColor = tint.copy(alpha = 0.4f)) {
                     SectionAccentHeader(
                         title = "Margin Call Monitor",
-                        badge = if (mc.isMarginCallTriggered) "CALL TRIGGERED" else "BUFFER ${String.format("%.1f", mc.dropPercentToMarginCall)}%",
+                        badge = if (mc.isMarginCallTriggered) {
+                            "CALL TRIGGERED"
+                        } else {
+                            "BUFFER ${String.format(
+                                "%.1f",
+                                mc.dropPercentToMarginCall
+                            )}%"
+                        },
                         accentColor = tint
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
                         text = if (mc.isMarginCallTriggered) {
-                            "Margin Call active! Pledged value (${CurrencyFormatter.format(mc.pledgedShareValue, currency)}) is below required collateral (${CurrencyFormatter.format(mc.marginCallTriggerValue, currency)})."
+                            "Margin Call active! Pledged value (${CurrencyFormatter.format(
+                                mc.pledgedShareValue,
+                                currency
+                            )}) is below required collateral (${CurrencyFormatter.format(mc.marginCallTriggerValue, currency)})."
                         } else {
-                            "Current LTV is ${String.format("%.1f", mc.currentLtvPercent)}%. A ${String.format("%.1f", mc.dropPercentToMarginCall)}% drop triggers a Margin Call."
+                            "Current LTV is ${String.format(
+                                "%.1f",
+                                mc.currentLtvPercent
+                            )}%. A ${String.format("%.1f", mc.dropPercentToMarginCall)}% drop triggers a Margin Call."
                         },
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -318,7 +399,11 @@ fun GraphTab(
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         GraphStat("GST on Fees", CurrencyFormatter.format(result.gstOnFeeAmount, currency), InterestAmber)
                         GraphStat("GST on Interest", CurrencyFormatter.format(result.gstOnInterestAmount, currency), DangerRed)
-                        GraphStat("Pro-Rata 1st Mo", CurrencyFormatter.format(result.brokenPeriodInterest, currency), MaterialTheme.colorScheme.onSurface)
+                        GraphStat(
+                            "Pro-Rata 1st Mo",
+                            CurrencyFormatter.format(result.brokenPeriodInterest, currency),
+                            MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

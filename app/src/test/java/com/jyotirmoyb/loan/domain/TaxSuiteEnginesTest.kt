@@ -5,12 +5,12 @@ import com.jyotirmoyb.loan.data.remote.RemoteConfigMoshi
 import com.jyotirmoyb.loan.data.remote.RemoteConfigValidator
 import com.jyotirmoyb.loan.data.remote.TaxRulesCatalog
 import com.jyotirmoyb.loan.data.remote.TaxYearRules
+import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.File
 
 class TaxSuiteEnginesTest {
 
@@ -381,7 +381,12 @@ class TaxSuiteEnginesTest {
 
         // Presumptive Sec 44AD -> single 100% instalment by 15 Mar
         val presumptive = AdvanceTaxAndTdsEngine.calculateAdvanceTax(
-            input = AdvanceTaxInput(fyCode = "FY 2026-27", estimatedAnnualTax = 80_000.0, tdsTcsDeducted = 0.0, isPresumptive44AdAda = true),
+            input = AdvanceTaxInput(
+                fyCode = "FY 2026-27",
+                estimatedAnnualTax = 80_000.0,
+                tdsTcsDeducted = 0.0,
+                isPresumptive44AdAda = true
+            ),
             threshold = cat.advanceTaxThreshold,
             scheduleRules = cat.advanceTaxSchedule
         )

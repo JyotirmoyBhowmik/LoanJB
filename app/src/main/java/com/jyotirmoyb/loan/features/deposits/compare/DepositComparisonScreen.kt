@@ -151,7 +151,11 @@ fun DepositComparisonScreen(
                         if (report.taxAdvantageVsFd > 0.0) {
                             HorizontalDivider(color = Color.White.copy(alpha = 0.14f))
                             Text(
-                                text = "${stringResource(R.string.dep_cmp_extra_vs_fd)}: +${CurrencyFormatter.format(report.taxAdvantageVsFd, currency)}",
+                                text = stringResource(
+                                    R.string.ui_txt_fmt_2e870c,
+                                    stringResource(R.string.dep_cmp_extra_vs_fd),
+                                    CurrencyFormatter.format(report.taxAdvantageVsFd, currency)
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = PrincipalEmerald,
                                 fontWeight = FontWeight.SemiBold
@@ -192,7 +196,7 @@ fun DepositComparisonScreen(
                         FilterChip(
                             selected = input.horizonYears == yr,
                             onClick = { onUpdateHorizonYears(yr) },
-                            label = { Text("$yr Yrs") },
+                            label = { Text(stringResource(R.string.ui_txt_yrs, yr)) },
                             modifier = Modifier.testTag("dep_cmp_yr_$yr")
                         )
                     }
@@ -211,7 +215,7 @@ fun DepositComparisonScreen(
                         FilterChip(
                             selected = input.taxSlabPercent == slab,
                             onClick = { onUpdateTaxSlab(slab) },
-                            label = { Text("${slab.toInt()}%") },
+                            label = { Text(stringResource(R.string.ui_txt_fmt_361cec, slab.toInt())) },
                             modifier = Modifier.testTag("dep_cmp_slab_${slab.toInt()}")
                         )
                     }
@@ -300,11 +304,7 @@ fun DepositComparisonScreen(
 }
 
 @Composable
-private fun InstrumentComparisonCard(
-    instrument: DepositInstrumentResult,
-    maxPostTax: Double,
-    currency: CurrencyCode
-) {
+private fun InstrumentComparisonCard(instrument: DepositInstrumentResult, maxPostTax: Double, currency: CurrencyCode) {
     val accent = when (instrument.id) {
         "ppf" -> SavingsGreen
         "debt_fund" -> InfoBlue
@@ -329,7 +329,7 @@ private fun InstrumentComparisonCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${instrument.rateLabel} • ${instrument.taxRuleSummary}",
+                    text = stringResource(R.string.ui_txt_fmt_4ed101, instrument.rateLabel, instrument.taxRuleSummary),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -341,7 +341,7 @@ private fun InstrumentComparisonCard(
                     border = BorderStroke(1.dp, SageGreen.copy(alpha = 0.45f))
                 ) {
                     Text(
-                        text = "BEST",
+                        text = stringResource(R.string.ui_txt_best),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = SageGreen,
@@ -383,7 +383,13 @@ private fun InstrumentComparisonCard(
             )
             MetricColumn(
                 label = stringResource(R.string.dep_cmp_tax_paid),
-                value = if (instrument.estimatedTax <= 0.0) "₹0 (Exempt)" else "-${CurrencyFormatter.formatCompact(instrument.estimatedTax, currency)}",
+                value = if (instrument.estimatedTax <=
+                    0.0
+                ) {
+                    "₹0 (Exempt)"
+                } else {
+                    "-${CurrencyFormatter.formatCompact(instrument.estimatedTax, currency)}"
+                },
                 valueColor = if (instrument.estimatedTax <= 0.0) SavingsGreen else InterestAmber
             )
             MetricColumn(
@@ -403,12 +409,7 @@ private fun InstrumentComparisonCard(
 }
 
 @Composable
-private fun MetricColumn(
-    label: String,
-    value: String,
-    valueColor: Color,
-    bold: Boolean = false
-) {
+private fun MetricColumn(label: String, value: String, valueColor: Color, bold: Boolean = false) {
     Column {
         Text(
             text = label,

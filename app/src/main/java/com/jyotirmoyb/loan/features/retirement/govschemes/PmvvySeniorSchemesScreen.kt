@@ -98,7 +98,11 @@ fun PmvvySeniorSchemesScreen(
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "${activeScheme.shortName}: ${activeScheme.statusLabel.uppercase()}",
+                                text = stringResource(
+                                    R.string.ui_txt_fmt_6c03a4,
+                                    activeScheme.shortName,
+                                    activeScheme.statusLabel.uppercase()
+                                ),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = if (isClosed) MaterialTheme.colorScheme.error else SavingsGreen
@@ -134,7 +138,11 @@ fun PmvvySeniorSchemesScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = "${activeScheme.shortName.uppercase()} • ${payoutResult.payoutPeriodLabel.uppercase()}",
+                            text = stringResource(
+                                R.string.ui_txt_fmt_4ed101,
+                                activeScheme.shortName.uppercase(),
+                                payoutResult.payoutPeriodLabel.uppercase()
+                            ),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White.copy(alpha = 0.72f),
                             fontWeight = FontWeight.Bold
@@ -145,7 +153,12 @@ fun PmvvySeniorSchemesScreen(
                             color = PrincipalEmerald
                         )
                         Text(
-                            text = "Indicative Rate: ${activeScheme.ratePercent}% p.a. • Tenure: ${activeScheme.tenureYears} yrs • Issuer: ${activeScheme.sovereignIssuer}",
+                            text = stringResource(
+                                R.string.ui_txt_indicative_rate_p_a_tenure_yrs_iss,
+                                activeScheme.ratePercent,
+                                activeScheme.tenureYears,
+                                activeScheme.sovereignIssuer
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.White.copy(alpha = 0.85f)
                         )
@@ -187,7 +200,10 @@ fun PmvvySeniorSchemesScreen(
                 ValueSourceBadgesRow(
                     source = catalog.source,
                     asOfDate = catalog.asOfDateFormatted,
-                    isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true)
+                    isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true),
+                    sourceName = catalog.sourceName,
+                    effectiveFrom = catalog.publishedOn,
+                    lastVerified = catalog.lastVerified
                 )
                 Spacer(Modifier.height(10.dp))
 
@@ -200,7 +216,9 @@ fun PmvvySeniorSchemesScreen(
                         FilterChip(
                             selected = uiState.selectedSeniorSchemeId == sch.id,
                             onClick = { onSelectScheme(sch.id) },
-                            label = { Text("${sch.shortName}$statusTag", fontWeight = FontWeight.SemiBold) },
+                            label = {
+                                Text(stringResource(R.string.ui_txt_fmt_1cc8d9, sch.shortName, statusTag), fontWeight = FontWeight.SemiBold)
+                            },
                             modifier = Modifier.testTag("senior_scheme_chip_${sch.id}")
                         )
                     }
@@ -218,7 +236,10 @@ fun PmvvySeniorSchemesScreen(
                 if (payoutResult != null && payoutResult.exceedsCap && activeScheme?.maxInvestmentCap != null) {
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Note: Investment exceeds the ${CurrencyFormatter.format(activeScheme.maxInvestmentCap, currency)} statutory limit; payout above is calculated on the capped maximum.",
+                        text = stringResource(
+                            R.string.ui_txt_note_investment_exceeds_the_statut,
+                            CurrencyFormatter.format(activeScheme.maxInvestmentCap, currency)
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold

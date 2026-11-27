@@ -42,12 +42,7 @@ data class LoanCategory(
 )
 
 @JsonClass(generateAdapter = true)
-data class VariantGroup(
-    val id: String,
-    val name: String,
-    val required: Boolean = true,
-    val variants: List<LoanVariant> = emptyList()
-)
+data class VariantGroup(val id: String, val name: String, val required: Boolean = true, val variants: List<LoanVariant> = emptyList())
 
 @JsonClass(generateAdapter = true)
 data class LoanVariant(

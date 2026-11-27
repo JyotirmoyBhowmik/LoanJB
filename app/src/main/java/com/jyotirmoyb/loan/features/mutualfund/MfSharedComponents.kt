@@ -52,7 +52,6 @@ import com.jyotirmoyb.loan.ui.components.SectionAccentHeader
 import com.jyotirmoyb.loan.ui.theme.InfoBlue
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.MonoSmallStyle
-import com.jyotirmoyb.loan.ui.theme.PrincipalEmerald
 import com.jyotirmoyb.loan.ui.theme.SageGreen
 import com.jyotirmoyb.loan.ui.theme.SavingsGreen
 
@@ -96,11 +95,7 @@ fun MutualFundRiskNoticeBanner(modifier: Modifier = Modifier) {
  * Responsive Canvas growth chart plotting Total Invested vs Projected Corpus vs Inflation-Adjusted Value.
  */
 @Composable
-fun MfWealthGrowthChartCard(
-    rows: List<MfYearRow>,
-    currency: CurrencyCode,
-    modifier: Modifier = Modifier
-) {
+fun MfWealthGrowthChartCard(rows: List<MfYearRow>, currency: CurrencyCode, modifier: Modifier = Modifier) {
     if (rows.isEmpty()) return
     val maxVal = rows.maxOf { it.closingValue }.coerceAtLeast(1.0)
     val gridColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
@@ -190,18 +185,18 @@ fun MfWealthGrowthChartCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Yr 1 (${rows.first().fyLabel})",
+                text = stringResource(R.string.ui_txt_yr_1, rows.first().fyLabel),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "Peak ${CurrencyFormatter.formatCompact(maxVal, currency)}",
+                text = stringResource(R.string.ui_txt_peak, CurrencyFormatter.formatCompact(maxVal, currency)),
                 style = MonoSmallStyle,
                 color = SageGreen,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Yr ${rows.size} (${rows.last().fyLabel})",
+                text = stringResource(R.string.ui_txt_yr_483cd5, rows.size, rows.last().fyLabel),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -227,12 +222,7 @@ private fun ChartLegendDot(color: Color, label: String) {
 }
 
 @Composable
-fun MfYearWiseTableCard(
-    rows: List<MfYearRow>,
-    currency: CurrencyCode,
-    expanded: Boolean,
-    onToggleExpanded: () -> Unit
-) {
+fun MfYearWiseTableCard(rows: List<MfYearRow>, currency: CurrencyCode, expanded: Boolean, onToggleExpanded: () -> Unit) {
     if (rows.isEmpty()) return
     FintechCard {
         Row(
@@ -264,10 +254,33 @@ fun MfYearWiseTableCard(
                         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                         .padding(horizontal = 8.dp, vertical = 6.dp)
                 ) {
-                    Text("Yr", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.75f))
-                    Text("Invested", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
-                    Text("Corpus", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
-                    Text("Real Value", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(1.1f))
+                    Text(
+                        stringResource(R.string.ui_txt_yr_173ac6),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(0.75f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_invested),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1.1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_corpus),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1.1f)
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_real_value),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1.1f)
+                    )
                 }
                 Spacer(Modifier.height(4.dp))
                 rows.forEachIndexed { idx, row ->
@@ -278,7 +291,7 @@ fun MfYearWiseTableCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Y${row.yearIndex}",
+                            text = stringResource(R.string.ui_txt_y_be9cd4, row.yearIndex),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.weight(0.75f)

@@ -102,7 +102,7 @@ fun HraScreen(
                         color = PrincipalEmerald
                     )
                     Text(
-                        text = "${CurrencyFormatter.format(result.exemptHraMonthly, currency)} / month exempt",
+                        text = stringResource(R.string.ui_txt_month_exempt, CurrencyFormatter.format(result.exemptHraMonthly, currency)),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.84f)
                     )
@@ -199,7 +199,7 @@ fun HraScreen(
 
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    text = "Old Regime Tax Slab (for tax saved estimate)",
+                    text = stringResource(R.string.ui_txt_old_regime_tax_slab_for_tax_saved),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -209,7 +209,7 @@ fun HraScreen(
                         FilterChip(
                             selected = uiState.input.marginalTaxSlabPercent == slab,
                             onClick = { onSelectSlab(slab) },
-                            label = { Text("${slab.toInt()}%") },
+                            label = { Text(stringResource(R.string.ui_txt_fmt_361cec, slab.toInt())) },
                             modifier = Modifier.testTag("hra_slab_${slab.toInt()}")
                         )
                     }
@@ -351,7 +351,7 @@ fun HraScreen(
             TaxRulesMetadataFooter(
                 catalog = uiState.catalog,
                 activeFyCode = uiState.catalog.taxYears.firstOrNull()?.fyCode,
-                lawReference = "Income-tax Rules, Rule 2A • Metro ${metroPct}% / Non-Metro ${nonMetroPct}%",
+                lawReference = "Income-tax Rules, Rule 2A • Metro $metroPct% / Non-Metro $nonMetroPct%",
                 isCheckingUpdates = uiState.isCheckingUpdates,
                 syncFeedback = uiState.syncFeedback,
                 onCheckForUpdatedTaxRules = onCheckUpdates

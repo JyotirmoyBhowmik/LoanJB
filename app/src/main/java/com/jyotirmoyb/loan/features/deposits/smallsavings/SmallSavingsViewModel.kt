@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.jyotirmoyb.loan.data.AppContainer
-import com.jyotirmoyb.loan.data.UserPreferences
 import com.jyotirmoyb.loan.data.remote.ConfigKeys
 import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
 import com.jyotirmoyb.loan.domain.CurrencyCode
@@ -14,13 +13,13 @@ import com.jyotirmoyb.loan.domain.SmallSavingsInput
 import com.jyotirmoyb.loan.domain.SmallSavingsResult
 import com.jyotirmoyb.loan.domain.SmallSavingsSchemeType
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 data class SmallSavingsUiState(
     val input: SmallSavingsInput = defaultSmallSavingsInput(),
@@ -53,7 +52,8 @@ private fun defaultSmallSavingsInput(): SmallSavingsInput {
     )
 }
 
-class SmallSavingsViewModel(application: Application) : AndroidViewModel(application),
+class SmallSavingsViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<SmallSavingsInput, SmallSavingsResult> {
 
     override val id: String = "small_savings"
@@ -92,8 +92,7 @@ class SmallSavingsViewModel(application: Application) : AndroidViewModel(applica
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SmallSavingsUiState())
 
-    override fun compute(input: SmallSavingsInput): SmallSavingsResult =
-        SmallSavingsEngine.calculate(input, latestConfig)
+    override fun compute(input: SmallSavingsInput): SmallSavingsResult = SmallSavingsEngine.calculate(input, latestConfig)
 
     fun selectScheme(scheme: SmallSavingsSchemeType) {
         val defaultAmt = when (scheme) {

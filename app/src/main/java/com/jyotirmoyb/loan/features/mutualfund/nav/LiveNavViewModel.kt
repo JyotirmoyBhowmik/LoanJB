@@ -53,8 +53,10 @@ class LiveNavViewModel(application: Application) : AndroidViewModel(application)
     ) { arr ->
         val query = arr[0] as String
         val favOnly = arr[1] as Boolean
+
         @Suppress("UNCHECKED_CAST")
         val allMatches = arr[2] as List<AmfiNavEntity>
+
         @Suppress("UNCHECKED_CAST")
         val favs = arr[3] as List<AmfiNavEntity>
         val totalCount = arr[4] as Int
@@ -63,11 +65,14 @@ class LiveNavViewModel(application: Application) : AndroidViewModel(application)
         val snack = arr[7] as String?
 
         val filteredList = if (favOnly) {
-            if (query.isBlank()) favs
-            else favs.filter {
-                it.schemeName.contains(query, ignoreCase = true) ||
-                    it.schemeCode.contains(query, ignoreCase = true) ||
-                    it.isinGrowth.contains(query, ignoreCase = true)
+            if (query.isBlank()) {
+                favs
+            } else {
+                favs.filter {
+                    it.schemeName.contains(query, ignoreCase = true) ||
+                        it.schemeCode.contains(query, ignoreCase = true) ||
+                        it.isinGrowth.contains(query, ignoreCase = true)
+                }
             }
         } else {
             allMatches

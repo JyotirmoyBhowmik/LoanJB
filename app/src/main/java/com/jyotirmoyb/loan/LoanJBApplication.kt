@@ -57,8 +57,6 @@ class LoanJBApplication : Application() {
         )
     }
 
-    private fun isRunningInUnitTest(): Boolean {
-        return Build.FINGERPRINT == "robolectric" ||
-            runCatching { Class.forName("org.robolectric.Robolectric") }.isSuccess
-    }
+    private fun isRunningInUnitTest(): Boolean = Build.FINGERPRINT == "robolectric" ||
+        runCatching { Class.forName("org.robolectric.Robolectric") }.isSuccess
 }

@@ -26,7 +26,9 @@ internal object FixedRateLoanCalculator {
             errors.add("Loan tenure must be at least 1 month.")
         } else if (category != null) {
             if (request.tenureMonths < category.tenureMinMonths || request.tenureMonths > category.tenureMaxMonths) {
-                errors.add("Tenure for ${category.name} must be between ${category.tenureMinMonths} and ${category.tenureMaxMonths} months.")
+                errors.add(
+                    "Tenure for ${category.name} must be between ${category.tenureMinMonths} and ${category.tenureMaxMonths} months."
+                )
             }
         }
         if (request.processingFeePercent < 0.0 || request.processingFeePercent > 15.0) {
@@ -35,7 +37,13 @@ internal object FixedRateLoanCalculator {
         if (category?.secured == true && request.propertyValue > 0.0) {
             val ltv = (request.principal / request.propertyValue) * 100.0
             if (ltv > category.ltvMaxPercent + 0.01) {
-                errors.add("LTV (${String.format(Locale.US, "%.1f", ltv)}%) exceeds ${String.format(Locale.US, "%.0f", category.ltvMaxPercent)}% cap for ${category.name}.")
+                errors.add(
+                    "LTV (${String.format(
+                        Locale.US,
+                        "%.1f",
+                        ltv
+                    )}%) exceeds ${String.format(Locale.US, "%.0f", category.ltvMaxPercent)}% cap for ${category.name}."
+                )
             }
         }
         return errors
@@ -46,8 +54,20 @@ internal object FixedRateLoanCalculator {
         category: LoanCategory? = HomeLoanCatalogDefaults.homeLoanCategory
     ): FixedRateLoanResult {
         val ltvCap = category?.ltvMaxPercent ?: 80.0
-        val ltvPercent = if (request.propertyValue > 0.0) LoanCalculationEngine.roundPaisa((request.principal / request.propertyValue) * 100.0) else 0.0
-        val downPayment = if (request.propertyValue > request.principal) LoanCalculationEngine.roundPaisa(request.propertyValue - request.principal) else 0.0
+        val ltvPercent = if (request.propertyValue >
+            0.0
+        ) {
+            LoanCalculationEngine.roundPaisa((request.principal / request.propertyValue) * 100.0)
+        } else {
+            0.0
+        }
+        val downPayment = if (request.propertyValue >
+            request.principal
+        ) {
+            LoanCalculationEngine.roundPaisa(request.propertyValue - request.principal)
+        } else {
+            0.0
+        }
         val isLtvExceeded = (category?.secured == true) && request.propertyValue > 0.0 && ltvPercent > ltvCap + 0.01
 
         val errors = validateFixedRateRequest(request, category)

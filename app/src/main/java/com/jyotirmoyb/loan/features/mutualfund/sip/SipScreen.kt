@@ -90,7 +90,7 @@ fun SipScreen(
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(
-                            text = "FUND REFERENCE (USER CAGR)",
+                            text = stringResource(R.string.ui_txt_fund_reference_user_cagr),
                             style = MaterialTheme.typography.labelSmall,
                             color = InfoBlue,
                             fontWeight = FontWeight.Bold
@@ -131,7 +131,11 @@ fun SipScreen(
                     )
                     if (input.annualStepUpPercent > 0.0) {
                         Text(
-                            text = "With ${input.annualStepUpPercent.toInt()}% annual step-up • Final yr SIP: ${CurrencyFormatter.format(result.finalMonthlySip, currency)}/mo",
+                            text = stringResource(
+                                R.string.ui_txt_with_annual_step_up_final_yr_sip_m,
+                                input.annualStepUpPercent.toInt(),
+                                CurrencyFormatter.format(result.finalMonthlySip, currency)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = PrincipalEmerald
                         )
@@ -223,7 +227,7 @@ fun SipScreen(
                         FilterChip(
                             selected = input.tenureYears == yr,
                             onClick = { onUpdateTenureYears(yr) },
-                            label = { Text("${yr}Y") },
+                            label = { Text(stringResource(R.string.ui_txt_y_3e961f, yr)) },
                             modifier = Modifier.testTag("mf_sip_yr_$yr")
                         )
                     }

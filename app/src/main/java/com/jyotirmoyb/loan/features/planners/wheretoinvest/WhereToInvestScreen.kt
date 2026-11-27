@@ -130,7 +130,10 @@ fun WhereToInvestScreen(
                     ValueSourceBadgesRow(
                         source = catalog.source,
                         asOfDate = catalog.asOfDateFormatted,
-                        isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true)
+                        isUnverified = catalog.lastVerified.equals(UNVERIFIED_MARKER, ignoreCase = true),
+                        sourceName = catalog.sourceName,
+                        effectiveFrom = catalog.publishedOn,
+                        lastVerified = catalog.lastVerified
                     )
                     Spacer(Modifier.height(12.dp))
 
@@ -161,25 +164,49 @@ fun WhereToInvestScreen(
                                 color = PrincipalEmerald,
                                 label = "Equity Asset Class",
                                 percent = alloc.equityPercent,
-                                amountText = if (uiState.investableAmount > 0) CurrencyFormatter.format(alloc.equityAmount, currency) else null
+                                amountText = if (uiState.investableAmount >
+                                    0
+                                ) {
+                                    CurrencyFormatter.format(alloc.equityAmount, currency)
+                                } else {
+                                    null
+                                }
                             )
                             AssetMixRow(
                                 color = InfoBlue,
                                 label = "Debt / Fixed Income",
                                 percent = alloc.debtPercent,
-                                amountText = if (uiState.investableAmount > 0) CurrencyFormatter.format(alloc.debtAmount, currency) else null
+                                amountText = if (uiState.investableAmount >
+                                    0
+                                ) {
+                                    CurrencyFormatter.format(alloc.debtAmount, currency)
+                                } else {
+                                    null
+                                }
                             )
                             AssetMixRow(
                                 color = InterestAmber,
                                 label = "Gold / Commodity Hedge",
                                 percent = alloc.goldPercent,
-                                amountText = if (uiState.investableAmount > 0) CurrencyFormatter.format(alloc.goldAmount, currency) else null
+                                amountText = if (uiState.investableAmount >
+                                    0
+                                ) {
+                                    CurrencyFormatter.format(alloc.goldAmount, currency)
+                                } else {
+                                    null
+                                }
                             )
                             AssetMixRow(
                                 color = PurpleAccent,
                                 label = "Cash / Liquid Reserve",
                                 percent = alloc.cashLiquidPercent,
-                                amountText = if (uiState.investableAmount > 0) CurrencyFormatter.format(alloc.cashLiquidAmount, currency) else null
+                                amountText = if (uiState.investableAmount >
+                                    0
+                                ) {
+                                    CurrencyFormatter.format(alloc.cashLiquidAmount, currency)
+                                } else {
+                                    null
+                                }
                             )
                         }
                     }
@@ -195,7 +222,7 @@ fun WhereToInvestScreen(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Horizon: ${alloc.horizonHint} • Rebalance: ${alloc.rebalanceNote}",
+                        text = stringResource(R.string.ui_txt_horizon_rebalance, alloc.horizonHint, alloc.rebalanceNote),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -218,7 +245,7 @@ fun WhereToInvestScreen(
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = "Risk Profile (Questionnaire: ${uiState.computedProfile.displayName})",
+                    text = stringResource(R.string.ui_txt_risk_profile_questionnaire, uiState.computedProfile.displayName),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -324,11 +351,40 @@ fun WhereToInvestScreen(
                             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                             .padding(horizontal = 8.dp, vertical = 6.dp)
                     ) {
-                        Text("Age / Risk", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.7f))
-                        Text("Eq", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = PrincipalEmerald, modifier = Modifier.weight(0.7f))
-                        Text("Debt", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = InfoBlue, modifier = Modifier.weight(0.7f))
-                        Text("Gold", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = InterestAmber, modifier = Modifier.weight(0.7f))
-                        Text("Cash", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = PurpleAccent, modifier = Modifier.weight(0.7f))
+                        Text(
+                            stringResource(R.string.ui_txt_age_risk),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1.7f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_eq),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = PrincipalEmerald,
+                            modifier = Modifier.weight(0.7f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_debt),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = InfoBlue,
+                            modifier = Modifier.weight(0.7f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_gold),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = InterestAmber,
+                            modifier = Modifier.weight(0.7f)
+                        )
+                        Text(
+                            stringResource(R.string.ui_txt_cash),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = PurpleAccent,
+                            modifier = Modifier.weight(0.7f)
+                        )
                     }
                     Spacer(Modifier.height(4.dp))
 
@@ -340,23 +396,48 @@ fun WhereToInvestScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    if (isActiveRow) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
-                                    else Color.Transparent,
+                                    if (isActiveRow) {
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
+                                    } else {
+                                        Color.Transparent
+                                    },
                                     RoundedCornerShape(6.dp)
                                 )
                                 .padding(horizontal = 8.dp, vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "${row.ageBandLabel} • ${row.riskProfile.lowercase().replaceFirstChar { it.uppercase() }}",
+                                text = stringResource(
+                                    R.string.ui_txt_fmt_4ed101,
+                                    row.ageBandLabel,
+                                    row.riskProfile.lowercase().replaceFirstChar {
+                                        it.uppercase()
+                                    }
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = if (isActiveRow) FontWeight.Bold else FontWeight.Normal,
                                 modifier = Modifier.weight(1.7f)
                             )
-                            Text("${row.equityPercent.toInt()}%", style = MonoSmallStyle, modifier = Modifier.weight(0.7f))
-                            Text("${row.debtPercent.toInt()}%", style = MonoSmallStyle, modifier = Modifier.weight(0.7f))
-                            Text("${row.goldPercent.toInt()}%", style = MonoSmallStyle, modifier = Modifier.weight(0.7f))
-                            Text("${row.cashLiquidPercent.toInt()}%", style = MonoSmallStyle, modifier = Modifier.weight(0.7f))
+                            Text(
+                                stringResource(R.string.ui_txt_fmt_361cec, row.equityPercent.toInt()),
+                                style = MonoSmallStyle,
+                                modifier = Modifier.weight(0.7f)
+                            )
+                            Text(
+                                stringResource(R.string.ui_txt_fmt_361cec, row.debtPercent.toInt()),
+                                style = MonoSmallStyle,
+                                modifier = Modifier.weight(0.7f)
+                            )
+                            Text(
+                                stringResource(R.string.ui_txt_fmt_361cec, row.goldPercent.toInt()),
+                                style = MonoSmallStyle,
+                                modifier = Modifier.weight(0.7f)
+                            )
+                            Text(
+                                stringResource(R.string.ui_txt_fmt_361cec, row.cashLiquidPercent.toInt()),
+                                style = MonoSmallStyle,
+                                modifier = Modifier.weight(0.7f)
+                            )
                         }
                     }
                 }
@@ -370,12 +451,7 @@ fun WhereToInvestScreen(
 }
 
 @Composable
-private fun AssetMixRow(
-    color: Color,
-    label: String,
-    percent: Double,
-    amountText: String?
-) {
+private fun AssetMixRow(color: Color, label: String, percent: Double, amountText: String?) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -391,7 +467,12 @@ private fun AssetMixRow(
             Text(label, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text("${percent.toInt()}%", style = MonoSmallStyle, fontWeight = FontWeight.Bold, color = color)
+            Text(
+                stringResource(R.string.ui_txt_fmt_361cec, percent.toInt()),
+                style = MonoSmallStyle,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
             if (amountText != null) {
                 Text(amountText, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

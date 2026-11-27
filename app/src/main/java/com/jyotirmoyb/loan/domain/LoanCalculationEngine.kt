@@ -1,8 +1,6 @@
 package com.jyotirmoyb.loan.domain
 
-import java.math.BigDecimal
 import java.util.Locale
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -26,13 +24,11 @@ object LoanCalculationEngine {
 
     fun roundCurrency(value: Double): Double = MoneyMath.roundPaise(value)
 
-    fun standardEmi(principal: Double, annualRatePercent: Double, tenureMonths: Int): Double {
-        return MoneyMath.standardEmiBd(
-            MoneyMath.bd(principal),
-            MoneyMath.bd(annualRatePercent),
-            tenureMonths
-        ).toDouble()
-    }
+    fun standardEmi(principal: Double, annualRatePercent: Double, tenureMonths: Int): Double = MoneyMath.standardEmiBd(
+        MoneyMath.bd(principal),
+        MoneyMath.bd(annualRatePercent),
+        tenureMonths
+    ).toDouble()
 
     fun calculateEmi(principal: Double, annualRatePercent: Double, tenureMonths: Int): Double =
         standardEmi(principal, annualRatePercent, tenureMonths)
@@ -43,11 +39,9 @@ object LoanCalculationEngine {
     fun calculateFlatVsReducing(principal: Double, quotedAnnualRate: Double, tenureMonths: Int): FlatVsReducingComparison =
         LoanInsightsCalculator.calculateFlatVsReducing(principal, quotedAnnualRate, tenureMonths)
 
-    fun calculateBalanceTransfer(bt: BalanceTransferInput): BalanceTransferResult =
-        LoanInsightsCalculator.calculateBalanceTransfer(bt)
+    fun calculateBalanceTransfer(bt: BalanceTransferInput): BalanceTransferResult = LoanInsightsCalculator.calculateBalanceTransfer(bt)
 
-    fun calculateTopUp(tu: TopUpInput): TopUpResult =
-        LoanInsightsCalculator.calculateTopUp(tu)
+    fun calculateTopUp(tu: TopUpInput): TopUpResult = LoanInsightsCalculator.calculateTopUp(tu)
 
     fun validateFixedRateRequest(
         request: FixedRateLoanRequest,
@@ -66,12 +60,17 @@ object LoanCalculationEngine {
 
         val ltvPercent = if (input.assetValue > 0.0) {
             roundPaisa((input.principal / input.assetValue) * 100.0)
-        } else 0.0
+        } else {
+            0.0
+        }
         val downPayment = if (input.assetValue > input.principal) {
             roundPaisa(input.assetValue - input.principal)
-        } else 0.0
+        } else {
+            0.0
+        }
         val isLtvExceeded = (category?.secured == true || flags.contains("ASSET_MARGIN_SHARE")) &&
-            input.assetValue > 0.0 && ltvPercent > ltvCap + 0.01
+            input.assetValue > 0.0 &&
+            ltvPercent > ltvCap + 0.01
 
         if (errors.isNotEmpty()) {
             return CalculationResult(
@@ -135,15 +134,24 @@ object LoanCalculationEngine {
             errors.add("Tenure must be at least 1 month.")
         } else if (category != null && !flags.contains("BIZ_LC_TR")) {
             if (input.tenureMonths < category.tenureMinMonths || input.tenureMonths > category.tenureMaxMonths) {
-                errors.add("Tenure for ${category.name} must be between ${category.tenureMinMonths} and ${category.tenureMaxMonths} months.")
+                errors.add(
+                    "Tenure for ${category.name} must be between ${category.tenureMinMonths} and ${category.tenureMaxMonths} months."
+                )
             }
         }
         val enforceLtv = (category?.secured == true || flags.contains("ASSET_MARGIN_SHARE")) &&
-            !flags.contains("PURPOSE_BALANCE_TRANSFER") && !flags.contains("PURPOSE_TOP_UP")
+            !flags.contains("PURPOSE_BALANCE_TRANSFER") &&
+            !flags.contains("PURPOSE_TOP_UP")
         if (enforceLtv && input.assetValue > 0.0) {
             val ltv = (input.principal / input.assetValue) * 100.0
             if (ltv > ltvCap + 0.01) {
-                errors.add("LTV (${String.format(Locale.US, "%.1f", ltv)}%) exceeds ${String.format(Locale.US, "%.0f", ltvCap)}% cap. Increase asset value or reduce loan amount.")
+                errors.add(
+                    "LTV (${String.format(
+                        Locale.US,
+                        "%.1f",
+                        ltv
+                    )}%) exceeds ${String.format(Locale.US, "%.0f", ltvCap)}% cap. Increase asset value or reduce loan amount."
+                )
             }
         }
         if (flags.contains("EMI_BALLOON") && (input.balloonPercent <= 0.0 || input.balloonPercent >= 80.0)) {
@@ -168,7 +176,9 @@ object LoanCalculationEngine {
         val gstApplicable = input.gstOnFeesEnabled || forceGstOnFees
         val gstOnFeeBd = if (gstApplicable) {
             MoneyMath.percentageOf(procFeeBd.add(prepayFeeBd), MoneyMath.bd(input.gstRatePercent))
-        } else MoneyMath.ZERO
+        } else {
+            MoneyMath.ZERO
+        }
         val insBd = MoneyMath.roundPaiseBd(MoneyMath.bd(input.insurancePremium))
         val totalFeesBd = MoneyMath.roundPaiseBd(procFeeBd.add(gstOnFeeBd).add(insBd).add(prepayFeeBd))
         return FeeBundle(
@@ -187,15 +197,6 @@ object LoanCalculationEngine {
         val prepaymentFee: Double,
         val totalFees: Double
     )
-
-    private fun calculateBrokenPeriodInterest(input: CalculationInput, annualRate: Double): BigDecimal {
-        if (!input.proRataFirstMonthEnabled) return MoneyMath.ZERO
-        val startD = input.startDay.coerceIn(1, 31)
-        val emiD = input.emiDayOfMonth.coerceIn(1, 31)
-        if (startD == emiD) return MoneyMath.ZERO
-        val brokenDays = if (emiD > startD) emiD - startD else (30 - startD).coerceAtLeast(0) + emiD
-        return MoneyMath.dailyProRataInterest(MoneyMath.bd(input.principal), MoneyMath.bd(annualRate), brokenDays.coerceIn(1, 30))
-    }
 
     internal fun computeLoanFreeDate(input: CalculationInput, totalMonths: Int): String {
         val months = max(1, totalMonths)
@@ -222,8 +223,14 @@ object LoanCalculationEngine {
         val isStepDown = flags.contains("EMI_STEP_DOWN") || (flags.contains("EMI_STEP_UP") && input.isStepDown)
         val isOffset = flags.contains("EMI_OFFSET")
         val isTranche = flags.contains("DISB_TRANCHE_PRE_EMI") || flags.contains("EDU_TRANCHES")
-        val isMoratorium = flags.contains("TERM_MORATORIUM") || flags.contains("MOR_SIMPLE") || flags.contains("MOR_COMPOUND") || flags.contains("MORATORIUM")
-        val isMoratoriumCompound = flags.contains("MOR_COMPOUND") || ((flags.contains("TERM_MORATORIUM") || flags.contains("MORATORIUM")) && input.moratoriumCompound)
+        val isMoratorium =
+            flags.contains("TERM_MORATORIUM") ||
+                flags.contains("MOR_SIMPLE") ||
+                flags.contains("MOR_COMPOUND") ||
+                flags.contains("MORATORIUM")
+        val isMoratoriumCompound =
+            flags.contains("MOR_COMPOUND") ||
+                ((flags.contains("TERM_MORATORIUM") || flags.contains("MORATORIUM")) && input.moratoriumCompound)
         val isBalloon = flags.contains("EMI_BALLOON")
         val isFlatCompare = flags.contains("BASIS_FLAT_COMPARE") || input.categoryId == "personal"
         val isFdLoan = flags.contains("ASSET_FD")
@@ -233,18 +240,39 @@ object LoanCalculationEngine {
         val effectiveInitialRate = input.annualRate
 
         val baselineSchedule = if (input.prepaymentEnabled && input.prepayments.any { it.amount > 0.0 }) {
-            simulateSchedule(input.copy(prepaymentEnabled = false, prepayments = emptyList()), effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown, isOffset, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi).rows
-        } else null
+            LoanScheduleSimulator.simulateSchedule(
+                input.copy(prepaymentEnabled = false, prepayments = emptyList()),
+                effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown,
+                isOffset, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi
+            ).rows
+        } else {
+            null
+        }
 
         val nonOffsetSchedule = if (isOffset && input.offsetBalance > 0.0) {
-            simulateSchedule(input.copy(offsetBalance = 0.0), effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown, false, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi).rows
-        } else null
+            LoanScheduleSimulator.simulateSchedule(
+                input.copy(offsetBalance = 0.0),
+                effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown,
+                false, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi
+            ).rows
+        } else {
+            null
+        }
 
         val nonPmaySchedule = if (input.pmaySubsidyEnabled && input.pmaySubsidyAmount > 0.0) {
-            simulateSchedule(input.copy(pmaySubsidyEnabled = false), effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown, isOffset, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi).rows
-        } else null
+            LoanScheduleSimulator.simulateSchedule(
+                input.copy(pmaySubsidyEnabled = false),
+                effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown,
+                isOffset, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi
+            ).rows
+        } else {
+            null
+        }
 
-        val sim = simulateSchedule(input, effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown, isOffset, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi)
+        val sim = LoanScheduleSimulator.simulateSchedule(
+            input, effectiveInitialRate, isFloating, isMclr, isHybrid, isStepUp, isStepDown,
+            isOffset, isTranche, isMoratorium, isMoratoriumCompound, isBalloon, isCreditCardEmi
+        )
 
         val rows = sim.rows
         val totalPrincipal = roundPaisa(rows.sumOf { it.principalPaid })
@@ -261,9 +289,27 @@ object LoanCalculationEngine {
         val lastEmi = emiRows.lastOrNull()?.emiPaid ?: rows.lastOrNull()?.emiPaid ?: 0.0
         val headlineEmi = if (isStepUp || isStepDown || isTranche || isMoratorium) firstEmi else (rows.firstOrNull()?.emiPaid ?: 0.0)
 
-        val sensitivityRows = if (isFloating || isHybrid) buildSensitivityTable(input.principal, effectiveInitialRate, input.tenureMonths) else emptyList()
-        val offsetInterestSaved = if (nonOffsetSchedule != null) roundPaisa(max(0.0, nonOffsetSchedule.sumOf { it.interestPaid } - totalInterest)) else 0.0
-        val pmayInterestSaved = if (nonPmaySchedule != null) roundPaisa(max(0.0, nonPmaySchedule.sumOf { it.interestPaid } - totalInterest)) else 0.0
+        val sensitivityRows = if (isFloating ||
+            isHybrid
+        ) {
+            buildSensitivityTable(input.principal, effectiveInitialRate, input.tenureMonths)
+        } else {
+            emptyList()
+        }
+        val offsetInterestSaved = if (nonOffsetSchedule !=
+            null
+        ) {
+            roundPaisa(max(0.0, nonOffsetSchedule.sumOf { it.interestPaid } - totalInterest))
+        } else {
+            0.0
+        }
+        val pmayInterestSaved = if (nonPmaySchedule !=
+            null
+        ) {
+            roundPaisa(max(0.0, nonPmaySchedule.sumOf { it.interestPaid } - totalInterest))
+        } else {
+            0.0
+        }
         val flatVsReducing = if (isFlatCompare) calculateFlatVsReducing(input.principal, effectiveInitialRate, input.tenureMonths) else null
 
         val prepaymentImpact = if (baselineSchedule != null) {
@@ -279,9 +325,17 @@ object LoanCalculationEngine {
                 newMonths = rows.size,
                 monthsSaved = max(0, baselineSchedule.size - rows.size)
             )
-        } else null
+        } else {
+            null
+        }
 
-        val btResult = if (input.balanceTransfer.enabled || flags.contains("PURPOSE_BALANCE_TRANSFER")) calculateBalanceTransfer(input.balanceTransfer) else null
+        val btResult = if (input.balanceTransfer.enabled ||
+            flags.contains("PURPOSE_BALANCE_TRANSFER")
+        ) {
+            calculateBalanceTransfer(input.balanceTransfer)
+        } else {
+            null
+        }
         val topUpResult = if (input.topUp.enabled || flags.contains("PURPOSE_TOP_UP")) calculateTopUp(input.topUp) else null
 
         val fdNetCost = if (isFdLoan) {
@@ -290,8 +344,19 @@ object LoanCalculationEngine {
             val fdEarned = roundPaisa(fdVal * ((1.0 + input.fdRatePercent / 100.0 / 4.0).pow(4.0 * years) - 1.0))
             val netCost = roundPaisa(totalInterest - fdEarned)
             val effNetRate = if (input.principal > 0.0 && years > 0.0) roundPaisa(effectiveInitialRate - input.fdRatePercent) else 0.0
-            FdNetCostResult(roundPaisa(fdVal), roundPaisa(input.principal), input.fdRatePercent, effectiveInitialRate, totalInterest, fdEarned, netCost, effNetRate)
-        } else null
+            FdNetCostResult(
+                roundPaisa(fdVal),
+                roundPaisa(input.principal),
+                input.fdRatePercent,
+                effectiveInitialRate,
+                totalInterest,
+                fdEarned,
+                netCost,
+                effNetRate
+            )
+        } else {
+            null
+        }
 
         val marginCallResult = if (isMarginShare) {
             val pledged = if (input.shareValue > 0.0) input.shareValue else input.assetValue
@@ -299,15 +364,38 @@ object LoanCalculationEngine {
             val maxAllowedLtv = min(ltvCap, 100.0 - input.minMarginPercent)
             val triggerValue = if (maxAllowedLtv > 0.0) roundPaisa(input.principal / (maxAllowedLtv / 100.0)) else 0.0
             val dropPct = if (pledged > 0.0) roundPaisa(((pledged - triggerValue) / pledged) * 100.0) else 0.0
-            MarginCallResult(roundPaisa(pledged), roundPaisa(input.principal), currentLtv, maxAllowedLtv, input.minMarginPercent, triggerValue, dropPct, pledged <= triggerValue)
-        } else null
+            MarginCallResult(
+                roundPaisa(pledged),
+                roundPaisa(input.principal),
+                currentLtv,
+                maxAllowedLtv,
+                input.minMarginPercent,
+                triggerValue,
+                dropPct,
+                pledged <= triggerValue
+            )
+        } else {
+            null
+        }
 
         val isGoldAuctionRisk = (flags.contains("ASSET_GOLD_EMI") || input.categoryId == "gold") &&
-            ltvPercent >= input.goldAuctionRiskLtvPercent - 0.01 && input.assetValue > 0.0
+            ltvPercent >= input.goldAuctionRiskLtvPercent - 0.01 &&
+            input.assetValue > 0.0
 
         val goldSummary = if (flags.contains("ASSET_GOLD_EMI") || input.categoryId == "gold") {
-            GoldLoanSummary("Standard Monthly EMI", headlineEmi, lastEmi, totalInterest, totalPayment, ltvPercent, isGoldAuctionRisk, input.goldAuctionRiskLtvPercent)
-        } else null
+            GoldLoanSummary(
+                "Standard Monthly EMI",
+                headlineEmi,
+                lastEmi,
+                totalInterest,
+                totalPayment,
+                ltvPercent,
+                isGoldAuctionRisk,
+                input.goldAuctionRiskLtvPercent
+            )
+        } else {
+            null
+        }
 
         val yearly = groupByYear(rows)
         val interestRatio = if (totalPrincipal > 0.0) roundPaisa((totalInterest / totalPrincipal) * 100.0) else 0.0
@@ -355,318 +443,6 @@ object LoanCalculationEngine {
         )
     }
 
-    private data class SimulationOutput(
-        val rows: List<AmortizationRow>,
-        val moratoriumExtraInterest: Double = 0.0,
-        val brokenPeriodInterest: Double = 0.0,
-        val pmaySubsidyApplied: Double = 0.0
-    )
-
-    private fun simulateSchedule(
-        input: CalculationInput,
-        initialRate: Double,
-        isFloating: Boolean,
-        isMclr: Boolean,
-        isHybrid: Boolean,
-        isStepUp: Boolean,
-        isStepDown: Boolean,
-        isOffset: Boolean,
-        isTranche: Boolean,
-        isMoratorium: Boolean,
-        isMoratoriumCompound: Boolean,
-        isBalloon: Boolean,
-        isCreditCardEmi: Boolean
-    ): SimulationOutput {
-        val rows = mutableListOf<AmortizationRow>()
-        val sortedRateChanges = input.rateChanges.sortedBy { it.afterMonth }
-        val activePrepayments = if (input.prepaymentEnabled) input.prepayments.filter { it.amount > 0.0 } else emptyList()
-        val gstRateBd = MoneyMath.bd(input.gstRatePercent)
-
-        var monthIdx = 1
-        var currentRate = initialRate
-        var balanceBd: BigDecimal
-        var moratoriumAccruedBd = MoneyMath.ZERO
-        var pmayAppliedBd = MoneyMath.ZERO
-        val brokenPeriodBd = calculateBrokenPeriodInterest(input, initialRate)
-        var brokenApplied = false
-
-        if (isTranche && input.tranches.isNotEmpty()) {
-            val validTranches = input.tranches.filter { it.amount > 0.0 }.sortedBy { it.monthNumber }
-            val trancheTotal = validTranches.sumOf { it.amount }
-            val scale = if (trancheTotal > 0.0) input.principal / trancheTotal else 1.0
-            val handoverMonth = validTranches.maxOfOrNull { it.monthNumber } ?: 1
-            var disbursedBd = MoneyMath.ZERO
-            val principalCapBd = MoneyMath.roundPaiseBd(MoneyMath.bd(input.principal))
-
-            for (m in 1 until handoverMonth) {
-                val added = validTranches.filter { it.monthNumber == m }
-                    .fold(MoneyMath.ZERO) { acc, t -> acc.add(MoneyMath.roundPaiseBd(MoneyMath.bd(t.amount * scale))) }
-                disbursedBd = MoneyMath.roundPaiseBd(disbursedBd.add(added)).min(principalCapBd)
-                currentRate = resolveActiveRate(monthIdx, initialRate, isFloating, isMclr, input.mclrResetMonths, isHybrid, input.hybridFixedMonths, input.hybridFloatingRate, sortedRateChanges)
-                val interestBd = MoneyMath.monthlyInterest(disbursedBd, MoneyMath.bd(currentRate))
-
-                var prepayBd = MoneyMath.ZERO
-                for (rule in activePrepayments) {
-                    if (matchesPrepaymentMonth(rule, monthIdx) && disbursedBd > MoneyMath.ZERO) {
-                        val applied = MoneyMath.roundPaiseBd(MoneyMath.bd(rule.amount)).min(disbursedBd)
-                        prepayBd = MoneyMath.roundPaiseBd(prepayBd.add(applied))
-                        disbursedBd = MoneyMath.roundPaiseBd(disbursedBd.subtract(applied))
-                    }
-                }
-
-                val (mLabel, yIdx, yLabel) = dateMeta(input.startYear, input.startMonth, monthIdx)
-                rows.add(
-                    AmortizationRow(
-                        monthNumber = monthIdx,
-                        monthLabel = mLabel,
-                        yearGroupIndex = yIdx,
-                        yearRangeLabel = yLabel,
-                        openingBalance = MoneyMath.roundPaiseBd(disbursedBd.add(prepayBd)).toDouble(),
-                        emiPaid = MoneyMath.roundPaiseBd(interestBd.add(prepayBd)).toDouble(),
-                        principalPaid = prepayBd.toDouble(),
-                        interestPaid = interestBd.toDouble(),
-                        extraPrepayment = prepayBd.toDouble(),
-                        closingBalance = disbursedBd.toDouble(),
-                        activeRate = currentRate,
-                        phaseLabel = "Pre-EMI"
-                    )
-                )
-                monthIdx++
-            }
-            val preEmiPrepaid = rows.fold(MoneyMath.ZERO) { acc, r -> acc.add(MoneyMath.bd(r.extraPrepayment)) }
-            balanceBd = MoneyMath.roundPaiseBd(principalCapBd.subtract(preEmiPrepaid)).max(MoneyMath.ZERO)
-        } else {
-            balanceBd = MoneyMath.roundPaiseBd(MoneyMath.bd(input.principal))
-        }
-
-        val effectiveMoratorium = if (isMoratorium) max(0, min(input.moratoriumMonths, 60)) else 0
-        if (effectiveMoratorium > 0) {
-            for (k in 1..effectiveMoratorium) {
-                currentRate = resolveActiveRate(monthIdx, initialRate, isFloating, isMclr, input.mclrResetMonths, isHybrid, input.hybridFixedMonths, input.hybridFloatingRate, sortedRateChanges)
-                val openingBd = balanceBd
-                val interestBd = MoneyMath.monthlyInterest(balanceBd, MoneyMath.bd(currentRate))
-                val (mLabel, yIdx, yLabel) = dateMeta(input.startYear, input.startMonth, monthIdx)
-
-                var prepayBd = MoneyMath.ZERO
-                for (rule in activePrepayments) {
-                    if (matchesPrepaymentMonth(rule, monthIdx) && balanceBd > MoneyMath.ZERO) {
-                        val applied = MoneyMath.roundPaiseBd(MoneyMath.bd(rule.amount)).min(balanceBd)
-                        prepayBd = MoneyMath.roundPaiseBd(prepayBd.add(applied))
-                        balanceBd = MoneyMath.roundPaiseBd(balanceBd.subtract(applied))
-                    }
-                }
-
-                if (isMoratoriumCompound) {
-                    balanceBd = MoneyMath.roundPaiseBd(balanceBd.add(interestBd))
-                    moratoriumAccruedBd = MoneyMath.roundPaiseBd(moratoriumAccruedBd.add(interestBd))
-                    rows.add(
-                        AmortizationRow(monthIdx, mLabel, yIdx, yLabel, openingBd.toDouble(), prepayBd.toDouble(), prepayBd.toDouble(), 0.0, prepayBd.toDouble(), balanceBd.toDouble(), currentRate, "Moratorium")
-                    )
-                } else {
-                    rows.add(
-                        AmortizationRow(monthIdx, mLabel, yIdx, yLabel, openingBd.toDouble(), MoneyMath.roundPaiseBd(interestBd.add(prepayBd)).toDouble(), prepayBd.toDouble(), interestBd.toDouble(), prepayBd.toDouble(), balanceBd.toDouble(), currentRate, "Moratorium")
-                    )
-                }
-                monthIdx++
-            }
-        }
-
-        val amortTenure = max(1, input.tenureMonths)
-        val balloonBd = if (isBalloon) MoneyMath.percentageOf(balanceBd, MoneyMath.bd(input.balloonPercent)) else MoneyMath.ZERO
-
-        currentRate = resolveActiveRate(monthIdx, initialRate, isFloating, isMclr, input.mclrResetMonths, isHybrid, input.hybridFixedMonths, input.hybridFloatingRate, sortedRateChanges)
-        var currentEmiBd = when {
-            isBalloon -> {
-                val amortPart = MoneyMath.standardEmiBd(balanceBd.subtract(balloonBd), MoneyMath.bd(currentRate), amortTenure)
-                val balloonInt = MoneyMath.monthlyInterest(balloonBd, MoneyMath.bd(currentRate))
-                MoneyMath.roundPaiseBd(amortPart.add(balloonInt))
-            }
-            isStepUp -> {
-                val baseLevel = MoneyMath.standardEmiBd(balanceBd, MoneyMath.bd(currentRate), amortTenure)
-                val minSafe = MoneyMath.roundPaiseBd(MoneyMath.monthlyInterest(balanceBd, MoneyMath.bd(currentRate)).multiply(BigDecimal("1.05")).add(BigDecimal("100")))
-                MoneyMath.roundPaiseBd(baseLevel.multiply(BigDecimal("0.82"))).max(minSafe)
-            }
-            isStepDown -> {
-                val baseLevel = MoneyMath.standardEmiBd(balanceBd, MoneyMath.bd(currentRate), amortTenure)
-                MoneyMath.roundPaiseBd(baseLevel.multiply(BigDecimal("1.22")))
-            }
-            else -> MoneyMath.standardEmiBd(balanceBd, MoneyMath.bd(currentRate), amortTenure)
-        }
-
-        val maxLoops = max(amortTenure + 240, 600)
-        var amortStep = 1
-        var previousRate = currentRate
-        val offsetBd = MoneyMath.roundPaiseBd(MoneyMath.bd(input.offsetBalance))
-
-        while (balanceBd > BigDecimal("0.004") && amortStep <= maxLoops) {
-            currentRate = resolveActiveRate(monthIdx, initialRate, isFloating, isMclr, input.mclrResetMonths, isHybrid, input.hybridFixedMonths, input.hybridFloatingRate, sortedRateChanges)
-
-            if (abs(currentRate - previousRate) > 0.0001) {
-                val remainingMonths = max(1, amortTenure - amortStep + 1)
-                currentEmiBd = if (isBalloon) {
-                    val amortPart = MoneyMath.standardEmiBd(balanceBd.subtract(balloonBd).max(MoneyMath.ZERO), MoneyMath.bd(currentRate), remainingMonths)
-                    val balloonInt = MoneyMath.monthlyInterest(balloonBd, MoneyMath.bd(currentRate))
-                    MoneyMath.roundPaiseBd(amortPart.add(balloonInt))
-                } else {
-                    MoneyMath.standardEmiBd(balanceBd, MoneyMath.bd(currentRate), remainingMonths)
-                }
-                previousRate = currentRate
-            }
-
-            val interval = max(1, input.stepIntervalMonths)
-            if ((isStepUp || isStepDown) && amortStep > 1 && (amortStep - 1) % interval == 0) {
-                val pctBd = MoneyMath.bd(input.stepPercent).divide(MoneyMath.HUNDRED, MoneyMath.MC)
-                currentEmiBd = if (isStepUp) {
-                    MoneyMath.roundPaiseBd(currentEmiBd.multiply(MoneyMath.ONE.add(pctBd, MoneyMath.MC)))
-                } else {
-                    val monthlyInt = MoneyMath.monthlyInterest(balanceBd, MoneyMath.bd(currentRate))
-                    val floorExtra = balanceBd.multiply(BigDecimal("0.001")).max(BigDecimal("100"))
-                    val minSafeEmi = MoneyMath.roundPaiseBd(monthlyInt.add(floorExtra))
-                    MoneyMath.roundPaiseBd(currentEmiBd.multiply(MoneyMath.ONE.subtract(pctBd, MoneyMath.MC))).max(minSafeEmi)
-                }
-            }
-
-            val openingBd = balanceBd
-            val interestBearingBd = if (isOffset) balanceBd.subtract(offsetBd).max(MoneyMath.ZERO) else balanceBd
-            var interestBd = MoneyMath.monthlyInterest(interestBearingBd, MoneyMath.bd(currentRate))
-
-            val brokenThisMonth = if (!brokenApplied && brokenPeriodBd > BigDecimal.ZERO) {
-                brokenApplied = true
-                brokenPeriodBd
-            } else MoneyMath.ZERO
-            interestBd = MoneyMath.roundPaiseBd(interestBd.add(brokenThisMonth))
-
-            val isBalloonFinal = isBalloon && amortStep == amortTenure
-            val hasReduceTenurePrepay = input.prepaymentEnabled && activePrepayments.any { it.mode != PrepaymentMode.REDUCE_EMI.name }
-            val isNaturalFinal = (!isStepUp && !isStepDown && !hasReduceTenurePrepay && !isOffset && amortStep == amortTenure) || amortStep == maxLoops
-
-            val scheduledPrincipalBd: BigDecimal
-            val emiThisMonthBd: BigDecimal
-
-            if (isBalloonFinal || isNaturalFinal || currentEmiBd.subtract(interestBd) >= balanceBd.subtract(BigDecimal("0.01"))) {
-                scheduledPrincipalBd = balanceBd
-                emiThisMonthBd = MoneyMath.roundPaiseBd(scheduledPrincipalBd.add(interestBd))
-            } else {
-                val rawPrincipal = MoneyMath.roundPaiseBd(currentEmiBd.subtract(interestBd.subtract(brokenThisMonth)))
-                scheduledPrincipalBd = rawPrincipal.max(MoneyMath.ZERO).min(balanceBd)
-                emiThisMonthBd = MoneyMath.roundPaiseBd(scheduledPrincipalBd.add(interestBd))
-            }
-
-            var closingBd = MoneyMath.roundPaiseBd(balanceBd.subtract(scheduledPrincipalBd))
-
-            var subsidyCreditBd = MoneyMath.ZERO
-            if (input.pmaySubsidyEnabled && input.pmaySubsidyAmount > 0.0 && monthIdx == input.pmaySubsidyMonth.coerceAtLeast(1) && closingBd > MoneyMath.ZERO) {
-                subsidyCreditBd = MoneyMath.roundPaiseBd(MoneyMath.bd(input.pmaySubsidyAmount)).min(closingBd)
-                pmayAppliedBd = subsidyCreditBd
-                closingBd = MoneyMath.roundPaiseBd(closingBd.subtract(subsidyCreditBd))
-                if (closingBd > MoneyMath.ZERO) {
-                    val remainingAfter = max(1, amortTenure - amortStep)
-                    currentEmiBd = MoneyMath.standardEmiBd(closingBd, MoneyMath.bd(currentRate), remainingAfter)
-                }
-            }
-
-            var extraPrepayBd = MoneyMath.ZERO
-            var reduceEmiTriggered = false
-            for (rule in activePrepayments) {
-                if (matchesPrepaymentMonth(rule, monthIdx) && closingBd > MoneyMath.ZERO) {
-                    val applied = MoneyMath.roundPaiseBd(MoneyMath.bd(rule.amount)).min(closingBd)
-                    extraPrepayBd = MoneyMath.roundPaiseBd(extraPrepayBd.add(applied))
-                    closingBd = MoneyMath.roundPaiseBd(closingBd.subtract(applied))
-                    if (rule.mode == PrepaymentMode.REDUCE_EMI.name) {
-                        reduceEmiTriggered = true
-                    }
-                }
-            }
-
-            if (closingBd < BigDecimal("0.01")) closingBd = MoneyMath.ZERO
-
-            val gstOnInterestBd = if (isCreditCardEmi) MoneyMath.percentageOf(interestBd, gstRateBd) else MoneyMath.ZERO
-            val phaseLabel = when {
-                isBalloonFinal -> "Balloon"
-                subsidyCreditBd > MoneyMath.ZERO -> "PMAY Subsidy"
-                isCreditCardEmi -> "CC EMI"
-                isHybrid && monthIdx <= input.hybridFixedMonths -> "Fixed"
-                isHybrid -> "Floating"
-                isFloating -> "Floating"
-                else -> "EMI"
-            }
-
-            val (mLabel, yIdx, yLabel) = dateMeta(input.startYear, input.startMonth, monthIdx)
-            rows.add(
-                AmortizationRow(
-                    monthNumber = monthIdx,
-                    monthLabel = mLabel,
-                    yearGroupIndex = yIdx,
-                    yearRangeLabel = yLabel,
-                    openingBalance = openingBd.toDouble(),
-                    emiPaid = MoneyMath.roundPaiseBd(emiThisMonthBd.add(extraPrepayBd).add(gstOnInterestBd)).toDouble(),
-                    principalPaid = MoneyMath.roundPaiseBd(scheduledPrincipalBd.add(extraPrepayBd).add(subsidyCreditBd)).toDouble(),
-                    interestPaid = interestBd.toDouble(),
-                    extraPrepayment = extraPrepayBd.toDouble(),
-                    closingBalance = closingBd.toDouble(),
-                    activeRate = currentRate,
-                    phaseLabel = phaseLabel,
-                    gstOnInterest = gstOnInterestBd.toDouble()
-                )
-            )
-
-            balanceBd = closingBd
-            if (reduceEmiTriggered && balanceBd > MoneyMath.ZERO) {
-                val remainingMonths = max(1, amortTenure - amortStep)
-                currentEmiBd = MoneyMath.standardEmiBd(balanceBd, MoneyMath.bd(currentRate), remainingMonths)
-            }
-
-            monthIdx++
-            amortStep++
-        }
-
-        return SimulationOutput(
-            rows = rows,
-            moratoriumExtraInterest = moratoriumAccruedBd.toDouble(),
-            brokenPeriodInterest = if (brokenApplied) brokenPeriodBd.toDouble() else 0.0,
-            pmaySubsidyApplied = pmayAppliedBd.toDouble()
-        )
-    }
-
-    private fun matchesPrepaymentMonth(rule: PrepaymentRule, monthIdx: Int): Boolean {
-        return if (rule.isRecurring) {
-            monthIdx >= rule.startMonth && (monthIdx - rule.startMonth) % max(1, rule.intervalMonths) == 0
-        } else {
-            monthIdx == rule.startMonth
-        }
-    }
-
-    private fun resolveActiveRate(
-        monthNumber: Int,
-        initialRate: Double,
-        isFloating: Boolean,
-        isMclr: Boolean,
-        mclrResetMonths: Int,
-        isHybrid: Boolean,
-        hybridFixedMonths: Int,
-        hybridFloatingRate: Double,
-        rateChanges: List<RateChangeEvent>
-    ): Double {
-        var rate = initialRate
-        if (isHybrid && monthNumber > hybridFixedMonths) {
-            rate = hybridFloatingRate
-        }
-        if (isFloating || isHybrid) {
-            val resetInterval = if (isMclr) max(1, mclrResetMonths) else 1
-            for (ev in rateChanges) {
-                val effectiveAfter = if (isMclr && resetInterval > 1) {
-                    ((ev.afterMonth + resetInterval - 1) / resetInterval) * resetInterval
-                } else {
-                    ev.afterMonth
-                }
-                if (monthNumber > effectiveAfter) {
-                    rate = ev.newAnnualRate.coerceIn(0.0, 45.0)
-                }
-            }
-        }
-        return rate
-    }
-
     internal fun dateMeta(startYear: Int, startMonth: Int, offsetOneBased: Int): Triple<String, Int, String> {
         val totalM = (startMonth - 1) + (offsetOneBased - 1)
         val mIdx = ((totalM % 12) + 12) % 12
@@ -683,19 +459,19 @@ object LoanCalculationEngine {
         return Triple(monthLabel, yearGroupIdx, rangeLabel)
     }
 
-    internal fun groupByYear(rows: List<AmortizationRow>): List<YearlySummary> {
-        return rows.groupBy { it.yearGroupIndex }.entries.sortedBy { it.key }.map { (yIdx, groupRows) ->
-            val p = roundPaisa(groupRows.sumOf { it.principalPaid })
-            val i = roundPaisa(groupRows.sumOf { it.interestPaid })
-            YearlySummary(
-                yearIndex = yIdx,
-                label = groupRows.first().yearRangeLabel,
-                principalPaid = p,
-                interestPaid = i,
-                totalPaid = roundPaisa(p + i),
-                endingBalance = groupRows.last().closingBalance,
-                rows = groupRows
-            )
-        }
+    internal fun groupByYear(rows: List<AmortizationRow>): List<YearlySummary> = rows.groupBy {
+        it.yearGroupIndex
+    }.entries.sortedBy { it.key }.map { (yIdx, groupRows) ->
+        val p = roundPaisa(groupRows.sumOf { it.principalPaid })
+        val i = roundPaisa(groupRows.sumOf { it.interestPaid })
+        YearlySummary(
+            yearIndex = yIdx,
+            label = groupRows.first().yearRangeLabel,
+            principalPaid = p,
+            interestPaid = i,
+            totalPaid = roundPaisa(p + i),
+            endingBalance = groupRows.last().closingBalance,
+            rows = groupRows
+        )
     }
 }

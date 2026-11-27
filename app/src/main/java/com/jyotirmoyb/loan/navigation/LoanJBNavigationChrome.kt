@@ -103,43 +103,41 @@ internal val BOTTOM_TABS = listOf(
     )
 )
 
-internal fun isCalculatorRoute(route: String): Boolean {
-    return route in setOf(
-        AppRoute.EmiCalculator.route,
-        AppRoute.EmiResults.route,
-        AppRoute.LoanComparison.route,
-        AppRoute.LoanEligibility.route,
-        AppRoute.BalanceTransfer.route,
-        AppRoute.LoanTaxBenefit.route,
-        AppRoute.PartPaymentPlanner.route,
-        AppRoute.BankStaffLoan.route,
-        AppRoute.FixedDeposit.route,
-        AppRoute.FdInterestPayout.route,
-        AppRoute.RecurringDeposit.route,
-        AppRoute.SmallSavings.route,
-        AppRoute.DepositComparison.route,
-        AppRoute.MfSip.route,
-        AppRoute.MfLumpsum.route,
-        AppRoute.MfSwp.route,
-        AppRoute.MfGoal.route,
-        AppRoute.MfXirr.route,
-        AppRoute.MfTaxGains.route,
-        AppRoute.MfLiveNav.route,
-        AppRoute.IncomeTax.route,
-        AppRoute.HraCalculator.route,
-        AppRoute.GstCalculator.route,
-        AppRoute.AdvanceTaxTds.route,
-        AppRoute.RetirementPlanner.route,
-        AppRoute.NpsCalculator.route,
-        AppRoute.EpfCalculator.route,
-        AppRoute.ApyCalculator.route,
-        AppRoute.PmsymCalculator.route,
-        AppRoute.PmvvyCalculator.route,
-        AppRoute.GoalPlanner.route,
-        AppRoute.FinancialRules.route,
-        AppRoute.WhereToInvest.route
-    )
-}
+internal fun isCalculatorRoute(route: String): Boolean = route in setOf(
+    AppRoute.EmiCalculator.route,
+    AppRoute.EmiResults.route,
+    AppRoute.LoanComparison.route,
+    AppRoute.LoanEligibility.route,
+    AppRoute.BalanceTransfer.route,
+    AppRoute.LoanTaxBenefit.route,
+    AppRoute.PartPaymentPlanner.route,
+    AppRoute.BankStaffLoan.route,
+    AppRoute.FixedDeposit.route,
+    AppRoute.FdInterestPayout.route,
+    AppRoute.RecurringDeposit.route,
+    AppRoute.SmallSavings.route,
+    AppRoute.DepositComparison.route,
+    AppRoute.MfSip.route,
+    AppRoute.MfLumpsum.route,
+    AppRoute.MfSwp.route,
+    AppRoute.MfGoal.route,
+    AppRoute.MfXirr.route,
+    AppRoute.MfTaxGains.route,
+    AppRoute.MfLiveNav.route,
+    AppRoute.IncomeTax.route,
+    AppRoute.HraCalculator.route,
+    AppRoute.GstCalculator.route,
+    AppRoute.AdvanceTaxTds.route,
+    AppRoute.RetirementPlanner.route,
+    AppRoute.NpsCalculator.route,
+    AppRoute.EpfCalculator.route,
+    AppRoute.ApyCalculator.route,
+    AppRoute.PmsymCalculator.route,
+    AppRoute.PmvvyCalculator.route,
+    AppRoute.GoalPlanner.route,
+    AppRoute.FinancialRules.route,
+    AppRoute.WhereToInvest.route
+)
 
 @Composable
 internal fun LoanJBTopBar(
@@ -303,10 +301,7 @@ internal fun LoanJBTopBar(
 }
 
 @Composable
-internal fun WorkspaceDrawerSheet(
-    savedLoansCount: Int,
-    onNavigate: (String) -> Unit
-) {
+internal fun WorkspaceDrawerSheet(savedLoansCount: Int, onNavigate: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -315,13 +310,13 @@ internal fun WorkspaceDrawerSheet(
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = "LoanJB Workspace",
+            text = stringResource(R.string.ui_txt_loanjb_workspace),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.semantics { heading() }
         )
         Text(
-            text = "100% offline Indian loan planner & tracker",
+            text = stringResource(R.string.ui_txt_100_offline_indian_loan_planner_tr),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -373,11 +368,7 @@ internal fun WorkspaceDrawerSheet(
 }
 
 @Composable
-private fun DrawerSheetRow(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
+private fun DrawerSheetRow(icon: ImageVector, label: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

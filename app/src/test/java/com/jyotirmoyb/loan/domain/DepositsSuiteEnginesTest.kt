@@ -3,15 +3,13 @@ package com.jyotirmoyb.loan.domain
 import com.jyotirmoyb.loan.data.remote.ConfigKeys
 import com.jyotirmoyb.loan.data.remote.RemoteConfigMoshi
 import com.jyotirmoyb.loan.data.remote.RemoteConfigValidator
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import java.io.File
+import kotlin.math.pow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.File
-import kotlin.math.pow
 
 class DepositsSuiteEnginesTest {
 

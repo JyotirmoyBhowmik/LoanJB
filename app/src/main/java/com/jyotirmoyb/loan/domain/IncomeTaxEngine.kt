@@ -23,12 +23,7 @@ data class IncomeTaxInput(
     val deductionAmounts: Map<String, Double> = emptyMap()
 )
 
-data class SlabLineItem(
-    val rangeLabel: String,
-    val ratePercent: Double,
-    val taxableSlice: Double,
-    val taxAmount: Double
-)
+data class SlabLineItem(val rangeLabel: String, val ratePercent: Double, val taxableSlice: Double, val taxAmount: Double)
 
 data class AppliedDeductionItem(
     val id: String,
@@ -86,10 +81,7 @@ data class IncomeTaxComparisonResult(
  */
 object IncomeTaxEngine {
 
-    fun calculateComparison(
-        input: IncomeTaxInput,
-        fyRules: TaxYearRules
-    ): IncomeTaxComparisonResult {
+    fun calculateComparison(input: IncomeTaxInput, fyRules: TaxYearRules): IncomeTaxComparisonResult {
         val errors = mutableListOf<String>()
         if (input.grossSalary < 0.0) errors.add("Gross salary cannot be negative.")
         if (input.otherIncome < 0.0) errors.add("Other income cannot be negative.")
@@ -124,7 +116,9 @@ object IncomeTaxEngine {
 
         val breakeven = if (newTaxBd < oldTaxBd && oldCalc.taxableIncome > 0.0) {
             findExtraOldDeductionsForBreakeven(input, fyRules, newCalc.totalTaxPayable)
-        } else null
+        } else {
+            null
+        }
 
         val whyBullets = buildWhyBullets(
             input = input,
@@ -228,7 +222,9 @@ object IncomeTaxEngine {
             totalTaxBd.multiply(MoneyMath.HUNDRED, MoneyMath.MC)
                 .divide(grossTotalBd, 2, RoundingMode.HALF_UP)
                 .toDouble()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         return RegimeTaxCalculation(
             regimeId = regime.regimeId,
@@ -255,18 +251,13 @@ object IncomeTaxEngine {
         )
     }
 
-    private fun selectSlabsForAge(regime: TaxRegimeRules, ageGroup: TaxpayerAgeGroup): List<TaxSlabBand> {
-        return when (ageGroup) {
-            TaxpayerAgeGroup.SUPER_SENIOR -> regime.slabsSuperSenior ?: regime.slabsSenior ?: regime.slabsGeneral
-            TaxpayerAgeGroup.SENIOR -> regime.slabsSenior ?: regime.slabsGeneral
-            TaxpayerAgeGroup.GENERAL -> regime.slabsGeneral
-        }
+    private fun selectSlabsForAge(regime: TaxRegimeRules, ageGroup: TaxpayerAgeGroup): List<TaxSlabBand> = when (ageGroup) {
+        TaxpayerAgeGroup.SUPER_SENIOR -> regime.slabsSuperSenior ?: regime.slabsSenior ?: regime.slabsGeneral
+        TaxpayerAgeGroup.SENIOR -> regime.slabsSenior ?: regime.slabsGeneral
+        TaxpayerAgeGroup.GENERAL -> regime.slabsGeneral
     }
 
-    internal fun computeProgressiveSlabs(
-        taxableIncome: BigDecimal,
-        slabs: List<TaxSlabBand>
-    ): Pair<List<SlabLineItem>, BigDecimal> {
+    internal fun computeProgressiveSlabs(taxableIncome: BigDecimal, slabs: List<TaxSlabBand>): Pair<List<SlabLineItem>, BigDecimal> {
         var prevUpper = BigDecimal.ZERO
         var totalTax = BigDecimal.ZERO
         val lines = mutableListOf<SlabLineItem>()
@@ -293,7 +284,10 @@ object IncomeTaxEngine {
             val rangeLabel = if (upper == null) {
                 "Above ${CurrencyFormatter.formatCompact(prevUpper.toDouble(), CurrencyCode.INR)}"
             } else {
-                "${CurrencyFormatter.formatCompact(prevUpper.toDouble(), CurrencyCode.INR)} – ${CurrencyFormatter.formatCompact(upper.toDouble(), CurrencyCode.INR)}"
+                "${CurrencyFormatter.formatCompact(
+                    prevUpper.toDouble(),
+                    CurrencyCode.INR
+                )} – ${CurrencyFormatter.formatCompact(upper.toDouble(), CurrencyCode.INR)}"
             }
 
             lines.add(
@@ -312,17 +306,9 @@ object IncomeTaxEngine {
         return lines to MoneyMath.roundPaiseBd(totalTax)
     }
 
-    private data class RebateTriple(
-        val rebate87A: BigDecimal,
-        val marginalRelief: BigDecimal,
-        val taxAfterRebate: BigDecimal
-    )
+    private data class RebateTriple(val rebate87A: BigDecimal, val marginalRelief: BigDecimal, val taxAfterRebate: BigDecimal)
 
-    private fun applyRebateAndMarginalRelief(
-        taxableIncome: BigDecimal,
-        slabTax: BigDecimal,
-        regime: TaxRegimeRules
-    ): RebateTriple {
+    private fun applyRebateAndMarginalRelief(taxableIncome: BigDecimal, slabTax: BigDecimal, regime: TaxRegimeRules): RebateTriple {
         val limitBd = MoneyMath.bd(regime.rebateIncomeLimit)
         val maxRebateBd = MoneyMath.bd(regime.maxRebateAmount)
 
@@ -382,7 +368,9 @@ object IncomeTaxEngine {
         val prevRatePercent = if (activeIndex > 0) sortedBands[activeIndex - 1].ratePercent else 0.0
         val surchargeAtT = if (prevRatePercent > 0.0) {
             MoneyMath.percentageOf(baseTaxAtT, MoneyMath.bd(prevRatePercent))
-        } else BigDecimal.ZERO
+        } else {
+            BigDecimal.ZERO
+        }
 
         val taxPlusSurchargeAtT = baseTaxAtT.add(surchargeAtT)
         val excessIncome = taxableIncome.subtract(thresholdBd)
@@ -399,11 +387,7 @@ object IncomeTaxEngine {
         return SurchargeQuad(activeBand.ratePercent, rawSurcharge, relief, netSurcharge)
     }
 
-    private fun findExtraOldDeductionsForBreakeven(
-        input: IncomeTaxInput,
-        fyRules: TaxYearRules,
-        targetNewTax: Double
-    ): Double? {
+    private fun findExtraOldDeductionsForBreakeven(input: IncomeTaxInput, fyRules: TaxYearRules, targetNewTax: Double): Double? {
         // Binary search extra Old-Regime deduction amount needed for Old tax <= New tax
         val maxAdditional = (input.grossSalary + input.otherIncome).coerceAtMost(50_000_000.0)
         if (maxAdditional <= 0.0) return null
@@ -453,10 +437,16 @@ object IncomeTaxEngine {
 
         when (recId) {
             "NEW" -> bullets.add(
-                "${newCalc.displayName} saves ${fmt(annualSavings)} per year (${fmt(annualSavings / 12.0)}/mo) over Old Regime for ${fyRules.fyCode}."
+                "${newCalc.displayName} saves ${fmt(
+                    annualSavings
+                )} per year (${fmt(annualSavings / 12.0)}/mo) over Old Regime for ${fyRules.fyCode}."
             )
             "OLD" -> bullets.add(
-                "${oldCalc.displayName} saves ${fmt(annualSavings)} per year (${fmt(annualSavings / 12.0)}/mo) thanks to ${fmt(oldCalc.otherDeductionsTotal)} in eligible Chapter VI-A / HRA deductions."
+                "${oldCalc.displayName} saves ${fmt(
+                    annualSavings
+                )} per year (${fmt(
+                    annualSavings / 12.0
+                )}/mo) thanks to ${fmt(oldCalc.otherDeductionsTotal)} in eligible Chapter VI-A / HRA deductions."
             )
             else -> bullets.add("Both regimes produce the exact same tax payable (${fmt(newCalc.totalTaxPayable)}) for ${fyRules.fyCode}.")
         }
@@ -464,17 +454,23 @@ object IncomeTaxEngine {
         if (input.isSalaried && newCalc.standardDeduction > oldCalc.standardDeduction) {
             val extraStd = newCalc.standardDeduction - oldCalc.standardDeduction
             bullets.add(
-                "Higher Standard Deduction: New Regime gives ${fmt(newCalc.standardDeduction)} vs ${fmt(oldCalc.standardDeduction)} in Old (+${fmt(extraStd)})."
+                "Higher Standard Deduction: New Regime gives ${fmt(
+                    newCalc.standardDeduction
+                )} vs ${fmt(oldCalc.standardDeduction)} in Old (+${fmt(extraStd)})."
             )
         }
 
         if (newCalc.rebate87A > 0.0) {
             bullets.add(
-                "Sec 87A Rebate zeroes out New Regime tax (taxable income ${fmt(newCalc.taxableIncome)} ≤ ${fmt(fyRules.newRegime.rebateIncomeLimit)})."
+                "Sec 87A Rebate zeroes out New Regime tax (taxable income ${fmt(
+                    newCalc.taxableIncome
+                )} ≤ ${fmt(fyRules.newRegime.rebateIncomeLimit)})."
             )
         } else if (newCalc.rebateMarginalRelief > 0.0) {
             bullets.add(
-                "Marginal Relief of ${fmt(newCalc.rebateMarginalRelief)} protects your New Regime tax from exceeding income above ${fmt(fyRules.newRegime.rebateIncomeLimit)}."
+                "Marginal Relief of ${fmt(
+                    newCalc.rebateMarginalRelief
+                )} protects your New Regime tax from exceeding income above ${fmt(fyRules.newRegime.rebateIncomeLimit)}."
             )
         }
 
@@ -492,7 +488,9 @@ object IncomeTaxEngine {
 
         if (breakevenExtraOld != null && breakevenExtraOld > 0.0 && recId == "NEW") {
             bullets.add(
-                "Break-even insight: You would need about ${fmt(breakevenExtraOld)} in additional Old Regime deductions to match New Regime tax."
+                "Break-even insight: You would need about ${fmt(
+                    breakevenExtraOld
+                )} in additional Old Regime deductions to match New Regime tax."
             )
         }
 

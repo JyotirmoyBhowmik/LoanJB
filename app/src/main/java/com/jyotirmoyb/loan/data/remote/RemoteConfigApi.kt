@@ -8,8 +8,5 @@ import retrofit2.http.Path
 
 interface RemoteConfigApi {
     @GET("remote-config/{file}")
-    suspend fun fetchConfig(
-        @Path("file") file: String,
-        @Header("If-None-Match") ifNoneMatch: String? = null
-    ): Response<ResponseBody>
+    suspend fun fetchConfig(@Path("file") file: String, @Header("If-None-Match") ifNoneMatch: String? = null): Response<ResponseBody>
 }

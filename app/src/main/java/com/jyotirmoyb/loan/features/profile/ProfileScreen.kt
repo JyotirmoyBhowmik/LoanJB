@@ -133,7 +133,13 @@ fun ProfileScreen(
                     icon = Icons.Outlined.AccountBalanceWallet,
                     tint = TealPrimaryDark,
                     title = stringResource(R.string.hub_saved_loans_title),
-                    subtitle = if (uiState.savedLoansCount > 0) "${uiState.savedLoansCount} tracked loan(s) • EMI reminders & DTI" else stringResource(R.string.hub_saved_loans_sub),
+                    subtitle = if (uiState.savedLoansCount >
+                        0
+                    ) {
+                        "${uiState.savedLoansCount} tracked loan(s) • EMI reminders & DTI"
+                    } else {
+                        stringResource(R.string.hub_saved_loans_sub)
+                    },
                     onClick = onOpenSavedLoans,
                     testTag = "profile_saved_loans_row"
                 )
@@ -170,7 +176,7 @@ fun ProfileScreen(
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Replay Intro Walkthrough")
+                        Text(stringResource(R.string.ui_txt_replay_intro_walkthrough))
                     }
                 }
             }
@@ -202,14 +208,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileQuickRow(
-    icon: ImageVector,
-    tint: Color,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    testTag: String
-) {
+private fun ProfileQuickRow(icon: ImageVector, tint: Color, title: String, subtitle: String, onClick: () -> Unit, testTag: String) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()

@@ -25,7 +25,8 @@ data class PartPaymentPlannerUiState(
     val currency: CurrencyCode = CurrencyCode.INR
 )
 
-class PartPaymentPlannerViewModel(application: Application) : AndroidViewModel(application),
+class PartPaymentPlannerViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<PartPaymentPlanInput, PartPaymentPlanResult> {
 
     override val id: String = "part_payment_planner"
@@ -54,8 +55,7 @@ class PartPaymentPlannerViewModel(application: Application) : AndroidViewModel(a
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PartPaymentPlannerUiState())
 
-    override fun compute(input: PartPaymentPlanInput): PartPaymentPlanResult =
-        PartPaymentPlannerEngine.plan(input)
+    override fun compute(input: PartPaymentPlanInput): PartPaymentPlanResult = PartPaymentPlannerEngine.plan(input)
 
     fun updatePrincipal(v: Double) {
         _input.value = _input.value.copy(principal = v.coerceAtLeast(0.0))

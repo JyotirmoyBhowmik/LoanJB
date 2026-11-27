@@ -73,6 +73,7 @@ fun MarketSourceChip(sourceType: MarketSourceType, modifier: Modifier = Modifier
     val (bg, fg) = when (sourceType) {
         MarketSourceType.MANUAL -> PurpleAccent.copy(alpha = 0.14f) to PurpleAccent
         MarketSourceType.LIVE_API -> SavingsGreen.copy(alpha = 0.14f) to SavingsGreen
+        MarketSourceType.IMPORTED -> TealPrimaryDark.copy(alpha = 0.14f) to TealPrimaryDark
         MarketSourceType.ONLINE -> InfoBlue.copy(alpha = 0.14f) to InfoBlue
         MarketSourceType.BUILT_IN -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
     }
@@ -141,7 +142,7 @@ fun MarketDeltaChip(deltaAbs: Double?, deltaPercent: Double?, unit: String) {
         shape = RoundedCornerShape(6.dp)
     ) {
         Text(
-            text = "$sign$absFormatted ($sign$pctFormatted%)",
+            text = stringResource(R.string.ui_txt_fmt_55fbf4, sign, absFormatted, sign, pctFormatted),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
             color = color,
@@ -188,12 +189,12 @@ fun MarketHistoryLineChart(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "High: ${MarketStalenessEvaluator.formatMetricValue(maxVal, unit)}",
+                text = stringResource(R.string.ui_txt_high, MarketStalenessEvaluator.formatMetricValue(maxVal, unit)),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "Low: ${MarketStalenessEvaluator.formatMetricValue(minVal, unit)}",
+                text = stringResource(R.string.ui_txt_low, MarketStalenessEvaluator.formatMetricValue(minVal, unit)),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -358,7 +359,11 @@ fun MarketMetricDetailSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "${stringResource(R.string.market_as_of)}: ${MarketStalenessEvaluator.formatTimestamp(card.asOfMillis)}",
+                    text = stringResource(
+                        R.string.ui_txt_fmt_6c03a4,
+                        stringResource(R.string.market_as_of),
+                        MarketStalenessEvaluator.formatTimestamp(card.asOfMillis)
+                    ),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -368,7 +373,7 @@ fun MarketMetricDetailSheet(
             }
 
             Text(
-                text = "Source: ${card.sourceName} • Staleness threshold: ${staleLimitHours}h",
+                text = stringResource(R.string.ui_txt_source_staleness_threshold_h, card.sourceName, staleLimitHours),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -376,7 +381,7 @@ fun MarketMetricDetailSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Text(
-                text = "${stringResource(R.string.market_cached_history)} (${history.size} pts)",
+                text = stringResource(R.string.ui_txt_pts, stringResource(R.string.market_cached_history), history.size),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -429,7 +434,7 @@ fun MarketMetricDetailSheet(
                     manualInput = it
                     validationError = null
                 },
-                label = { Text("Enter value (${card.unit})") },
+                label = { Text(stringResource(R.string.ui_txt_enter_value, card.unit)) },
                 isError = validationError != null,
                 supportingText = {
                     validationError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -481,7 +486,15 @@ fun MarketMetricDetailSheet(
 fun EditBankFdDialog(
     initial: BankFdRateItem?,
     onDismiss: () -> Unit,
-    onSave: (bankId: String?, name: String, general: String, senior: String, tenure: String, onErr: (String) -> Unit, onDone: () -> Unit) -> Unit
+    onSave: (
+        bankId: String?,
+        name: String,
+        general: String,
+        senior: String,
+        tenure: String,
+        onErr: (String) -> Unit,
+        onDone: () -> Unit
+    ) -> Unit
 ) {
     var name by remember(initial?.bankId) { mutableStateOf(initial?.bankName.orEmpty()) }
     var general by remember(initial?.bankId) { mutableStateOf(initial?.generalRate?.toString().orEmpty()) }
@@ -501,8 +514,11 @@ fun EditBankFdDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it; errorMsg = null },
-                    label = { Text("Bank Name") },
+                    onValueChange = {
+                        name = it
+                        errorMsg = null
+                    },
+                    label = { Text(stringResource(R.string.ui_txt_bank_name)) },
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -511,8 +527,11 @@ fun EditBankFdDialog(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = general,
-                        onValueChange = { general = it; errorMsg = null },
-                        label = { Text("General %") },
+                        onValueChange = {
+                            general = it
+                            errorMsg = null
+                        },
+                        label = { Text(stringResource(R.string.ui_txt_general)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
                         modifier = Modifier
@@ -521,8 +540,11 @@ fun EditBankFdDialog(
                     )
                     OutlinedTextField(
                         value = senior,
-                        onValueChange = { senior = it; errorMsg = null },
-                        label = { Text("Senior %") },
+                        onValueChange = {
+                            senior = it
+                            errorMsg = null
+                        },
+                        label = { Text(stringResource(R.string.ui_txt_senior)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
                         modifier = Modifier
@@ -532,8 +554,11 @@ fun EditBankFdDialog(
                 }
                 OutlinedTextField(
                     value = tenure,
-                    onValueChange = { tenure = it; errorMsg = null },
-                    label = { Text("Peak Tenure Band (e.g. 400 days / 2–3 yrs)") },
+                    onValueChange = {
+                        tenure = it
+                        errorMsg = null
+                    },
+                    label = { Text(stringResource(R.string.ui_txt_peak_tenure_band_e_g_400_days_2_3)) },
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()

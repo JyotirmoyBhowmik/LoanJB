@@ -174,7 +174,7 @@ fun LiveNavScreen(
                         shape = SegmentedButtonDefaults.itemShape(1, 2),
                         modifier = Modifier.testTag("mf_nav_tab_favs")
                     ) {
-                        Text("${stringResource(R.string.mf_nav_tab_favs)} (${uiState.favouritesCount})")
+                        Text(stringResource(R.string.ui_txt_fmt, stringResource(R.string.mf_nav_tab_favs), uiState.favouritesCount))
                     }
                 }
             }
@@ -194,14 +194,20 @@ fun LiveNavScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = if (uiState.showFavouritesOnly) "No favourite schemes yet"
-                            else stringResource(R.string.mf_nav_empty_title),
+                            text = if (uiState.showFavouritesOnly) {
+                                "No favourite schemes yet"
+                            } else {
+                                stringResource(R.string.mf_nav_empty_title)
+                            },
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (uiState.showFavouritesOnly) "Tap the star icon on any fund to bookmark it for offline access."
-                            else stringResource(R.string.mf_nav_empty_sub),
+                            text = if (uiState.showFavouritesOnly) {
+                                "Tap the star icon on any fund to bookmark it for offline access."
+                            } else {
+                                stringResource(R.string.mf_nav_empty_sub)
+                            },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -245,7 +251,7 @@ fun LiveNavScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "NAV: ₹${"%.4f".format(fund.nav)} (as of ${fund.navDate}) • Code ${fund.schemeCode}",
+                        text = stringResource(R.string.ui_txt_nav_as_of_code, "%.4f".format(fund.nav), fund.navDate, fund.schemeCode),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -269,12 +275,12 @@ fun LiveNavScreen(
                     },
                     modifier = Modifier.testTag("mf_nav_open_sip_btn")
                 ) {
-                    Text("Open SIP Calculator")
+                    Text(stringResource(R.string.ui_txt_open_sip_calculator))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { selectedFundForCalc = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.ui_txt_cancel))
                 }
             }
         )
@@ -282,11 +288,7 @@ fun LiveNavScreen(
 }
 
 @Composable
-private fun AmfiSchemeCard(
-    scheme: AmfiNavEntity,
-    onToggleFavourite: () -> Unit,
-    onClick: () -> Unit
-) {
+private fun AmfiSchemeCard(scheme: AmfiNavEntity, onToggleFavourite: () -> Unit, onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -337,7 +339,7 @@ private fun AmfiSchemeCard(
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "₹${"%.2f".format(scheme.nav)}",
+                    text = stringResource(R.string.ui_txt_fmt_82d0a2, "%.2f".format(scheme.nav)),
                     style = MonoMediumStyle,
                     fontWeight = FontWeight.Bold,
                     color = SageGreen

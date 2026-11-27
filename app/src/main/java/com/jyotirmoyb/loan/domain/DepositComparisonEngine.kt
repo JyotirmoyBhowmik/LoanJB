@@ -1,7 +1,6 @@
 package com.jyotirmoyb.loan.domain
 
 import java.math.BigDecimal
-import java.math.RoundingMode
 import kotlin.math.pow
 
 data class DepositComparisonInput(
@@ -85,7 +84,8 @@ object DepositComparisonEngine {
         // 3. PPF (Annual compounding, EEE tax-exempt; if annualInvest > cap, excess earns 0 or capped cleanly)
         val ppfAnnualCapped = minOf(annualInvest, input.ppfYearlyCap)
         val ppfTotalInvested = MoneyMath.roundPaise(ppfAnnualCapped * input.horizonYears)
-        val ppfPreTax = compoundAnnualContributions(ppfAnnualCapped, input.ppfAnnualRatePercent / 100.0, input.horizonYears, annualTaxRate = 0.0)
+        val ppfPreTax =
+            compoundAnnualContributions(ppfAnnualCapped, input.ppfAnnualRatePercent / 100.0, input.horizonYears, annualTaxRate = 0.0)
         val ppfPostTax = ppfPreTax // EEE
 
         // 4. Debt Mutual Fund (Monthly SIP compounding, taxed at slab ONLY at final redemption)
@@ -163,12 +163,7 @@ object DepositComparisonEngine {
         )
     }
 
-    private fun compoundAnnualContributions(
-        annualAmount: Double,
-        annualRateFraction: Double,
-        years: Int,
-        annualTaxRate: Double
-    ): Double {
+    private fun compoundAnnualContributions(annualAmount: Double, annualRateFraction: Double, years: Int, annualTaxRate: Double): Double {
         var bal = BigDecimal.ZERO
         val contrib = MoneyMath.bd(annualAmount)
         val netRate = MoneyMath.bd(annualRateFraction * (1.0 - annualTaxRate))
@@ -180,11 +175,7 @@ object DepositComparisonEngine {
         return bal.toDouble()
     }
 
-    private fun compoundMonthlySip(
-        monthlyAmount: Double,
-        annualReturnPercent: Double,
-        totalMonths: Int
-    ): Double {
+    private fun compoundMonthlySip(monthlyAmount: Double, annualReturnPercent: Double, totalMonths: Int): Double {
         val monthlyRate = (1.0 + annualReturnPercent / 100.0).pow(1.0 / 12.0) - 1.0
         var bal = BigDecimal.ZERO
         val contrib = MoneyMath.bd(monthlyAmount)
@@ -197,11 +188,7 @@ object DepositComparisonEngine {
         return MoneyMath.roundPaiseBd(bal).toDouble()
     }
 
-    private fun effectiveSipAnnualizedReturn(
-        totalInvested: Double,
-        finalValue: Double,
-        years: Int
-    ): Double {
+    private fun effectiveSipAnnualizedReturn(totalInvested: Double, finalValue: Double, years: Int): Double {
         if (totalInvested <= 0.0 || finalValue <= totalInvested || years <= 0) return 0.0
         // Average capital duration for regular contributions is ~(years + 1) / 2
         val avgDurationYears = (years + 1.0) / 2.0

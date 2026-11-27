@@ -10,13 +10,14 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.jyotirmoyb.loan.MainActivity
+import com.jyotirmoyb.loan.R
 
 class EmiReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val loanId = intent.getLongExtra(EXTRA_LOAN_ID, 0L)
-        val title = intent.getStringExtra(EXTRA_TITLE) ?: "LoanJB EMI Reminder"
-        val body = intent.getStringExtra(EXTRA_BODY) ?: "Your upcoming loan EMI is due soon."
+        val title = intent.getStringExtra(EXTRA_TITLE) ?: context.getString(R.string.notif_emi_default_title)
+        val body = intent.getStringExtra(EXTRA_BODY) ?: context.getString(R.string.notif_emi_default_body)
         showNotification(context, loanId, title, body)
     }
 
@@ -58,10 +59,10 @@ class EmiReminderReceiver : BroadcastReceiver() {
                 val mgr = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
                 val channel = NotificationChannel(
                     CHANNEL_ID,
-                    "EMI Due Reminders",
+                    context.getString(R.string.notif_emi_channel_name),
                     NotificationManager.IMPORTANCE_DEFAULT
                 ).apply {
-                    description = "Local reminders before your scheduled loan EMI due dates"
+                    description = context.getString(R.string.notif_emi_channel_desc)
                 }
                 mgr?.createNotificationChannel(channel)
             }

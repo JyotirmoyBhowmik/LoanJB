@@ -115,7 +115,12 @@ fun EpfScreen(
                         color = PrincipalEmerald
                     )
                     Text(
-                        text = "At Age ${input.retirementAge} (${result.yearsToRetirement} years) • EPF Rate ${formatEpfRate(input.epfInterestRatePercent)}% p.a.",
+                        text = stringResource(
+                            R.string.ui_txt_at_age_years_epf_rate_p_a,
+                            input.retirementAge,
+                            result.yearsToRetirement,
+                            formatEpfRate(input.epfInterestRatePercent)
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.85f)
                     )
@@ -275,12 +280,24 @@ fun EpfScreen(
                 Spacer(Modifier.height(8.dp))
                 KeyValueRow("Year 1 Employee EPF (+VPF)", CurrencyFormatter.format(result.firstMonthEmployeeEpf, currency))
                 KeyValueRow("Year 1 Employer EPF Share", CurrencyFormatter.format(result.firstMonthEmployerEpf, currency))
-                KeyValueRow("Year 1 Employer EPS Share", CurrencyFormatter.format(result.firstMonthEmployerEps, currency), valueColor = InfoBlue)
+                KeyValueRow(
+                    "Year 1 Employer EPS Share",
+                    CurrencyFormatter.format(result.firstMonthEmployerEps, currency),
+                    valueColor = InfoBlue
+                )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
                 KeyValueRow("Total Employee Contribution", CurrencyFormatter.format(result.employeeTotalContribution, currency))
                 KeyValueRow("Total Employer EPF Contribution", CurrencyFormatter.format(result.employerEpfTotalContribution, currency))
-                KeyValueRow("Total EPF Interest Compounded", CurrencyFormatter.format(result.totalInterestEarned, currency), valueColor = SavingsGreen)
-                KeyValueRow("Total Employer EPS (Separate Pension)", CurrencyFormatter.format(result.epsTotalContribution, currency), valueColor = InfoBlue)
+                KeyValueRow(
+                    "Total EPF Interest Compounded",
+                    CurrencyFormatter.format(result.totalInterestEarned, currency),
+                    valueColor = SavingsGreen
+                )
+                KeyValueRow(
+                    "Total Employer EPS (Separate Pension)",
+                    CurrencyFormatter.format(result.epsTotalContribution, currency),
+                    valueColor = InfoBlue
+                )
             }
         }
 

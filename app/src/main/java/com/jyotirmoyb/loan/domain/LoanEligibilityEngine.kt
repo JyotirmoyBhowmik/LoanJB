@@ -6,12 +6,7 @@ import com.jyotirmoyb.loan.data.remote.ResolvedConfigItem
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-enum class CibilBand(
-    val id: String,
-    val displayLabel: String,
-    val rateDeltaPercent: Double,
-    val foirFactor: Double
-) {
+enum class CibilBand(val id: String, val displayLabel: String, val rateDeltaPercent: Double, val foirFactor: Double) {
     EXCELLENT_750_PLUS("750_plus", "750+ (Excellent)", 0.0, 1.00),
     GOOD_700_749("700_749", "700–749 (Good)", 0.35, 0.95),
     FAIR_650_699("650_699", "650–699 (Fair)", 1.00, 0.85),
@@ -100,11 +95,7 @@ object LoanEligibilityEngine {
      * Exact BigDecimal inverse EMI formula:
      *   P = EMI * ((1 + r)^n - 1) / (r * (1 + r)^n)
      */
-    fun maxPrincipalForEmiBd(
-        monthlyEmi: BigDecimal,
-        annualRatePercent: BigDecimal,
-        tenureMonths: Int
-    ): BigDecimal {
+    fun maxPrincipalForEmiBd(monthlyEmi: BigDecimal, annualRatePercent: BigDecimal, tenureMonths: Int): BigDecimal {
         if (monthlyEmi <= BigDecimal.ZERO || tenureMonths <= 0) return MoneyMath.ZERO
         if (annualRatePercent <= BigDecimal.ZERO) {
             return MoneyMath.roundPaiseBd(monthlyEmi.multiply(BigDecimal(tenureMonths), MoneyMath.MC))
@@ -118,10 +109,7 @@ object LoanEligibilityEngine {
         return numerator.divide(denominator, 2, RoundingMode.HALF_UP)
     }
 
-    fun calculateForward(
-        input: EligibilityForwardInput,
-        foirConfig: FoirConfig
-    ): EligibilityResult {
+    fun calculateForward(input: EligibilityForwardInput, foirConfig: FoirConfig): EligibilityResult {
         val errors = mutableListOf<String>()
         if (input.monthlyIncome <= 0.0) errors.add("Monthly income must be greater than 0.")
         if (input.existingEmis < 0.0) errors.add("Existing EMIs cannot be negative.")

@@ -218,7 +218,7 @@ fun MfTaxGainsScreen(
                             FilterChip(
                                 selected = input.userTaxSlabPercent == slab,
                                 onClick = { onSelectSlab(slab) },
-                                label = { Text("${slab.toInt()}%") },
+                                label = { Text(stringResource(R.string.ui_txt_fmt_361cec, slab.toInt())) },
                                 modifier = Modifier.testTag("mf_tax_slab_${slab.toInt()}")
                             )
                         }

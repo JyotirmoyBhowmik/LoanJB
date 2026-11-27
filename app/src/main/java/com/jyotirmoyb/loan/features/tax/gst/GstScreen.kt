@@ -186,7 +186,9 @@ fun GstScreen(
                         FilterChip(
                             selected = input.gstRatePercent == slab,
                             onClick = { onUpdateRate(slab) },
-                            label = { Text("${formatCleanRate(slab)}%", fontWeight = FontWeight.SemiBold) },
+                            label = {
+                                Text(stringResource(R.string.ui_txt_fmt_361cec, formatCleanRate(slab)), fontWeight = FontWeight.SemiBold)
+                            },
                             modifier = Modifier.testTag("gst_slab_${formatCleanRate(slab)}")
                         )
                     }
@@ -284,6 +286,5 @@ fun GstScreen(
     }
 }
 
-private fun formatCleanRate(rate: Double): String {
-    return if (rate % 1.0 == 0.0) rate.toInt().toString() else String.format("%.2f", rate).trimEnd('0').trimEnd('.')
-}
+private fun formatCleanRate(rate: Double): String =
+    if (rate % 1.0 == 0.0) rate.toInt().toString() else String.format("%.2f", rate).trimEnd('0').trimEnd('.')

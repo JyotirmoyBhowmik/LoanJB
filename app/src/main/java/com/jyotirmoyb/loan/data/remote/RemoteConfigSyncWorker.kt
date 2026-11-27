@@ -12,10 +12,7 @@ import androidx.work.WorkerParameters
 import com.jyotirmoyb.loan.data.AppContainer
 import java.util.concurrent.TimeUnit
 
-class RemoteConfigSyncWorker(
-    appContext: Context,
-    params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+class RemoteConfigSyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
         val repo = AppContainer.provideRatesRepository(applicationContext)

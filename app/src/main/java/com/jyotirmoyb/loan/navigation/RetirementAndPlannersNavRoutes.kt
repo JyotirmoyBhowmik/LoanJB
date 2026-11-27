@@ -94,11 +94,18 @@ internal fun NavGraphBuilder.addRetirementAndPlannersRoutes(
             onResetItem = { vm.resetToDefault(it) },
             onResetAllOverrides = { vm.resetAllOverrides() },
             exportOverridesJson = { vm.exportOverridesJson() },
-            onImportOverridesJson = { vm.importOverridesJson(it) },
+            onImportOverridesJson = { vm.importFileContent(it) },
             onShowMessage = { vm.showMessage(it) },
             onSetMarketStaleHours = { vm.setMarketStaleHours(it) },
+            onSetStaleDataThresholdDays = { vm.setStaleDataThresholdDays(it) },
             onSaveApiKey = { slot, key -> vm.saveApiKey(slot, key) },
-            onClearApiKey = { slot -> vm.clearApiKey(slot) }
+            onClearApiKey = { slot -> vm.clearApiKey(slot) },
+            onImportUpdateFile = { json, fileName -> vm.importFileContent(json, fileName) },
+            onApplyPendingBundle = { items, tables, applyUnchanged ->
+                vm.applyPendingBundle(items, tables, applyUnchanged)
+            },
+            onDismissBundlePreview = { vm.dismissBundlePreview() },
+            onUndoLastImport = { vm.undoLastImport() }
         )
     }
 

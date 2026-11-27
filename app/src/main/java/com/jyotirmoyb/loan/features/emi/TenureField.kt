@@ -125,12 +125,7 @@ fun TenureField(
 }
 
 @Composable
-private fun TenureTogglePill(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun TenureTogglePill(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier
             .defaultMinSize(minHeight = 52.dp)

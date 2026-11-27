@@ -59,13 +59,9 @@ data class BankStaffUiState(
         get() = maxOf(0.0, LoanCalculationEngine.roundPaisa(marketResult.monthlyEmi - staffResult.monthlyEmi))
 }
 
-fun resolveStaffPresets(
-    resolved: Map<String, ResolvedConfigItem> = emptyMap()
-): List<StaffLoanPreset> = defaultStaffPresets(resolved)
+fun resolveStaffPresets(resolved: Map<String, ResolvedConfigItem> = emptyMap()): List<StaffLoanPreset> = defaultStaffPresets(resolved)
 
-private fun defaultStaffPresets(
-    resolved: Map<String, ResolvedConfigItem> = emptyMap()
-): List<StaffLoanPreset> = listOf(
+private fun defaultStaffPresets(resolved: Map<String, ResolvedConfigItem> = emptyMap()): List<StaffLoanPreset> = listOf(
     StaffLoanPreset(
         id = "staff_housing",
         title = "Staff Housing Loan",
@@ -116,7 +112,8 @@ private fun defaultStaffPresets(
     )
 )
 
-class BankStaffViewModel(application: Application) : AndroidViewModel(application),
+class BankStaffViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<CalculationInput, CalculationResult> {
 
     override val id: String = "bank_staff_loan"
@@ -147,6 +144,7 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         val mRate = values[3] as Double
         val months = values[4] as Int
         val prefs = values[5] as com.jyotirmoyb.loan.data.UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = values[6] as Map<String, ResolvedConfigItem>
         val msg = values[7] as String?
@@ -181,8 +179,7 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BankStaffUiState())
 
-    override fun compute(input: CalculationInput): CalculationResult =
-        LoanCalculationEngine.calculate(input)
+    override fun compute(input: CalculationInput): CalculationResult = LoanCalculationEngine.calculate(input)
 
     fun selectPreset(preset: StaffLoanPreset) {
         _selectedId.value = preset.id
@@ -212,12 +209,7 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         _snackbar.value = null
     }
 
-    fun saveTemplateOverride(
-        preset: StaffLoanPreset,
-        newRate: Double,
-        newAmount: Double,
-        newTenureMonths: Int
-    ) {
+    fun saveTemplateOverride(preset: StaffLoanPreset, newRate: Double, newAmount: Double, newTenureMonths: Int) {
         viewModelScope.launch {
             preset.staffRateKey?.let { ratesRepository.setManualOverrideByKey(it, newRate) }
             preset.defaultAmountKey?.let { ratesRepository.setManualOverrideByKey(it, newAmount) }
@@ -240,8 +232,7 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun buildCurrentStaffInput(): CalculationInput =
-        buildStaffCalculationInput(_amount.value, _staffRate.value, _tenureMonths.value)
+    fun buildCurrentStaffInput(): CalculationInput = buildStaffCalculationInput(_amount.value, _staffRate.value, _tenureMonths.value)
 
     fun saveStaffLoan() {
         viewModelScope.launch {
@@ -287,16 +278,14 @@ class BankStaffViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    private fun buildStaffCalculationInput(amt: Double, rate: Double, months: Int): CalculationInput {
-        return CalculationInput(
-            categoryId = "home",
-            ruleFlags = listOf("RATE_FIXED", "EMI_STANDARD", "DISB_FULL"),
-            principal = amt,
-            assetValue = amt * 1.25,
-            annualRate = rate,
-            tenureMonths = months,
-            processingFeePercent = 0.0,
-            prepaymentFeePercent = 0.0
-        )
-    }
+    private fun buildStaffCalculationInput(amt: Double, rate: Double, months: Int): CalculationInput = CalculationInput(
+        categoryId = "home",
+        ruleFlags = listOf("RATE_FIXED", "EMI_STANDARD", "DISB_FULL"),
+        principal = amt,
+        assetValue = amt * 1.25,
+        annualRate = rate,
+        tenureMonths = months,
+        processingFeePercent = 0.0,
+        prepaymentFeePercent = 0.0
+    )
 }

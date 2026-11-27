@@ -124,7 +124,11 @@ fun NpsScreen(
                         color = PrincipalEmerald
                     )
                     Text(
-                        text = "${stringResource(R.string.nps_est_pension)}: ${CurrencyFormatter.format(result.estimatedMonthlyPension, currency)}/mo",
+                        text = stringResource(
+                            R.string.ui_txt_mo_babe8b,
+                            stringResource(R.string.nps_est_pension),
+                            CurrencyFormatter.format(result.estimatedMonthlyPension, currency)
+                        ),
                         style = MaterialTheme.typography.titleSmall,
                         color = InterestAmber,
                         fontWeight = FontWeight.Bold
@@ -204,8 +208,17 @@ fun NpsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(stringResource(R.string.nps_annuity_split), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                    Text("${result.annuityPercentApplied.roundToInt()}%", style = MonoSmallStyle, color = InfoBlue, fontWeight = FontWeight.Bold)
+                    Text(
+                        stringResource(R.string.nps_annuity_split),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        stringResource(R.string.ui_txt_fmt_361cec, result.annuityPercentApplied.roundToInt()),
+                        style = MonoSmallStyle,
+                        color = InfoBlue,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Slider(
                     value = result.annuityPercentApplied.toFloat().coerceIn(minSlider, 100f),
@@ -215,7 +228,10 @@ fun NpsScreen(
                 )
                 Text(
                     text = if (result.eligibleForFullLumpSumExit) {
-                        "Corpus is ≤ ${CurrencyFormatter.format(uiState.smallCorpusLimit, currency)} — PFRDA permits up to 100% lump-sum withdrawal."
+                        "Corpus is ≤ ${CurrencyFormatter.format(
+                            uiState.smallCorpusLimit,
+                            currency
+                        )} — PFRDA permits up to 100% lump-sum withdrawal."
                     } else {
                         "PFRDA mandates minimum ${uiState.minAnnuityPercent.roundToInt()}% annuity purchase at age 60; up to ${(100.0 - uiState.minAnnuityPercent).roundToInt()}% lump-sum withdrawal is exempt under Sec 10(12A)."
                     },
@@ -333,11 +349,25 @@ fun NpsScreen(
                 Spacer(Modifier.height(8.dp))
                 KeyValueRow("Total Contribution Invested", CurrencyFormatter.format(result.totalInvested, currency))
                 KeyValueRow("Estimated Wealth Gained", CurrencyFormatter.format(result.wealthGained, currency), valueColor = SavingsGreen)
-                KeyValueRow("Projected Maturity Corpus", CurrencyFormatter.format(result.projectedCorpus, currency), valueColor = PrincipalEmerald)
+                KeyValueRow(
+                    "Projected Maturity Corpus",
+                    CurrencyFormatter.format(result.projectedCorpus, currency),
+                    valueColor = PrincipalEmerald
+                )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
-                KeyValueRow("Lump-Sum Withdrawal (${result.lumpSumPercentApplied.roundToInt()}%)", CurrencyFormatter.format(result.lumpSumWithdrawal, currency))
-                KeyValueRow("Annuity Purchase (${result.annuityPercentApplied.roundToInt()}%)", CurrencyFormatter.format(result.annuityCorpus, currency))
-                KeyValueRow("Est. Monthly Pension (@ ${formatNpsRate(input.annuityRatePercent)}%)", CurrencyFormatter.format(result.estimatedMonthlyPension, currency), valueColor = InterestAmber)
+                KeyValueRow(
+                    "Lump-Sum Withdrawal (${result.lumpSumPercentApplied.roundToInt()}%)",
+                    CurrencyFormatter.format(result.lumpSumWithdrawal, currency)
+                )
+                KeyValueRow(
+                    "Annuity Purchase (${result.annuityPercentApplied.roundToInt()}%)",
+                    CurrencyFormatter.format(result.annuityCorpus, currency)
+                )
+                KeyValueRow(
+                    "Est. Monthly Pension (@ ${formatNpsRate(input.annuityRatePercent)}%)",
+                    CurrencyFormatter.format(result.estimatedMonthlyPension, currency),
+                    valueColor = InterestAmber
+                )
             }
         }
 

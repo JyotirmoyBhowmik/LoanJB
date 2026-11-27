@@ -13,12 +13,12 @@ import com.jyotirmoyb.loan.domain.LumpsumInput
 import com.jyotirmoyb.loan.domain.LumpsumResult
 import com.jyotirmoyb.loan.domain.SipLumpsumEngine
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import java.util.Calendar
 
 data class LumpsumUiState(
     val input: LumpsumInput = defaultLumpsumInput(),
@@ -42,7 +42,8 @@ private fun defaultLumpsumInput(): LumpsumInput {
     )
 }
 
-class LumpsumViewModel(application: Application) : AndroidViewModel(application),
+class LumpsumViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<LumpsumInput, LumpsumResult> {
 
     override val id: String = "lumpsum"
@@ -71,6 +72,7 @@ class LumpsumViewModel(application: Application) : AndroidViewModel(application)
         val customRet = arr[3] as Boolean
         val customInf = arr[4] as Boolean
         val prefs = arr[5] as UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolved = arr[6] as Map<String, ResolvedConfigItem>
 
@@ -119,6 +121,5 @@ class LumpsumViewModel(application: Application) : AndroidViewModel(application)
         _input.value = _input.value.copy(tenureYears = years.coerceIn(1, 50))
     }
 
-    private fun fmt(v: Double): String =
-        if (v % 1.0 == 0.0) "${v.toInt()}" else "%.2f".format(v).trimEnd('0').trimEnd('.')
+    private fun fmt(v: Double): String = if (v % 1.0 == 0.0) "${v.toInt()}" else "%.2f".format(v).trimEnd('0').trimEnd('.')
 }

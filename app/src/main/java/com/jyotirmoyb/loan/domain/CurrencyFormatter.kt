@@ -8,17 +8,10 @@ import kotlin.math.roundToLong
 
 object CurrencyFormatter {
 
-    fun format(
-        amount: Double,
-        currency: CurrencyCode = CurrencyCode.INR,
-        showDecimals: Boolean = false
-    ): String = format(MoneyMath.bd(amount), currency, showDecimals)
+    fun format(amount: Double, currency: CurrencyCode = CurrencyCode.INR, showDecimals: Boolean = false): String =
+        format(MoneyMath.bd(amount), currency, showDecimals)
 
-    fun format(
-        amount: BigDecimal,
-        currency: CurrencyCode = CurrencyCode.INR,
-        showDecimals: Boolean = false
-    ): String {
+    fun format(amount: BigDecimal, currency: CurrencyCode = CurrencyCode.INR, showDecimals: Boolean = false): String {
         val rounded = amount.setScale(2, RoundingMode.HALF_UP)
         val negative = rounded < BigDecimal.ZERO
         val absBd = rounded.abs()
@@ -61,22 +54,18 @@ object CurrencyFormatter {
                 else -> "${sign}${currency.symbol}${absVal.roundToLong()}"
             }
             CurrencyCode.USD -> when {
-                absVal >= 1_000_000.0 -> "${sign}$${String.format(Locale.US, "%.2f", absVal / 1_000_000.0)}M"
-                absVal >= 1_000.0 -> "${sign}$${String.format(Locale.US, "%.1f", absVal / 1_000.0)}K"
-                else -> "${sign}$${absVal.roundToLong()}"
+                absVal >= 1_000_000.0 -> "$sign$${String.format(Locale.US, "%.2f", absVal / 1_000_000.0)}M"
+                absVal >= 1_000.0 -> "$sign$${String.format(Locale.US, "%.1f", absVal / 1_000.0)}K"
+                else -> "$sign$${absVal.roundToLong()}"
             }
         }
     }
 
-    fun formatCompact(amount: Double, currency: CurrencyCode = CurrencyCode.INR): String {
-        return formatShortLabel(amount, currency)
-    }
+    fun formatCompact(amount: Double, currency: CurrencyCode = CurrencyCode.INR): String = formatShortLabel(amount, currency)
 
-    fun formatInputGrouping(whole: Long, currency: CurrencyCode = CurrencyCode.INR): String {
-        return when (currency) {
-            CurrencyCode.INR, CurrencyCode.NPR -> formatIndianGrouping(whole)
-            CurrencyCode.USD -> formatWesternGrouping(whole)
-        }
+    fun formatInputGrouping(whole: Long, currency: CurrencyCode = CurrencyCode.INR): String = when (currency) {
+        CurrencyCode.INR, CurrencyCode.NPR -> formatIndianGrouping(whole)
+        CurrencyCode.USD -> formatWesternGrouping(whole)
     }
 
     fun formatIndianGrouping(value: Long): String {
@@ -109,7 +98,5 @@ object CurrencyFormatter {
         return sb.reverse().toString()
     }
 
-    fun formatPercent(value: Double, decimals: Int = 2): String {
-        return "${String.format(Locale.US, "%.${decimals}f", value)}%"
-    }
+    fun formatPercent(value: Double, decimals: Int = 2): String = "${String.format(Locale.US, "%.${decimals}f", value)}%"
 }

@@ -9,12 +9,12 @@ import java.util.Locale
 enum class MarketSourceType(val chipLabel: String) {
     MANUAL("Manual"),
     LIVE_API("Live API"),
+    IMPORTED("Imported"),
     ONLINE("Online"),
     BUILT_IN("Built-in");
 
     companion object {
-        fun fromNameOrDefault(raw: String?): MarketSourceType =
-            entries.firstOrNull { it.name.equals(raw, ignoreCase = true) } ?: BUILT_IN
+        fun fromNameOrDefault(raw: String?): MarketSourceType = entries.firstOrNull { it.name.equals(raw, ignoreCase = true) } ?: BUILT_IN
     }
 }
 
@@ -36,11 +36,7 @@ data class MarketQuoteSample(
     val asOfMillis: Long
 )
 
-data class MarketHistoryPoint(
-    val recordedAtMillis: Long,
-    val value: Double,
-    val sourceType: MarketSourceType
-)
+data class MarketHistoryPoint(val recordedAtMillis: Long, val value: Double, val sourceType: MarketSourceType)
 
 data class MarketMetricCardData(
     val key: String,
@@ -56,7 +52,11 @@ data class MarketMetricCardData(
     val asOfMillis: Long,
     val isStale: Boolean,
     val canEditManually: Boolean = true,
-    val hasManualOverride: Boolean = false
+    val hasManualOverride: Boolean = false,
+    val sourceUrl: String = "",
+    val effectiveFrom: String = "",
+    val lastVerified: String = "",
+    val isUnverified: Boolean = false
 ) {
     val isAvailable: Boolean get() = value != null
 }
@@ -71,10 +71,7 @@ data class BankFdRateItem(
     val updatedOnDate: String = ""
 )
 
-data class MarketDelta(
-    val absoluteChange: Double,
-    val percentChange: Double
-)
+data class MarketDelta(val absoluteChange: Double, val percentChange: Double)
 
 /**
  * Pure domain logic for Market staleness checks, delta calculation, provider precedence,
@@ -152,11 +149,9 @@ object MarketStalenessEvaluator {
         return fmt.format(Date(asOfMillis))
     }
 
-    fun parseIsoDateToMillis(isoDate: String): Long {
-        return runCatching {
-            SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(isoDate)?.time ?: 0L
-        }.getOrDefault(0L)
-    }
+    fun parseIsoDateToMillis(isoDate: String): Long = runCatching {
+        SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(isoDate)?.time ?: 0L
+    }.getOrDefault(0L)
 
     private fun formatDecimal(value: Double, scale: Int): String =
         BigDecimal.valueOf(value).setScale(scale, RoundingMode.HALF_UP).toPlainString()

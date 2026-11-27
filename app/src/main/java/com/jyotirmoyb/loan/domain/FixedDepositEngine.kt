@@ -33,11 +33,9 @@ data class TdsConfig(
     val rateWithoutPanPercent: Double,
     val cessPercent: Double = 4.0
 ) {
-    fun thresholdFor(isSeniorCitizen: Boolean): Double =
-        if (isSeniorCitizen) seniorThreshold else generalThreshold
+    fun thresholdFor(isSeniorCitizen: Boolean): Double = if (isSeniorCitizen) seniorThreshold else generalThreshold
 
-    fun tdsRateFor(hasPan: Boolean): Double =
-        if (hasPan) rateWithPanPercent else rateWithoutPanPercent
+    fun tdsRateFor(hasPan: Boolean): Double = if (hasPan) rateWithPanPercent else rateWithoutPanPercent
 
     companion object {
         fun fromResolvedConfig(resolved: Map<String, ResolvedConfigItem>): TdsConfig = TdsConfig(
@@ -104,10 +102,7 @@ data class FixedDepositResult(
  */
 object FixedDepositEngine {
 
-    fun calculate(
-        input: FixedDepositInput,
-        tdsConfig: TdsConfig
-    ): FixedDepositResult {
+    fun calculate(input: FixedDepositInput, tdsConfig: TdsConfig): FixedDepositResult {
         val errors = mutableListOf<String>()
         if (input.principal <= 0.0) errors.add("Deposit amount must be greater than 0.")
         if (input.annualRatePercent <= 0.0 || input.annualRatePercent > 30.0) {

@@ -14,13 +14,13 @@ import com.jyotirmoyb.loan.domain.RecurringDepositInput
 import com.jyotirmoyb.loan.domain.RecurringDepositResult
 import com.jyotirmoyb.loan.domain.TdsConfig
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 data class RecurringDepositUiState(
     val input: RecurringDepositInput = defaultRdInput(),
@@ -52,7 +52,8 @@ private fun defaultRdInput(): RecurringDepositInput {
     )
 }
 
-class RecurringDepositViewModel(application: Application) : AndroidViewModel(application),
+class RecurringDepositViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<RecurringDepositInput, RecurringDepositResult> {
 
     override val id: String = "recurring_deposit"
@@ -78,6 +79,7 @@ class RecurringDepositViewModel(application: Application) : AndroidViewModel(app
         val rateStr = arr[1] as String
         val userEdited = arr[2] as Boolean
         val prefs = arr[3] as UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = arr[4] as Map<String, ResolvedConfigItem>
         val snack = arr[5] as String?
@@ -110,8 +112,7 @@ class RecurringDepositViewModel(application: Application) : AndroidViewModel(app
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RecurringDepositUiState())
 
-    override fun compute(input: RecurringDepositInput): RecurringDepositResult =
-        RecurringDepositEngine.calculate(input, latestTdsConfig)
+    override fun compute(input: RecurringDepositInput): RecurringDepositResult = RecurringDepositEngine.calculate(input, latestTdsConfig)
 
     fun updateMonthlyDeposit(amount: Double) {
         _input.value = _input.value.copy(monthlyDeposit = amount)

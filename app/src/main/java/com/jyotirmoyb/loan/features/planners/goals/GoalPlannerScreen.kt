@@ -132,7 +132,7 @@ fun GoalPlannerScreen(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "${summary.activeGoalCount} Active Goals",
+                            text = stringResource(R.string.ui_txt_active_goals, summary.activeGoalCount),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -142,7 +142,7 @@ fun GoalPlannerScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = "${CurrencyFormatter.format(summary.combinedMonthlySipNeeded, currency)}/mo",
+                    text = stringResource(R.string.ui_txt_mo, CurrencyFormatter.format(summary.combinedMonthlySipNeeded, currency)),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -174,7 +174,7 @@ fun GoalPlannerScreen(
                 if (activeSipResults.isNotEmpty() && summary.combinedMonthlySipNeeded > 0.0) {
                     Spacer(Modifier.height(14.dp))
                     Text(
-                        text = "Monthly SIP Share Across Goals",
+                        text = stringResource(R.string.ui_txt_monthly_sip_share_across_goals),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -276,7 +276,7 @@ fun GoalPlannerScreen(
             item(key = "goal_empty") {
                 FintechCard {
                     Text(
-                        text = "No goals added yet. Tap any goal chip above (Child Education, Home, Car, Wedding, Travel) to start planning.",
+                        text = stringResource(R.string.ui_txt_no_goals_added_yet_tap_any_goal_ch),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -348,20 +348,31 @@ private fun GoalItemCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = "In ${goal.yearsToGoal} yrs • Future: ${CurrencyFormatter.formatCompact(result.inflationAdjustedTarget, currency)}",
+                        text = stringResource(
+                            R.string.ui_txt_in_yrs_future,
+                            goal.yearsToGoal,
+                            CurrencyFormatter.formatCompact(result.inflationAdjustedTarget, currency)
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = if (result.isAlreadyFunded) "Funded!" else "${CurrencyFormatter.format(result.monthlySipNeeded, currency)}/mo",
+                        text = if (result.isAlreadyFunded) {
+                            "Funded!"
+                        } else {
+                            "${CurrencyFormatter.format(
+                                result.monthlySipNeeded,
+                                currency
+                            )}/mo"
+                        },
                         style = MonoSmallStyle,
                         fontWeight = FontWeight.ExtraBold,
                         color = if (result.isAlreadyFunded) SavingsGreen else accentColor
                     )
                     Text(
-                        text = "SIP Needed",
+                        text = stringResource(R.string.ui_txt_sip_needed),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -481,7 +492,11 @@ private fun GoalItemCard(
                     HorizontalDivider()
                     Spacer(Modifier.height(8.dp))
                     KeyValueRow("Inflation-Adjusted Target", CurrencyFormatter.format(result.inflationAdjustedTarget, currency), InfoBlue)
-                    KeyValueRow("Future Value of Current Savings", CurrencyFormatter.format(result.futureValueOfCurrentSavings, currency), PrincipalEmerald)
+                    KeyValueRow(
+                        "Future Value of Current Savings",
+                        CurrencyFormatter.format(result.futureValueOfCurrentSavings, currency),
+                        PrincipalEmerald
+                    )
                     KeyValueRow("Net Target Gap", CurrencyFormatter.format(result.netTargetGap, currency))
                     KeyValueRow("Total SIP Outflow", CurrencyFormatter.format(result.totalSipInvestment, currency))
                     KeyValueRow("Estimated SIP Gains", CurrencyFormatter.format(result.estimatedSipGain, currency), SavingsGreen)
@@ -500,5 +515,4 @@ private fun goalCategoryIcon(category: GoalCategory): ImageVector = when (catego
     GoalCategory.CUSTOM -> Icons.Outlined.TrackChanges
 }
 
-private fun formatRate(v: Double): String =
-    if (v % 1.0 == 0.0) v.toInt().toString() else String.format("%.2f", v).trimEnd('0').trimEnd('.')
+private fun formatRate(v: Double): String = if (v % 1.0 == 0.0) v.toInt().toString() else String.format("%.2f", v).trimEnd('0').trimEnd('.')

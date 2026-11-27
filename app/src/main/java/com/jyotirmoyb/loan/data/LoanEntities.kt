@@ -135,10 +135,4 @@ data class BankFdRateEntity(
 )
 
 @Entity(tableName = "article_bookmarks")
-data class ArticleBookmarkEntity(
-    @PrimaryKey val articleId: String,
-    val bookmarkedAtMillis: Long = System.currentTimeMillis()
-)
-
-
-
+data class ArticleBookmarkEntity(@PrimaryKey val articleId: String, val bookmarkedAtMillis: Long = System.currentTimeMillis())

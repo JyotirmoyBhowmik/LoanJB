@@ -30,15 +30,9 @@ data class EpfUiState(
     val hasCustomRate: Boolean = false
 )
 
-class EpfViewModel(
-    prefsRepo: UserPreferencesRepository,
-    ratesRepo: RatesRepository
-) : ViewModel() {
+class EpfViewModel(prefsRepo: UserPreferencesRepository, ratesRepo: RatesRepository) : ViewModel() {
 
-    private data class Draft(
-        val input: EpfInput = EpfInput(),
-        val hasCustomRate: Boolean = false
-    )
+    private data class Draft(val input: EpfInput = EpfInput(), val hasCustomRate: Boolean = false)
 
     private val draft = MutableStateFlow(Draft())
 
@@ -116,12 +110,8 @@ class EpfViewModel(
         draft.update { it.copy(hasCustomRate = false) }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepo: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepo: RatesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            EpfViewModel(prefsRepo, ratesRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = EpfViewModel(prefsRepo, ratesRepo) as T
     }
 }

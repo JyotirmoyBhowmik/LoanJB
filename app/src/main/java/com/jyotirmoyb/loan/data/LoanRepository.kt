@@ -32,11 +32,7 @@ data class AppBackupPayload(
     val compareScenarios: List<CompareScenarioEntity> = emptyList()
 )
 
-class LoanRepository(
-    private val context: Context,
-    private val dao: LoanDao,
-    private val prefsRepo: UserPreferencesRepository
-) {
+class LoanRepository(private val context: Context, private val dao: LoanDao, private val prefsRepo: UserPreferencesRepository) {
     val moshi: Moshi = Moshi.Builder()
         .addLast(KotlinJsonAdapterFactory())
         .build()

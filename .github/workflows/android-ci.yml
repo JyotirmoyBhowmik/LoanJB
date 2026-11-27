@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-test-verify:
-    name: Build, Unit/Robolectric Tests, Coverage, Lint & R8
+    name: Lint, Tests, Coverage, Debug APK & Release R8
     runs-on: ubuntu-latest
 
     steps:
@@ -23,15 +23,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
-      - name: Validate Kotlin formatting & static analysis (ktlint / detekt conventions)
-        run: |
-          echo "Checking source file modularization and baseline rules..."
-          test -f app/src/main/baseline-prof.txt
-          test -f app/proguard-rules.pro
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Ensure debug.keystore exists for external CI environments
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x gradlew
+
+      - name: Run ktlint static analysis
+        run: ./gradlew :app:ktlintCheck --console=plain
+
+      - name: Ensure debug.keystore exists for CI
         run: |
           if [ ! -f debug.keystore ]; then
             if [ -f debug.keystore.base64 ]; then
@@ -41,22 +43,38 @@ jobs:
             fi
           fi
 
-      - name: Assemble Debug APK & Export Room Schemas
-        run: gradle :app:assembleDebug --console=plain
+      - name: Run Unit, Robolectric UI, Migration & Benchmark Tests
+        run: ./gradlew :app:testDebugUnitTest --console=plain
 
-      - name: Run Unit, Robolectric UI, Room Migration & Performance Benchmark Tests
-        run: gradle :app:testDebugUnitTest --console=plain
-
-      - name: Generate JaCoCo Code Coverage Report (XML + HTML)
-        run: gradle :app:jacocoTestReport --console=plain
+      - name: Generate JaCoCo Code Coverage Report
+        run: ./gradlew :app:jacocoTestReport --console=plain
 
       - name: Run Android Lint
-        run: gradle :app:lintDebug --console=plain
+        run: ./gradlew :app:lintDebug --console=plain
 
-      - name: Verify Release R8 Minification & ProGuard Rules
-        run: gradle :app:minifyReleaseWithR8 --console=plain
+      - name: Assemble Debug APK
+        run: ./gradlew :app:assembleDebug --console=plain
 
-      - name: Upload Test, Coverage & Lint Artifacts
+      - name: Verify Release R8 Minification & Bundle (throwaway CI key)
+        run: |
+          TMP_KEYSTORE="${RUNNER_TEMP}/ci-release-upload.jks"
+          TMP_PASS="ci-throwaway-$(date +%s)"
+          keytool -genkey -v \
+            -keystore "${TMP_KEYSTORE}" \
+            -storepass "${TMP_PASS}" \
+            -alias upload \
+            -keypass "${TMP_PASS}" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 2 \
+            -dname "CN=LoanJB CI,O=LoanJB,C=IN"
+          KEYSTORE_PATH="${TMP_KEYSTORE}" \
+          STORE_PASSWORD="${TMP_PASS}" \
+          KEY_PASSWORD="${TMP_PASS}" \
+          ./gradlew :app:minifyReleaseWithR8 :app:bundleRelease --console=plain
+          rm -f "${TMP_KEYSTORE}"
+
+      - name: Upload Test, Coverage, Lint & ktlint Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -65,4 +83,12 @@ jobs:
             app/build/reports/tests/testDebugUnitTest/
             app/build/reports/jacoco/jacocoTestReport/
             app/build/reports/lint-results-debug.html
+            app/build/reports/ktlint/
             app/schemas/
+
+      - name: Upload Debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loanjb-debug-apk
+          path: app/build/outputs/apk/debug/*.apk

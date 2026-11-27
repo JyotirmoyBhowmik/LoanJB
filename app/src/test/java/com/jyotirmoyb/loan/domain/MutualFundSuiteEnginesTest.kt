@@ -3,17 +3,17 @@ package com.jyotirmoyb.loan.domain
 import com.jyotirmoyb.loan.data.remote.ConfigKeys
 import com.jyotirmoyb.loan.data.remote.RemoteConfigMoshi
 import com.jyotirmoyb.loan.data.remote.RemoteConfigValidator
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import kotlin.math.abs
 import kotlin.math.pow
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
 class MutualFundSuiteEnginesTest {
 

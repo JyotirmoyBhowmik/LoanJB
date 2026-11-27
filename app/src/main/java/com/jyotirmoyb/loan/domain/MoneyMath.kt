@@ -27,31 +27,24 @@ object MoneyMath {
         return BigDecimal.valueOf(value)
     }
 
-    fun roundPaiseBd(value: BigDecimal): BigDecimal =
-        value.setScale(2, RoundingMode.HALF_UP)
+    fun roundPaiseBd(value: BigDecimal): BigDecimal = value.setScale(2, RoundingMode.HALF_UP)
 
     fun roundPaise(value: Double): Double {
         if (value.isNaN() || value.isInfinite()) return 0.0
         return roundPaiseBd(BigDecimal.valueOf(value)).toDouble()
     }
 
-    fun toPaise(amount: BigDecimal): Long =
-        roundPaiseBd(amount).movePointRight(2).longValueExact()
+    fun toPaise(amount: BigDecimal): Long = roundPaiseBd(amount).movePointRight(2).longValueExact()
 
     fun toPaise(amount: Double): Long = toPaise(bd(amount))
 
-    fun fromPaise(paise: Long): BigDecimal =
-        BigDecimal.valueOf(paise, 2)
+    fun fromPaise(paise: Long): BigDecimal = BigDecimal.valueOf(paise, 2)
 
     /**
      * Exact reducing-balance EMI formula computed with BigDecimal:
      *   EMI = P * r * (1 + r)^n / ((1 + r)^n - 1), where r = annualRatePercent / 1200.
      */
-    fun standardEmiBd(
-        principal: BigDecimal,
-        annualRatePercent: BigDecimal,
-        tenureMonths: Int
-    ): BigDecimal {
+    fun standardEmiBd(principal: BigDecimal, annualRatePercent: BigDecimal, tenureMonths: Int): BigDecimal {
         if (principal <= BigDecimal.ZERO || tenureMonths <= 0) return ZERO
         if (annualRatePercent <= BigDecimal.ZERO) {
             return principal.divide(BigDecimal(tenureMonths), 2, RoundingMode.HALF_UP)
@@ -77,11 +70,7 @@ object MoneyMath {
         return principal.multiply(annualRatePercent, MC).divide(TWELVE_HUNDRED, 2, RoundingMode.HALF_UP)
     }
 
-    fun dailyProRataInterest(
-        principal: BigDecimal,
-        annualRatePercent: BigDecimal,
-        days: Int
-    ): BigDecimal {
+    fun dailyProRataInterest(principal: BigDecimal, annualRatePercent: BigDecimal, days: Int): BigDecimal {
         if (principal <= BigDecimal.ZERO || annualRatePercent <= BigDecimal.ZERO || days <= 0) return ZERO
         return principal
             .multiply(annualRatePercent, MC)

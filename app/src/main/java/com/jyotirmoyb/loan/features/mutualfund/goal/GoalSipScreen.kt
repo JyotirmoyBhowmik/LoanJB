@@ -94,12 +94,16 @@ fun GoalSipScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${CurrencyFormatter.format(result.requiredMonthlySip, currency)} / mo",
+                        text = stringResource(R.string.ui_txt_mo_d337f7, CurrencyFormatter.format(result.requiredMonthlySip, currency)),
                         style = MonoLargeStyle,
                         color = Color.White
                     )
                     Text(
-                        text = "${stringResource(R.string.mf_goal_future_target)}: ${CurrencyFormatter.format(result.nominalTargetCorpus, currency)}",
+                        text = stringResource(
+                            R.string.ui_txt_fmt_6c03a4,
+                            stringResource(R.string.mf_goal_future_target),
+                            CurrencyFormatter.format(result.nominalTargetCorpus, currency)
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = InterestAmber,
                         fontWeight = FontWeight.SemiBold
@@ -179,7 +183,7 @@ fun GoalSipScreen(
                         FilterChip(
                             selected = input.years == yr,
                             onClick = { onUpdateYears(yr) },
-                            label = { Text("${yr}Y") },
+                            label = { Text(stringResource(R.string.ui_txt_y_3e961f, yr)) },
                             modifier = Modifier.testTag("mf_goal_yr_$yr")
                         )
                     }

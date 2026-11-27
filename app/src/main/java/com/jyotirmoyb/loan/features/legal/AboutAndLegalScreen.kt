@@ -1,5 +1,7 @@
 package com.jyotirmoyb.loan.features.legal
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,14 +15,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.AccountBalance
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Gavel
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material3.FilterChip
@@ -38,18 +40,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jyotirmoyb.loan.BuildConfig
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.ui.components.FintechCard
 import com.jyotirmoyb.loan.ui.designsystem.FinancialDisclaimerBanner
 import com.jyotirmoyb.loan.ui.designsystem.LoanJBSpacing
 import com.jyotirmoyb.loan.ui.theme.AppThemeMode
 import com.jyotirmoyb.loan.ui.theme.LoanJBTheme
+
+const val PRIVACY_POLICY_WEB_URL = "https://jyotirmoyb.github.io/loanjb/privacy-policy"
+const val TERMS_OF_USE_WEB_URL = "https://jyotirmoyb.github.io/loanjb/terms"
 
 data class DataSourceCredit(
     val id: String,
@@ -99,7 +107,8 @@ val OFFICIAL_DATA_SOURCE_CREDITS = listOf(
         authority = "Association of Mutual Funds in India (AMFI)",
         asOfDate = "Live On-Demand / Last Cached NAV Date",
         configArtifact = "AMFI NAVAll.txt (Streamed to local Room DB)",
-        scopeDescription = "Public daily Net Asset Value feed parsed via streaming reader for offline scheme search, favourites, and historical CAGR simulations."
+        scopeDescription = "Public daily Net Asset Value feed parsed via streaming reader " +
+            "for offline scheme search, favourites, and historical CAGR simulations."
     )
 )
 
@@ -111,7 +120,16 @@ fun AboutAndLegalScreen(
     onOpenDataAndRates: () -> Unit = {},
     onOpenPrivacySecurity: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var selectedSection by remember { mutableIntStateOf(0) }
+    val openWebPage: (String) -> Unit = { url ->
+        runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        }
+    }
     val tabs = listOf(
         "About & Credits",
         "Privacy Policy",
@@ -143,13 +161,17 @@ fun AboutAndLegalScreen(
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "LoanJB — Indian Loan & Wealth Planner",
+                            text = stringResource(R.string.ui_txt_loanjb_indian_loan_wealth_planner),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.semantics { heading() }
                         )
                         Text(
-                            text = "Version ${BuildConfig.VERSION_NAME} (Build ${BuildConfig.VERSION_CODE}) • 100% Offline-First",
+                            text = stringResource(
+                                R.string.ui_txt_version_build_100_offline_first,
+                                BuildConfig.VERSION_NAME,
+                                BuildConfig.VERSION_CODE
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -184,14 +206,14 @@ fun AboutAndLegalScreen(
                 item(key = "about_overview") {
                     FintechCard {
                         Text(
-                            text = "Data Sources, Credits & 'As Of' Dates",
+                            text = stringResource(R.string.ui_txt_data_sources_credits_as_of_dates),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.semantics { heading() }
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "Every benchmark rate, tax slab, and scheme limit in LoanJB is loaded from versioned JSON configuration files — never hardcoded in formulas. You can inspect or override any rate offline under Data & Rates.",
+                            text = stringResource(R.string.ui_txt_every_benchmark_rate_tax_slab_and),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -204,7 +226,7 @@ fun AboutAndLegalScreen(
                                     .minimumInteractiveComponentSize()
                                     .testTag("about_open_data_rates_btn")
                             ) {
-                                Text("Inspect Data & Rates", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.ui_txt_inspect_data_rates), fontWeight = FontWeight.SemiBold)
                             }
                             OutlinedButton(
                                 onClick = onOpenPrivacySecurity,
@@ -213,7 +235,7 @@ fun AboutAndLegalScreen(
                                     .minimumInteractiveComponentSize()
                                     .testTag("about_open_security_btn")
                             ) {
-                                Text("Security Controls", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.ui_txt_security_controls), fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -249,7 +271,7 @@ fun AboutAndLegalScreen(
                             color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.65f)
                         ) {
                             Text(
-                                text = "${credit.asOfDate} • Source: ${credit.configArtifact}",
+                                text = stringResource(R.string.ui_txt_source, credit.asOfDate, credit.configArtifact),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -269,7 +291,7 @@ fun AboutAndLegalScreen(
                     item(key = "crash_diagnostic_card") {
                         FintechCard {
                             Text(
-                                text = "Local Reliability Log (Device-Only)",
+                                text = stringResource(R.string.ui_txt_local_reliability_log_device_only),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
@@ -285,7 +307,7 @@ fun AboutAndLegalScreen(
                                     onClick = onClearCrashDiagnostic,
                                     modifier = Modifier.minimumInteractiveComponentSize()
                                 ) {
-                                    Text("Clear Diagnostic Log")
+                                    Text(stringResource(R.string.ui_txt_clear_diagnostic_log))
                                 }
                             }
                         }
@@ -306,7 +328,7 @@ fun AboutAndLegalScreen(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "In-App Privacy Policy (Effective: November 2026)",
+                                text = stringResource(R.string.ui_txt_in_app_privacy_policy_effective_no),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.semantics { heading() }
@@ -315,28 +337,59 @@ fun AboutAndLegalScreen(
                         Spacer(Modifier.height(LoanJBSpacing.sm))
                         LegalSectionBlock(
                             heading = "1. Zero Personal Data Collection",
-                            body = "LoanJB does not collect, transmit, rent, or sell any personal data, income figures, loan account numbers, tax inputs, or device identifiers. No user account or sign-in is required."
+                            body = "LoanJB does not collect, transmit, rent, or sell any personal data, income figures, " +
+                                "loan account numbers, tax inputs, or device identifiers. No user account or sign-in is required."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "2. Local-Only Storage & Encryption",
-                            body = "All saved loans, EMI payment logs, prepayments, and preferences reside strictly in your device's private sandboxed Room database and DataStore. Optional market API keys and App Lock PIN hashes are encrypted using Android Keystore AES-256-GCM EncryptedSharedPreferences."
+                            body = "All saved loans, EMI payment logs, prepayments, and preferences reside strictly " +
+                                "in your device's private sandboxed Room database and DataStore. Optional market API keys " +
+                                "and App Lock PIN hashes are encrypted using Android Keystore AES-256-GCM."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "3. Encrypted Backups & Auto-Backup Exclusions",
-                            body = "When you export a backup, LoanJB encrypts the JSON archive with your password using PBKDF2-HMAC-SHA256 (120,000 iterations) and AES-256-GCM before sharing. Android Auto Backup rules explicitly exclude the Room database and encrypted preferences from cloud syncing."
+                            body = "When you export a backup, LoanJB encrypts the JSON archive with your password using " +
+                                "PBKDF2-HMAC-SHA256 (120,000 iterations) and AES-256-GCM before sharing. Android Auto Backup " +
+                                "rules explicitly exclude the Room database and encrypted preferences from cloud syncing."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "4. Network Requests (GET-Only Public Data)",
-                            body = "Network access is strictly optional and used only for HTTP GET requests to fetch public rate configuration files (rates.json, schemes.json, taxslabs.json, articles.json) and AMFI's public NAVAll.txt feed. Zero user financial inputs are ever attached to network requests."
+                            body = "Network access is strictly optional and used only for HTTP GET requests to fetch public " +
+                                "rate configuration files (rates.json, schemes.json, taxslabs.json, articles.json) and AMFI's " +
+                                "public NAVAll.txt feed. Zero user financial inputs are ever attached to network requests."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "5. No Analytics, Ads, or Trackers",
-                            body = "LoanJB contains zero third-party analytics SDKs, zero crash-reporting telemetry, and zero advertising trackers."
+                            body = "LoanJB contains zero third-party analytics SDKs, zero crash-reporting telemetry, " +
+                                "and zero advertising trackers."
                         )
+                        Spacer(Modifier.height(LoanJBSpacing.md))
+                        Text(
+                            text = stringResource(R.string.about_web_links_hint),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        OutlinedButton(
+                            onClick = { openWebPage(PRIVACY_POLICY_WEB_URL) },
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .minimumInteractiveComponentSize()
+                                .testTag("legal_open_privacy_web_btn")
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.about_open_privacy_web), fontWeight = FontWeight.SemiBold)
+                        }
                     }
                 }
             }
@@ -354,7 +407,7 @@ fun AboutAndLegalScreen(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "Terms of Use & Financial Advisory Disclaimer",
+                                text = stringResource(R.string.ui_txt_terms_of_use_financial_advisory_di),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.semantics { heading() }
@@ -363,23 +416,54 @@ fun AboutAndLegalScreen(
                         Spacer(Modifier.height(LoanJBSpacing.sm))
                         LegalSectionBlock(
                             heading = "1. Not a Financial, Investment, or Tax Advisor",
-                            body = "LoanJB is an educational and mathematical calculation tool. The app creator is NOT a SEBI-registered Investment Adviser (RIA), RBI-regulated lender, or Chartered Accountant. Nothing in this app constitutes financial, investment, legal, or tax advice."
+                            body = "LoanJB is an educational and mathematical calculation tool. The app creator is NOT a " +
+                                "SEBI-registered Investment Adviser (RIA), RBI-regulated lender, or Chartered Accountant. " +
+                                "Nothing in this app constitutes financial, investment, legal, or tax advice."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "2. Accuracy of Bank & Government Rates",
-                            body = "Actual bank EMI schedules may vary slightly due to day-count conventions (Actual/365 vs 30/360), broken-period interest, bank-specific rounding rules, or quarterly government rate revisions. Always verify final sanction terms and Key Fact Statements (KFS) with your bank or qualified advisor."
+                            body = "Actual bank EMI schedules may vary slightly due to day-count conventions " +
+                                "(Actual/365 vs 30/360), broken-period interest, bank-specific rounding rules, or quarterly " +
+                                "government rate revisions. Always verify final sanction terms and Key Fact Statements (KFS) " +
+                                "with your bank or qualified advisor."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "3. Mutual Fund & Market Risk Warning",
-                            body = "Mutual fund investments are subject to market risks. Past CAGR or NAV performance does not guarantee future returns. Asset allocation guides in the app are strictly educational illustrations."
+                            body = "Mutual fund investments are subject to market risks. Past CAGR or NAV performance " +
+                                "does not guarantee future returns. Asset allocation guides in the app are strictly " +
+                                "educational illustrations."
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         LegalSectionBlock(
                             heading = "4. User Responsibility for Encrypted Backups",
-                            body = "Because LoanJB operates with zero servers, password-encrypted backups can only be decrypted with the password you set. Keep your backup password safe."
+                            body = "Because LoanJB operates with zero servers, password-encrypted backups can only be " +
+                                "decrypted with the password you set. Keep your backup password safe."
                         )
+                        Spacer(Modifier.height(LoanJBSpacing.md))
+                        Text(
+                            text = stringResource(R.string.about_web_links_hint),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        OutlinedButton(
+                            onClick = { openWebPage(TERMS_OF_USE_WEB_URL) },
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .minimumInteractiveComponentSize()
+                                .testTag("legal_open_terms_web_btn")
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.about_open_terms_web), fontWeight = FontWeight.SemiBold)
+                        }
                     }
                 }
             }
@@ -397,7 +481,7 @@ fun AboutAndLegalScreen(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "Google Play Data Safety Declarations",
+                                text = stringResource(R.string.ui_txt_google_play_data_safety_declaratio),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.semantics { heading() }
@@ -414,24 +498,24 @@ fun AboutAndLegalScreen(
                                 verticalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
                                 Text(
-                                    text = "• Does this app collect or share any required user data types? NO",
+                                    text = stringResource(R.string.ui_txt_does_this_app_collect_or_share_any),
                                     style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "• Data shared with third parties: None (0 data types shared)",
+                                    text = stringResource(R.string.ui_txt_data_shared_with_third_parties_non),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(
-                                    text = "• Data collected by the app: None (0 data types collected off-device)",
+                                    text = stringResource(R.string.ui_txt_data_collected_by_the_app_none_0_d),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(
-                                    text = "• Local encryption: AES-256-GCM (backups & Android Keystore preferences)",
+                                    text = stringResource(R.string.ui_txt_local_encryption_aes_256_gcm_backu),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(
-                                    text = "• Data deletion: Instant in-app 'Reset All Local Data' button + full uninstall cleanup",
+                                    text = stringResource(R.string.ui_txt_data_deletion_instant_in_app_reset),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -444,10 +528,7 @@ fun AboutAndLegalScreen(
 }
 
 @Composable
-private fun LegalSectionBlock(
-    heading: String,
-    body: String
-) {
+private fun LegalSectionBlock(heading: String, body: String) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = heading,

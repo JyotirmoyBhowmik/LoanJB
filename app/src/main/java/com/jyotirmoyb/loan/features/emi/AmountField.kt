@@ -71,7 +71,7 @@ fun AmountField(
             label = { Text(label) },
             prefix = {
                 Text(
-                    text = "${currency.symbol} ",
+                    text = stringResource(R.string.ui_txt_fmt_4939b3, currency.symbol),
                     style = MonoMediumStyle,
                     color = MaterialTheme.colorScheme.onSurface
                 )

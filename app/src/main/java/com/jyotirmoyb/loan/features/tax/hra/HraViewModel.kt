@@ -53,10 +53,7 @@ data class HraUiState(
     val syncFeedback: String? = null
 )
 
-class HraViewModel(
-    private val prefsRepo: UserPreferencesRepository,
-    private val ratesRepository: RatesRepository
-) : ViewModel() {
+class HraViewModel(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HraUiState())
     val uiState: StateFlow<HraUiState> = _uiState.asStateFlow()
@@ -123,13 +120,9 @@ class HraViewModel(
         }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepository: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) :
+        ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return HraViewModel(prefsRepo, ratesRepository) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = HraViewModel(prefsRepo, ratesRepository) as T
     }
 }

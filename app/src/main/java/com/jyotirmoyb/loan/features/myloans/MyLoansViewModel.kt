@@ -101,7 +101,8 @@ class MyLoansViewModel(application: Application) : AndroidViewModel(application)
             )
             val updatedEntity = summary.entity.copy(inputJson = repository.serializeInput(updatedInput))
             repository.updateLoan(updatedEntity)
-            _snackbar.value = "Floating rate reset to ${String.format("%.2f", newAnnualRate)}% after month $afterMonth — schedule recomputed"
+            _snackbar.value =
+                "Floating rate reset to ${String.format("%.2f", newAnnualRate)}% after month $afterMonth — schedule recomputed"
         }
     }
 

@@ -179,7 +179,9 @@ object MarkdownParser {
                     t.startsWith(">") ||
                     t.startsWith("- ") ||
                     t.startsWith("* ") ||
-                    t == "---" || t == "***" || t == "___" ||
+                    t == "---" ||
+                    t == "***" ||
+                    t == "___" ||
                     NUMBERED_ITEM_REGEX.matches(t) ||
                     (t.contains("|") && i + 1 < lines.size && TABLE_SEPARATOR_REGEX.matches(lines[i + 1].trim()))
                 ) {
@@ -254,11 +256,9 @@ object MarkdownParser {
         return spans
     }
 
-    private fun parseTableRow(line: String): List<String> {
-        return line.trim()
-            .removePrefix("|")
-            .removeSuffix("|")
-            .split("|")
-            .map { it.trim() }
-    }
+    private fun parseTableRow(line: String): List<String> = line.trim()
+        .removePrefix("|")
+        .removeSuffix("|")
+        .split("|")
+        .map { it.trim() }
 }

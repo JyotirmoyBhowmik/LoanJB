@@ -180,7 +180,7 @@ fun LumpsumScreen(
                         FilterChip(
                             selected = input.tenureYears == yr,
                             onClick = { onUpdateTenureYears(yr) },
-                            label = { Text("${yr}Y") },
+                            label = { Text(stringResource(R.string.ui_txt_y_3e961f, yr)) },
                             modifier = Modifier.testTag("mf_lumpsum_yr_$yr")
                         )
                     }

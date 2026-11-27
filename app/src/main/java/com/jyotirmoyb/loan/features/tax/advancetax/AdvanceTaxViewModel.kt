@@ -68,10 +68,7 @@ data class AdvanceTaxUiState(
     val syncFeedback: String? = null
 )
 
-class AdvanceTaxViewModel(
-    private val prefsRepo: UserPreferencesRepository,
-    private val ratesRepository: RatesRepository
-) : ViewModel() {
+class AdvanceTaxViewModel(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdvanceTaxUiState())
     val uiState: StateFlow<AdvanceTaxUiState> = _uiState.asStateFlow()
@@ -189,13 +186,9 @@ class AdvanceTaxViewModel(
         val isSyncing: Boolean
     )
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepository: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepository: RatesRepository) :
+        ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AdvanceTaxViewModel(prefsRepo, ratesRepository) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = AdvanceTaxViewModel(prefsRepo, ratesRepository) as T
     }
 }

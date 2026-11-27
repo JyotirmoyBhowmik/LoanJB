@@ -36,11 +36,7 @@ import com.jyotirmoyb.loan.ui.theme.PrincipalEmerald
 import com.jyotirmoyb.loan.ui.theme.SlateNavy
 
 @Composable
-fun YearlyScheduleTab(
-    result: CalculationResult,
-    currency: CurrencyCode,
-    modifier: Modifier = Modifier
-) {
+fun YearlyScheduleTab(result: CalculationResult, currency: CurrencyCode, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -57,7 +53,7 @@ fun YearlyScheduleTab(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "YEAR",
+                    text = stringResource(R.string.ui_txt_year),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -80,7 +76,7 @@ fun YearlyScheduleTab(
                     modifier = Modifier.weight(1.0f)
                 )
                 Text(
-                    text = "END BALANCE",
+                    text = stringResource(R.string.ui_txt_end_balance),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -109,7 +105,7 @@ fun YearlyScheduleTab(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Yr ${ys.yearIndex}",
+                        text = stringResource(R.string.ui_txt_yr, ys.yearIndex),
                         style = MonoSmallStyle,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,

@@ -21,6 +21,9 @@ interface RemoteConfigDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertCache(entity: RemoteConfigCacheEntity)
 
+    @Query("DELETE FROM remote_config_cache WHERE fileName = :fileName")
+    suspend fun deleteCacheByFile(fileName: String)
+
     @Query("DELETE FROM remote_config_cache")
     suspend fun clearAllCaches()
 

@@ -179,12 +179,7 @@ object FinancialRulesEngine {
 
     private val TWELVE = BigDecimal("12")
 
-    fun calculateBudgetSplit(
-        monthlyIncome: Double,
-        needsPercent: Double,
-        wantsPercent: Double,
-        savingsPercent: Double
-    ): BudgetSplitResult {
+    fun calculateBudgetSplit(monthlyIncome: Double, needsPercent: Double, wantsPercent: Double, savingsPercent: Double): BudgetSplitResult {
         if (monthlyIncome < 0.0) {
             return BudgetSplitResult(isValid = false, validationError = "Monthly income cannot be negative.")
         }
@@ -238,7 +233,9 @@ object FinancialRulesEngine {
                 .divide(targetBd, 1, RoundingMode.HALF_UP)
                 .toDouble()
                 .coerceIn(0.0, 100.0)
-        } else 100.0
+        } else {
+            100.0
+        }
 
         val monthsToBuild = when {
             shortfallBd <= BigDecimal.ZERO -> 0
@@ -290,7 +287,10 @@ object FinancialRulesEngine {
         val healthGapBd = MoneyMath.roundPaiseBd(recHealthBd.subtract(MoneyMath.bd(safeHealth)).max(BigDecimal.ZERO))
 
         val cityLabel = if (isMetroCity) "Metro" else "Non-Metro"
-        val healthNote = "$cityLabel base cover (${CurrencyFormatter.formatCompact(baseHealth, CurrencyCode.INR)}) scaled for $safeMembers member(s). Consider a super top-up if family includes senior parents."
+        val healthNote = "$cityLabel base cover (${CurrencyFormatter.formatCompact(
+            baseHealth,
+            CurrencyCode.INR
+        )}) scaled for $safeMembers member(s). Consider a super top-up if family includes senior parents."
 
         return InsuranceCoverResult(
             recommendedTermCover = recTermBd.toDouble(),
@@ -327,16 +327,10 @@ enum class RiskProfile(val id: String, val displayName: String, val summary: Str
     )
 }
 
-data class RiskQuestion(
-    val id: String,
-    val prompt: String,
-    val options: List<RiskQuestionOption>
-)
+data class RiskQuestion(val id: String, val prompt: String, val options: List<RiskQuestionOption>)
 
-data class RiskQuestionOption(
-    val label: String,
-    val score: Int // 1 = Conservative, 2 = Moderate, 3 = Aggressive
-)
+// score: 1 = Conservative, 2 = Moderate, 3 = Aggressive
+data class RiskQuestionOption(val label: String, val score: Int)
 
 data class AssetAllocationResult(
     val isValid: Boolean,

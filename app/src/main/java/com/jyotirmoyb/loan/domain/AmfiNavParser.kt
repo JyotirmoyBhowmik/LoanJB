@@ -13,12 +13,7 @@ data class ParsedAmfiNav(
     val navDate: String
 )
 
-data class AmfiParseSummary(
-    val totalParsed: Int,
-    val skippedRows: Int,
-    val latestNavDate: String,
-    val batchesEmitted: Int
-)
+data class AmfiParseSummary(val totalParsed: Int, val skippedRows: Int, val latestNavDate: String, val batchesEmitted: Int)
 
 /**
  * Memory-efficient line-by-line streaming parser for AMFI India's public NAVAll.txt file.
@@ -33,11 +28,7 @@ data class AmfiParseSummary(
  */
 object AmfiNavParser {
 
-    fun parseStream(
-        reader: BufferedReader,
-        batchSize: Int = 500,
-        onBatch: (List<ParsedAmfiNav>) -> Unit
-    ): AmfiParseSummary {
+    fun parseStream(reader: BufferedReader, batchSize: Int = 500, onBatch: (List<ParsedAmfiNav>) -> Unit): AmfiParseSummary {
         val safeBatchSize = batchSize.coerceIn(1, 5000)
         val buffer = ArrayList<ParsedAmfiNav>(safeBatchSize)
         var currentCategory = "Mutual Fund"

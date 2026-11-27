@@ -87,16 +87,26 @@ fun TaxRulesMetadataFooter(
             ValueSourceBadgesRow(
                 source = catalog.source,
                 asOfDate = catalog.asOfDateFormatted,
-                isUnverified = isUnverified
+                isUnverified = isUnverified,
+                sourceName = catalog.sourceName,
+                sourceUrl = catalog.sourceUrl,
+                effectiveFrom = catalog.publishedOn,
+                lastVerified = catalog.lastVerified
             )
 
+            val verifiedDisplay = if (isUnverified) {
+                stringResource(R.string.badge_not_yet_checked_plain)
+            } else {
+                com.jyotirmoyb.loan.data.remote.DataSourceResolver.formatToCompactDate(catalog.lastVerified)
+                    .ifBlank { catalog.asOfDateFormatted }
+            }
             Text(
                 text = stringResource(
                     R.string.tax_rules_as_of,
                     fyDisplay,
                     catalog.asOfDateFormatted,
                     catalog.sourceName,
-                    catalog.lastVerified
+                    verifiedDisplay
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant

@@ -61,7 +61,6 @@ import com.jyotirmoyb.loan.ui.components.ValueSourceBadgesRow
 import com.jyotirmoyb.loan.ui.theme.InfoBlue
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.MonoLargeStyle
-import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle
 import com.jyotirmoyb.loan.ui.theme.PrincipalEmerald
 import com.jyotirmoyb.loan.ui.theme.SlateNavy
 
@@ -178,7 +177,10 @@ fun SmallSavingsScreen(
                             color = Color.White
                         )
                         Text(
-                            text = "Total value incl. interest: ${CurrencyFormatter.format(result.maturityAmount, currency)}",
+                            text = stringResource(
+                                R.string.ui_txt_total_value_incl_interest,
+                                CurrencyFormatter.format(result.maturityAmount, currency)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = PrincipalEmerald
                         )
@@ -234,7 +236,11 @@ fun SmallSavingsScreen(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "${CurrencyFormatter.formatPercent(result.appliedRatePercent)} • ${result.quarterLabel}",
+                                text = stringResource(
+                                    R.string.ui_txt_fmt_4ed101,
+                                    CurrencyFormatter.formatPercent(result.appliedRatePercent),
+                                    result.quarterLabel
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
@@ -394,7 +400,7 @@ fun SmallSavingsScreen(
                                 shape = SegmentedButtonDefaults.itemShape(0, 2),
                                 modifier = Modifier.testTag("ss_pomis_single_btn")
                             ) {
-                                Text("${stringResource(R.string.ss_pomis_single)} (₹9L)")
+                                Text(stringResource(R.string.ui_txt_9l, stringResource(R.string.ss_pomis_single)))
                             }
                             SegmentedButton(
                                 selected = input.pomisJointAccount,
@@ -402,7 +408,7 @@ fun SmallSavingsScreen(
                                 shape = SegmentedButtonDefaults.itemShape(1, 2),
                                 modifier = Modifier.testTag("ss_pomis_joint_btn")
                             ) {
-                                Text("${stringResource(R.string.ss_pomis_joint)} (₹15L)")
+                                Text(stringResource(R.string.ui_txt_15l, stringResource(R.string.ss_pomis_joint)))
                             }
                         }
                     }
@@ -421,7 +427,7 @@ fun SmallSavingsScreen(
                                 FilterChip(
                                     selected = input.potdTenureYears == yrs,
                                     onClick = { onSetPoTdYears(yrs) },
-                                    label = { Text("${yrs}Y (${CurrencyFormatter.formatPercent(r)})") },
+                                    label = { Text(stringResource(R.string.ui_txt_y, yrs, CurrencyFormatter.formatPercent(r))) },
                                     modifier = Modifier.testTag("ss_potd_yr_$yrs")
                                 )
                             }
@@ -456,7 +462,7 @@ fun SmallSavingsScreen(
                         },
                         modifier = Modifier.testTag("ss_rate_apply_btn")
                     ) {
-                        Text("Apply", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.ui_txt_apply), fontWeight = FontWeight.Bold)
                     }
                 }
                 ResetToDefaultAction(

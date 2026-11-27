@@ -2,10 +2,10 @@ package com.jyotirmoyb.loan.util
 
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.CoroutineExceptionHandler
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.CoroutineExceptionHandler
 
 /**
  * Global crash and coroutine exception handler that records a PII-redacted diagnostic summary
@@ -31,13 +31,11 @@ object GlobalErrorHandler {
         )
     }
 
-    fun getLastCrashSummary(context: Context): String? {
-        return runCatching {
-            context.applicationContext
-                .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .getString(KEY_LAST_CRASH, null)
-        }.getOrNull()
-    }
+    fun getLastCrashSummary(context: Context): String? = runCatching {
+        context.applicationContext
+            .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_LAST_CRASH, null)
+    }.getOrNull()
 
     fun clearLastCrashSummary(context: Context) {
         runCatching {
@@ -49,7 +47,11 @@ object GlobalErrorHandler {
         }
     }
 
-    internal fun sanitizeCrashSummary(threadName: String, throwable: Throwable, timestampMillis: Long = System.currentTimeMillis()): String {
+    internal fun sanitizeCrashSummary(
+        threadName: String,
+        throwable: Throwable,
+        timestampMillis: Long = System.currentTimeMillis()
+    ): String {
         val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date(timestampMillis))
         val exName = throwable::class.java.name
         val topFrame = throwable.stackTrace.firstOrNull {
@@ -63,10 +65,8 @@ object GlobalErrorHandler {
         return "[$dateStr] Thread=$threadName Exception=$exName at $location ($safeMsg)"
     }
 
-    private class LoanJBUncaughtExceptionHandler(
-        private val appContext: Context,
-        private val delegate: Thread.UncaughtExceptionHandler?
-    ) : Thread.UncaughtExceptionHandler {
+    private class LoanJBUncaughtExceptionHandler(private val appContext: Context, private val delegate: Thread.UncaughtExceptionHandler?) :
+        Thread.UncaughtExceptionHandler {
         override fun uncaughtException(thread: Thread, throwable: Throwable) {
             runCatching {
                 val summary = sanitizeCrashSummary(thread.name, throwable)

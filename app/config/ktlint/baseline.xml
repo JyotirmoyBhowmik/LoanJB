@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/main/java/com/jyotirmoyb/loan/data/LoanDatabase.kt">
+        <error line="186" column="21" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/data/market/MarketRepository.kt">
+        <error line="58" column="17" source="standard:backing-property-naming" />
+        <error line="59" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/domain/PartPaymentPlannerEngine.kt">
+        <error line="14" column="37" source="standard:value-parameter-comment" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/articles/ArticlesViewModel.kt">
+        <error line="35" column="17" source="standard:backing-property-naming" />
+        <error line="36" column="17" source="standard:backing-property-naming" />
+        <error line="37" column="17" source="standard:backing-property-naming" />
+        <error line="38" column="17" source="standard:backing-property-naming" />
+        <error line="39" column="17" source="standard:backing-property-naming" />
+        <error line="40" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/bankstaff/BankStaffViewModel.kt">
+        <error line="124" column="17" source="standard:backing-property-naming" />
+        <error line="125" column="17" source="standard:backing-property-naming" />
+        <error line="126" column="17" source="standard:backing-property-naming" />
+        <error line="127" column="17" source="standard:backing-property-naming" />
+        <error line="128" column="17" source="standard:backing-property-naming" />
+        <error line="129" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/compare/CompareViewModel.kt">
+        <error line="30" column="17" source="standard:backing-property-naming" />
+        <error line="31" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/datarates/DataRatesViewModel.kt">
+        <error line="53" column="17" source="standard:backing-property-naming" />
+        <error line="54" column="17" source="standard:backing-property-naming" />
+        <error line="55" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/deposits/compare/DepositComparisonViewModel.kt">
+        <error line="56" column="17" source="standard:backing-property-naming" />
+        <error line="57" column="17" source="standard:backing-property-naming" />
+        <error line="58" column="17" source="standard:backing-property-naming" />
+        <error line="59" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/deposits/fd/FixedDepositViewModel.kt">
+        <error line="72" column="17" source="standard:backing-property-naming" />
+        <error line="73" column="17" source="standard:backing-property-naming" />
+        <error line="74" column="17" source="standard:backing-property-naming" />
+        <error line="75" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/deposits/rd/RecurringDepositViewModel.kt">
+        <error line="64" column="17" source="standard:backing-property-naming" />
+        <error line="65" column="17" source="standard:backing-property-naming" />
+        <error line="66" column="17" source="standard:backing-property-naming" />
+        <error line="67" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/deposits/smallsavings/SmallSavingsViewModel.kt">
+        <error line="64" column="17" source="standard:backing-property-naming" />
+        <error line="65" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/emi/EmiViewModel.kt">
+        <error line="84" column="17" source="standard:backing-property-naming" />
+        <error line="85" column="17" source="standard:backing-property-naming" />
+        <error line="86" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/hub/HubViewModel.kt">
+        <error line="38" column="17" source="standard:backing-property-naming" />
+        <error line="39" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/legal/AboutAndLegalScreen.kt">
+        <error line="78" column="141" source="standard:max-line-length" />
+        <error line="86" column="141" source="standard:max-line-length" />
+        <error line="94" column="141" source="standard:max-line-length" />
+        <error line="102" column="141" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/loans/balancetransfer/BalanceTransferViewModel.kt">
+        <error line="38" column="17" source="standard:backing-property-naming" />
+        <error line="39" column="17" source="standard:backing-property-naming" />
+        <error line="40" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/loans/comparison/LoanComparisonViewModel.kt">
+        <error line="50" column="17" source="standard:backing-property-naming" />
+        <error line="51" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/loans/eligibility/EligibilityViewModel.kt">
+        <error line="53" column="17" source="standard:backing-property-naming" />
+        <error line="54" column="17" source="standard:backing-property-naming" />
+        <error line="55" column="17" source="standard:backing-property-naming" />
+        <error line="56" column="17" source="standard:backing-property-naming" />
+        <error line="57" column="17" source="standard:backing-property-naming" />
+        <error line="58" column="17" source="standard:backing-property-naming" />
+        <error line="59" column="17" source="standard:backing-property-naming" />
+        <error line="60" column="17" source="standard:backing-property-naming" />
+        <error line="61" column="17" source="standard:backing-property-naming" />
+        <error line="62" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/loans/partpayment/PartPaymentPlannerViewModel.kt">
+        <error line="37" column="17" source="standard:backing-property-naming" />
+        <error line="38" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/loans/taxbenefit/LoanTaxBenefitViewModel.kt">
+        <error line="47" column="17" source="standard:backing-property-naming" />
+        <error line="48" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/market/MarketViewModel.kt">
+        <error line="55" column="17" source="standard:backing-property-naming" />
+        <error line="56" column="17" source="standard:backing-property-naming" />
+        <error line="57" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/goal/GoalSipViewModel.kt">
+        <error line="55" column="17" source="standard:backing-property-naming" />
+        <error line="56" column="17" source="standard:backing-property-naming" />
+        <error line="57" column="17" source="standard:backing-property-naming" />
+        <error line="58" column="17" source="standard:backing-property-naming" />
+        <error line="59" column="17" source="standard:backing-property-naming" />
+        <error line="60" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/lumpsum/LumpsumViewModel.kt">
+        <error line="54" column="17" source="standard:backing-property-naming" />
+        <error line="55" column="17" source="standard:backing-property-naming" />
+        <error line="56" column="17" source="standard:backing-property-naming" />
+        <error line="57" column="17" source="standard:backing-property-naming" />
+        <error line="58" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/nav/LiveNavViewModel.kt">
+        <error line="36" column="17" source="standard:backing-property-naming" />
+        <error line="37" column="17" source="standard:backing-property-naming" />
+        <error line="38" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/sip/SipViewModel.kt">
+        <error line="58" column="17" source="standard:backing-property-naming" />
+        <error line="59" column="17" source="standard:backing-property-naming" />
+        <error line="60" column="17" source="standard:backing-property-naming" />
+        <error line="61" column="17" source="standard:backing-property-naming" />
+        <error line="62" column="17" source="standard:backing-property-naming" />
+        <error line="63" column="17" source="standard:backing-property-naming" />
+        <error line="64" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/swp/SwpViewModel.kt">
+        <error line="48" column="17" source="standard:backing-property-naming" />
+        <error line="49" column="17" source="standard:backing-property-naming" />
+        <error line="50" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/tax/MfTaxGainsViewModel.kt">
+        <error line="43" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/mutualfund/xirr/XirrViewModel.kt">
+        <error line="41" column="17" source="standard:backing-property-naming" />
+        <error line="42" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/myloans/MyLoansViewModel.kt">
+        <error line="36" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/profile/ProfileViewModel.kt">
+        <error line="38" column="17" source="standard:backing-property-naming" />
+        <error line="39" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/features/security/PrivacySecurityScreen.kt">
+        <error line="206" column="141" source="standard:max-line-length" />
+        <error line="212" column="141" source="standard:max-line-length" />
+        <error line="218" column="141" source="standard:max-line-length" />
+        <error line="240" column="141" source="standard:max-line-length" />
+        <error line="250" column="141" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/java/com/jyotirmoyb/loan/navigation/AppRoutes.kt">
+        <error line="1" column="1" source="standard:filename" />
+    </file>
+</baseline>

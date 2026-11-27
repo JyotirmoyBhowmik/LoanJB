@@ -72,10 +72,7 @@ private data class OnboardingPageData(
 )
 
 @Composable
-fun OnboardingScreen(
-    onFinished: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun OnboardingScreen(onFinished: () -> Unit, modifier: Modifier = Modifier) {
     val pages = listOf(
         OnboardingPageData(
             titleRes = R.string.onboarding_title_1,

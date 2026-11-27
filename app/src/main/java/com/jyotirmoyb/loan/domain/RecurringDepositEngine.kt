@@ -1,7 +1,6 @@
 package com.jyotirmoyb.loan.domain
 
 import java.math.BigDecimal
-import java.math.RoundingMode
 import kotlin.math.pow
 
 data class RecurringDepositInput(
@@ -40,10 +39,7 @@ data class RecurringDepositResult(
  */
 object RecurringDepositEngine {
 
-    fun calculate(
-        input: RecurringDepositInput,
-        tdsConfig: TdsConfig
-    ): RecurringDepositResult {
+    fun calculate(input: RecurringDepositInput, tdsConfig: TdsConfig): RecurringDepositResult {
         val errors = mutableListOf<String>()
         if (input.monthlyDeposit <= 0.0) errors.add("Monthly instalment must be greater than 0.")
         if (input.annualRatePercent <= 0.0 || input.annualRatePercent > 30.0) {

@@ -30,9 +30,7 @@ data class ArticlesUiState(
         get() = allArticles.count { it.isBookmarked }
 }
 
-class ArticlesViewModel(
-    private val articlesRepository: ArticlesRepository
-) : ViewModel() {
+class ArticlesViewModel(private val articlesRepository: ArticlesRepository) : ViewModel() {
 
     private val _selectedCategory = MutableStateFlow<ArticleCategory?>(null)
     private val _bookmarkedOnly = MutableStateFlow(false)
@@ -121,18 +119,16 @@ class ArticlesViewModel(
         }
     }
 
-    fun buildShareText(article: ArticleItem): String {
-        return buildString {
-            appendLine(article.title)
-            appendLine("Category: ${article.category.displayTitle} • ${article.readingTimeMinutes} min read")
-            appendLine("Last reviewed: ${article.lastReviewedFormatted}")
-            appendLine()
-            appendLine(article.summary)
-            appendLine()
-            appendLine(article.markdownBody)
-            appendLine()
-            append("Shared via LoanJB — Offline Indian Finance & Loan Companion")
-        }
+    fun buildShareText(article: ArticleItem): String = buildString {
+        appendLine(article.title)
+        appendLine("Category: ${article.category.displayTitle} • ${article.readingTimeMinutes} min read")
+        appendLine("Last reviewed: ${article.lastReviewedFormatted}")
+        appendLine()
+        appendLine(article.summary)
+        appendLine()
+        appendLine(article.markdownBody)
+        appendLine()
+        append("Shared via LoanJB — Offline Indian Finance & Loan Companion")
     }
 
     fun clearSnackbar() {
@@ -141,8 +137,6 @@ class ArticlesViewModel(
 
     class Factory(private val articlesRepository: ArticlesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ArticlesViewModel(articlesRepository) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = ArticlesViewModel(articlesRepository) as T
     }
 }

@@ -41,7 +41,8 @@ data class EligibilityUiState(
     val activeFoirPercent: Double get() = customFoirPercent ?: defaultFoirPercent
 }
 
-class EligibilityViewModel(application: Application) : AndroidViewModel(application),
+class EligibilityViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<EligibilityForwardInput, EligibilityResult> {
 
     override val id: String = "loan_eligibility"
@@ -87,6 +88,7 @@ class EligibilityViewModel(application: Application) : AndroidViewModel(applicat
         val cibil = values[8] as CibilBand
         val reverseEmi = values[9] as Double
         val prefs = values[10] as com.jyotirmoyb.loan.data.UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = values[11] as Map<String, ResolvedConfigItem>
 
@@ -152,16 +154,40 @@ class EligibilityViewModel(application: Application) : AndroidViewModel(applicat
     override fun compute(input: EligibilityForwardInput): EligibilityResult =
         LoanEligibilityEngine.calculateForward(input, latestFoirConfig)
 
-    fun setReverseMode(reverse: Boolean) { _isReverse.value = reverse }
-    fun updateMonthlyIncome(v: Double) { _monthlyIncome.value = v.coerceAtLeast(0.0) }
-    fun updateExistingEmis(v: Double) { _existingEmis.value = v.coerceAtLeast(0.0) }
-    fun updateAge(v: Int) { _age.value = v.coerceIn(18, 75) }
-    fun updateRetirementAge(v: Int) { _retirementAge.value = v.coerceIn(25, 80) }
-    fun updateRate(v: Double) { _rate.value = v.coerceIn(0.5, 35.0) }
-    fun resetRateToDefault() { _rate.value = null }
-    fun updateTenureYears(v: Int) { _tenureYears.value = v.coerceIn(1, 35) }
-    fun updateCustomFoir(v: Double) { _customFoir.value = v.coerceIn(10.0, 80.0) }
-    fun resetFoirToDefault() { _customFoir.value = null }
-    fun selectCibilBand(band: CibilBand) { _cibil.value = band }
-    fun updateReverseEmiBudget(v: Double) { _reverseBudget.value = v.coerceAtLeast(0.0) }
+    fun setReverseMode(reverse: Boolean) {
+        _isReverse.value = reverse
+    }
+    fun updateMonthlyIncome(v: Double) {
+        _monthlyIncome.value = v.coerceAtLeast(0.0)
+    }
+    fun updateExistingEmis(v: Double) {
+        _existingEmis.value = v.coerceAtLeast(0.0)
+    }
+    fun updateAge(v: Int) {
+        _age.value = v.coerceIn(18, 75)
+    }
+    fun updateRetirementAge(v: Int) {
+        _retirementAge.value = v.coerceIn(25, 80)
+    }
+    fun updateRate(v: Double) {
+        _rate.value = v.coerceIn(0.5, 35.0)
+    }
+    fun resetRateToDefault() {
+        _rate.value = null
+    }
+    fun updateTenureYears(v: Int) {
+        _tenureYears.value = v.coerceIn(1, 35)
+    }
+    fun updateCustomFoir(v: Double) {
+        _customFoir.value = v.coerceIn(10.0, 80.0)
+    }
+    fun resetFoirToDefault() {
+        _customFoir.value = null
+    }
+    fun selectCibilBand(band: CibilBand) {
+        _cibil.value = band
+    }
+    fun updateReverseEmiBudget(v: Double) {
+        _reverseBudget.value = v.coerceAtLeast(0.0)
+    }
 }

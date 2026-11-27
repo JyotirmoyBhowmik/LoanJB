@@ -82,7 +82,7 @@ fun LoanTaxBenefitScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "RECOMMENDED: ${res.recommendedRegime.uppercase()}",
+                            text = stringResource(R.string.ui_txt_recommended, res.recommendedRegime.uppercase()),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF86EFAC),
                             fontWeight = FontWeight.Bold
@@ -273,7 +273,11 @@ private fun RegimeSummaryCard(
                 color = if (isRecommended) SavingsGreen else MaterialTheme.colorScheme.onSurface
             )
             Column {
-                Text(stringResource(R.string.tax_saved_label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.tax_saved_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Text(
                     text = CurrencyFormatter.format(breakdown.totalTaxSavedByLoans, currency),
                     style = MonoMediumStyle,
@@ -282,18 +286,33 @@ private fun RegimeSummaryCard(
             }
             HorizontalDivider()
             Column {
-                Text(stringResource(R.string.tax_before_loans), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.tax_before_loans),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Text(CurrencyFormatter.format(breakdown.taxWithoutLoanDeductions, currency), style = MonoSmallStyle)
             }
             Column {
-                Text(stringResource(R.string.tax_after_loans), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(CurrencyFormatter.format(breakdown.taxWithLoanDeductions, currency), style = MonoSmallStyle, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.tax_after_loans),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    CurrencyFormatter.format(breakdown.taxWithLoanDeductions, currency),
+                    style = MonoSmallStyle,
+                    fontWeight = FontWeight.Bold
+                )
             }
             HorizontalDivider()
             Text(
-                text = "24(b): ${CurrencyFormatter.formatCompact(breakdown.sec24bDeductionUsed, currency)}\n" +
-                    "80C Loan: ${CurrencyFormatter.formatCompact(breakdown.sec80cLoanDeductionUsed, currency)}\n" +
-                    "80E: ${CurrencyFormatter.formatCompact(breakdown.sec80eDeductionUsed, currency)}",
+                text = stringResource(
+                    R.string.ui_tax_deductions_summary,
+                    CurrencyFormatter.formatCompact(breakdown.sec24bDeductionUsed, currency),
+                    CurrencyFormatter.formatCompact(breakdown.sec80cLoanDeductionUsed, currency),
+                    CurrencyFormatter.formatCompact(breakdown.sec80eDeductionUsed, currency)
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -302,11 +321,7 @@ private fun RegimeSummaryCard(
 }
 
 @Composable
-private fun TaxCapSourceRow(
-    item: ResolvedConfigItem,
-    currency: CurrencyCode,
-    onReset: () -> Unit
-) {
+private fun TaxCapSourceRow(item: ResolvedConfigItem, currency: CurrencyCode, onReset: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),

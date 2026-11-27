@@ -58,7 +58,11 @@ data class TaxSlabsConfig(
             newSlab4Limit = DataSourceResolver.resolveDouble(resolved, ConfigKeys.TAX_NEW_SLAB4, 1600000.0),
             newSlab5Limit = DataSourceResolver.resolveDouble(resolved, ConfigKeys.TAX_NEW_SLAB5, 2000000.0),
             newSlab6Limit = DataSourceResolver.resolveDouble(resolved, ConfigKeys.TAX_NEW_SLAB6, 2400000.0),
-            newRegimeSec24bSelfOccupiedAllowed = DataSourceResolver.resolveDouble(resolved, ConfigKeys.TAX_NEW_SEC24B_SO_ALLOWED, 0.0) > 0.5,
+            newRegimeSec24bSelfOccupiedAllowed = DataSourceResolver.resolveDouble(
+                resolved,
+                ConfigKeys.TAX_NEW_SEC24B_SO_ALLOWED,
+                0.0
+            ) > 0.5,
             newRegimeSec80cAllowed = DataSourceResolver.resolveDouble(resolved, ConfigKeys.TAX_NEW_SEC80C_ALLOWED, 0.0) > 0.5,
             newRegimeSec80eAllowed = DataSourceResolver.resolveDouble(resolved, ConfigKeys.TAX_NEW_SEC80E_ALLOWED, 0.0) > 0.5
         )
@@ -105,10 +109,7 @@ data class LoanTaxBenefitResult(
  */
 object LoanTaxBenefitEngine {
 
-    fun calculate(
-        input: LoanTaxBenefitInput,
-        config: TaxSlabsConfig
-    ): LoanTaxBenefitResult {
+    fun calculate(input: LoanTaxBenefitInput, config: TaxSlabsConfig): LoanTaxBenefitResult {
         val errors = mutableListOf<String>()
         if (input.grossAnnualIncome < 0.0) errors.add("Gross annual income cannot be negative.")
         if (input.homeLoanInterestPaid < 0.0) errors.add("Home loan interest cannot be negative.")
@@ -135,12 +136,21 @@ object LoanTaxBenefitEngine {
         val diffBd = MoneyMath.roundPaiseBd(oldTaxBd.subtract(newTaxBd).abs())
 
         val (recommended, summary) = when {
-            oldTaxBd < newTaxBd -> "Old Regime" to
-                "Old Regime saves ${CurrencyFormatter.format(diffBd.toDouble(), CurrencyCode.INR)} more total tax after loan deductions."
-            newTaxBd < oldTaxBd -> "New Regime" to
-                "New Regime still leaves you ${CurrencyFormatter.format(diffBd.toDouble(), CurrencyCode.INR)} ahead despite lower loan deductions."
-            else -> "Either Regime" to
-                "Both Old and New Regimes result in the same estimated tax liability."
+            oldTaxBd < newTaxBd ->
+                "Old Regime" to
+                    "Old Regime saves ${CurrencyFormatter.format(
+                        diffBd.toDouble(),
+                        CurrencyCode.INR
+                    )} more total tax after loan deductions."
+            newTaxBd < oldTaxBd ->
+                "New Regime" to
+                    "New Regime still leaves you ${CurrencyFormatter.format(
+                        diffBd.toDouble(),
+                        CurrencyCode.INR
+                    )} ahead despite lower loan deductions."
+            else ->
+                "Either Regime" to
+                    "Both Old and New Regimes result in the same estimated tax liability."
         }
 
         return LoanTaxBenefitResult(
@@ -153,10 +163,7 @@ object LoanTaxBenefitEngine {
         )
     }
 
-    private fun computeOldRegime(
-        input: LoanTaxBenefitInput,
-        config: TaxSlabsConfig
-    ): RegimeTaxBreakdown {
+    private fun computeOldRegime(input: LoanTaxBenefitInput, config: TaxSlabsConfig): RegimeTaxBreakdown {
         val grossBd = MoneyMath.bd(input.grossAnnualIncome)
         val stdDedBd = if (input.isSalaried) MoneyMath.bd(config.oldStdDeduction) else BigDecimal.ZERO
         val other80cBd = MoneyMath.bd(input.other80cInvestments.coerceAtLeast(0.0))
@@ -221,10 +228,7 @@ object LoanTaxBenefitEngine {
         )
     }
 
-    private fun computeNewRegime(
-        input: LoanTaxBenefitInput,
-        config: TaxSlabsConfig
-    ): RegimeTaxBreakdown {
+    private fun computeNewRegime(input: LoanTaxBenefitInput, config: TaxSlabsConfig): RegimeTaxBreakdown {
         val grossBd = MoneyMath.bd(input.grossAnnualIncome)
         val stdDedBd = if (input.isSalaried) MoneyMath.bd(config.newStdDeduction) else BigDecimal.ZERO
         val netRentBd = if (input.propertyOccupancy == PropertyOccupancy.LET_OUT) {
@@ -322,11 +326,7 @@ object LoanTaxBenefitEngine {
         return MoneyMath.roundPaiseBd(effectiveBaseTax.add(cess))
     }
 
-    private fun progressiveTax(
-        income: BigDecimal,
-        slabs: List<Pair<BigDecimal, BigDecimal>>,
-        topRatePercent: BigDecimal
-    ): BigDecimal {
+    private fun progressiveTax(income: BigDecimal, slabs: List<Pair<BigDecimal, BigDecimal>>, topRatePercent: BigDecimal): BigDecimal {
         var prevLimit = BigDecimal.ZERO
         var tax = BigDecimal.ZERO
         for ((limit, ratePct) in slabs) {

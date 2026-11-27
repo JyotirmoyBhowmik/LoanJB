@@ -72,10 +72,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoanJBMainShell(
-    profileViewModel: ProfileViewModel,
-    navController: NavHostController = rememberNavController()
-) {
+fun LoanJBMainShell(profileViewModel: ProfileViewModel, navController: NavHostController = rememberNavController()) {
     val context = LocalContext.current
     val appContext = context.applicationContext
     val coroutineScope = rememberCoroutineScope()
@@ -286,7 +283,8 @@ fun LoanJBMainShell(
                                     }
                                 },
                                 onOpenSavedLoans = { navController.navigate(AppRoute.SavedLoans.route) },
-                                onOpenLoanGuide = { navController.navigate(AppRoute.LoanGuide.route) }
+                                onOpenLoanGuide = { navController.navigate(AppRoute.LoanGuide.route) },
+                                onOpenDataAndRates = { navController.navigate(AppRoute.DataAndRates.route) }
                             )
                         }
 

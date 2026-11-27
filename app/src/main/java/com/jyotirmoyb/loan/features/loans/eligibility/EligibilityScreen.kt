@@ -49,7 +49,6 @@ import com.jyotirmoyb.loan.ui.theme.DangerRed
 import com.jyotirmoyb.loan.ui.theme.InterestAmber
 import com.jyotirmoyb.loan.ui.theme.MonoLargeStyle
 import com.jyotirmoyb.loan.ui.theme.MonoMediumStyle
-import com.jyotirmoyb.loan.ui.theme.MonoSmallStyle
 import com.jyotirmoyb.loan.ui.theme.SageGreen
 import com.jyotirmoyb.loan.ui.theme.SavingsGreen
 import com.jyotirmoyb.loan.ui.theme.SlateNavy
@@ -137,7 +136,12 @@ fun EligibilityScreen(
                             color = Color.White
                         )
                         Text(
-                            text = "${CurrencyFormatter.formatShortLabel(res.maxLoanAmount, cur)} • ${res.appliedTenureMonths / 12} yrs @ ${CurrencyFormatter.formatPercent(res.effectiveAnnualRatePercent)}",
+                            text = stringResource(
+                                R.string.ui_txt_yrs_668acc,
+                                CurrencyFormatter.formatShortLabel(res.maxLoanAmount, cur),
+                                res.appliedTenureMonths / 12,
+                                CurrencyFormatter.formatPercent(res.effectiveAnnualRatePercent)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFFCBD5E1)
                         )
@@ -146,7 +150,11 @@ fun EligibilityScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text(stringResource(R.string.eligibility_max_emi), style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
+                                Text(
+                                    stringResource(R.string.eligibility_max_emi),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
                                 Text(
                                     text = CurrencyFormatter.format(res.maxEmi, cur),
                                     style = MonoMediumStyle,
@@ -154,9 +162,13 @@ fun EligibilityScreen(
                                 )
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                Text("EMI / INCOME", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCBD5E1))
                                 Text(
-                                    text = "${res.totalEmiToIncomePercent}%",
+                                    stringResource(R.string.ui_txt_emi_income),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFCBD5E1)
+                                )
+                                Text(
+                                    text = stringResource(R.string.ui_txt_fmt_361cec, res.totalEmiToIncomePercent),
                                     style = MonoMediumStyle,
                                     color = when (res.zone) {
                                         AffordabilityZone.COMFORTABLE -> Color(0xFF86EFAC)
@@ -333,11 +345,7 @@ fun EligibilityScreen(
 }
 
 @Composable
-private fun AffordabilityMeterCard(
-    zone: AffordabilityZone,
-    ratioPercent: Double,
-    summary: String
-) {
+private fun AffordabilityMeterCard(zone: AffordabilityZone, ratioPercent: Double, summary: String) {
     val zoneColor = when (zone) {
         AffordabilityZone.COMFORTABLE -> SavingsGreen
         AffordabilityZone.STRETCH -> InterestAmber
@@ -389,9 +397,24 @@ private fun AffordabilityMeterCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(stringResource(R.string.eligibility_zone_comfortable), style = MaterialTheme.typography.labelSmall, color = SavingsGreen, fontWeight = FontWeight.Bold)
-            Text(stringResource(R.string.eligibility_zone_stretch), style = MaterialTheme.typography.labelSmall, color = InterestAmber, fontWeight = FontWeight.Bold)
-            Text(stringResource(R.string.eligibility_zone_risky), style = MaterialTheme.typography.labelSmall, color = DangerRed, fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.eligibility_zone_comfortable),
+                style = MaterialTheme.typography.labelSmall,
+                color = SavingsGreen,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                stringResource(R.string.eligibility_zone_stretch),
+                style = MaterialTheme.typography.labelSmall,
+                color = InterestAmber,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                stringResource(R.string.eligibility_zone_risky),
+                style = MaterialTheme.typography.labelSmall,
+                color = DangerRed,
+                fontWeight = FontWeight.Bold
+            )
         }
 
         Spacer(Modifier.height(8.dp))

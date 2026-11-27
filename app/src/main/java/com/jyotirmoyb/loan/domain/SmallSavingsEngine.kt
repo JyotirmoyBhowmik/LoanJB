@@ -7,17 +7,17 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.pow
 
-enum class SmallSavingsSchemeType(
-    val id: String,
-    val title: String,
-    val shortTitle: String,
-    val taxBadge: String,
-    val summary: String
-) {
+enum class SmallSavingsSchemeType(val id: String, val title: String, val shortTitle: String, val taxBadge: String, val summary: String) {
     PPF("ppf", "Public Provident Fund (PPF)", "PPF", "EEE Tax-Free", "15-yr lock-in with 5-yr extension blocks; ₹1.5L yearly cap."),
     SSY("ssy", "Sukanya Samriddhi (SSY)", "SSY", "EEE Tax-Free", "Deposit for 15 yrs; compounds tax-free until maturity at 21 yrs."),
     NSC("nsc", "National Savings Cert (NSC)", "NSC", "80C Eligible", "5-yr lump-sum compounded annually; interest reinvested."),
-    SCSS("scss", "Senior Citizens Savings (SCSS)", "SCSS", "Quarterly Payout", "5-yr senior scheme paying interest every quarter; ₹30L cap."),
+    SCSS(
+        "scss",
+        "Senior Citizens Savings (SCSS)",
+        "SCSS",
+        "Quarterly Payout",
+        "5-yr senior scheme paying interest every quarter; ₹30L cap."
+    ),
     PO_MIS("po_mis", "Post Office MIS", "PO MIS", "Monthly Payout", "5-yr steady monthly income; Single ₹9L / Joint ₹15L cap."),
     PO_TD("po_td", "Post Office Time Deposit", "PO TD", "5Y 80C Eligible", "1Y, 2Y, 3Y or 5Y deposit; quarterly compounding paid yearly."),
     PO_RD("po_rd", "Post Office RD (5-Yr)", "PO RD", "Taxable", "Monthly Post Office deposit with quarterly compounding."),
@@ -152,10 +152,7 @@ data class SmallSavingsResult(
  */
 object SmallSavingsEngine {
 
-    fun calculate(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig
-    ): SmallSavingsResult {
+    fun calculate(input: SmallSavingsInput, config: SmallSavingsConfig): SmallSavingsResult {
         if (input.contributionAmount <= 0.0) {
             return SmallSavingsResult(
                 isValid = false,
@@ -179,12 +176,7 @@ object SmallSavingsEngine {
         }
     }
 
-    private fun calculatePpf(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double,
-        rateBd: BigDecimal
-    ): SmallSavingsResult {
+    private fun calculatePpf(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double, rateBd: BigDecimal): SmallSavingsResult {
         val extBlocks = input.ppfExtensionBlocks.coerceIn(0, 3)
         val totalYears = config.ppfTenureYears + extBlocks * config.ppfExtensionBlockYears
         val capExceeded = input.contributionAmount > config.ppfYearlyCap
@@ -231,22 +223,26 @@ object SmallSavingsEngine {
             appliedRatePercent = rate,
             quarterLabel = config.quarterLabel,
             tenureMonths = totalYears * 12,
-            tenureDisplay = "$totalYears years" + if (extBlocks > 0) " (${config.ppfTenureYears} + ${extBlocks * config.ppfExtensionBlockYears} ext)" else "",
+            tenureDisplay =
+            "$totalYears years" +
+                if (extBlocks > 0) " (${config.ppfTenureYears} + ${extBlocks * config.ppfExtensionBlockYears} ext)" else "",
             totalInvested = MoneyMath.roundPaiseBd(totalInvestedBd).toDouble(),
             totalInterest = MoneyMath.roundPaiseBd(totalInterestBd).toDouble(),
             maturityAmount = balanceBd.toDouble(),
-            capWarning = if (capExceeded) "Capped at PPF yearly maximum of ${CurrencyFormatter.format(config.ppfYearlyCap, CurrencyCode.INR)}/yr." else null,
+            capWarning = if (capExceeded) {
+                "Capped at PPF yearly maximum of ${CurrencyFormatter.format(
+                    config.ppfYearlyCap,
+                    CurrencyCode.INR
+                )}/yr."
+            } else {
+                null
+            },
             maturityDateLabel = matDate,
             yearlyRows = rows
         )
     }
 
-    private fun calculateSsy(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double,
-        rateBd: BigDecimal
-    ): SmallSavingsResult {
+    private fun calculateSsy(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double, rateBd: BigDecimal): SmallSavingsResult {
         val capExceeded = input.contributionAmount > config.ssyYearlyCap
         val effectiveAnnual = minOf(input.contributionAmount, config.ssyYearlyCap)
         val annualBd = MoneyMath.bd(effectiveAnnual)
@@ -291,18 +287,20 @@ object SmallSavingsEngine {
             totalInvested = MoneyMath.roundPaiseBd(totalInvestedBd).toDouble(),
             totalInterest = MoneyMath.roundPaiseBd(totalInterestBd).toDouble(),
             maturityAmount = balanceBd.toDouble(),
-            capWarning = if (capExceeded) "Capped at SSY yearly maximum of ${CurrencyFormatter.format(config.ssyYearlyCap, CurrencyCode.INR)}/yr." else null,
+            capWarning = if (capExceeded) {
+                "Capped at SSY yearly maximum of ${CurrencyFormatter.format(
+                    config.ssyYearlyCap,
+                    CurrencyCode.INR
+                )}/yr."
+            } else {
+                null
+            },
             maturityDateLabel = matDate,
             yearlyRows = rows
         )
     }
 
-    private fun calculateNsc(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double,
-        rateBd: BigDecimal
-    ): SmallSavingsResult {
+    private fun calculateNsc(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double, rateBd: BigDecimal): SmallSavingsResult {
         val principalBd = MoneyMath.bd(input.contributionAmount)
         var balanceBd = principalBd
         var totalInterestBd = MoneyMath.ZERO
@@ -343,12 +341,7 @@ object SmallSavingsEngine {
         )
     }
 
-    private fun calculateScss(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double,
-        rateBd: BigDecimal
-    ): SmallSavingsResult {
+    private fun calculateScss(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double, rateBd: BigDecimal): SmallSavingsResult {
         val capExceeded = input.contributionAmount > config.scssMaxCap
         val effectivePrincipal = minOf(input.contributionAmount, config.scssMaxCap)
         val principalBd = MoneyMath.bd(effectivePrincipal)
@@ -383,18 +376,20 @@ object SmallSavingsEngine {
             maturityAmount = MoneyMath.roundPaiseBd(principalBd.add(totalInterestBd)).toDouble(),
             periodicPayoutLabel = "Quarterly Interest Payout",
             periodicPayoutAmount = quarterlyPayoutBd.toDouble(),
-            capWarning = if (capExceeded) "Capped at SCSS maximum deposit of ${CurrencyFormatter.format(config.scssMaxCap, CurrencyCode.INR)}." else null,
+            capWarning = if (capExceeded) {
+                "Capped at SCSS maximum deposit of ${CurrencyFormatter.format(
+                    config.scssMaxCap,
+                    CurrencyCode.INR
+                )}."
+            } else {
+                null
+            },
             maturityDateLabel = maturityDate(input, config.scssTenureYears * 12),
             yearlyRows = rows
         )
     }
 
-    private fun calculatePoMis(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double,
-        rateBd: BigDecimal
-    ): SmallSavingsResult {
+    private fun calculatePoMis(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double, rateBd: BigDecimal): SmallSavingsResult {
         val cap = if (input.pomisJointAccount) config.pomisJointCap else config.pomisSingleCap
         val capExceeded = input.contributionAmount > cap
         val effectivePrincipal = minOf(input.contributionAmount, cap)
@@ -433,18 +428,15 @@ object SmallSavingsEngine {
             capWarning = if (capExceeded) {
                 val acct = if (input.pomisJointAccount) "Joint" else "Single"
                 "Capped at PO MIS $acct limit of ${CurrencyFormatter.format(cap, CurrencyCode.INR)}."
-            } else null,
+            } else {
+                null
+            },
             maturityDateLabel = maturityDate(input, config.pomisTenureYears * 12),
             yearlyRows = rows
         )
     }
 
-    private fun calculatePoTd(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double,
-        rateBd: BigDecimal
-    ): SmallSavingsResult {
+    private fun calculatePoTd(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double, rateBd: BigDecimal): SmallSavingsResult {
         val years = input.potdTenureYears.let { if (it in listOf(1, 2, 3, 5)) it else 5 }
         val principalBd = MoneyMath.bd(input.contributionAmount)
         // Post Office TD compounds quarterly and pays interest annually
@@ -482,11 +474,7 @@ object SmallSavingsEngine {
         )
     }
 
-    private fun calculatePoRd(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double
-    ): SmallSavingsResult {
+    private fun calculatePoRd(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double): SmallSavingsResult {
         val rdRes = RecurringDepositEngine.calculate(
             RecurringDepositInput(
                 monthlyDeposit = input.contributionAmount,
@@ -517,11 +505,7 @@ object SmallSavingsEngine {
         )
     }
 
-    private fun calculateKvp(
-        input: SmallSavingsInput,
-        config: SmallSavingsConfig,
-        rate: Double
-    ): SmallSavingsResult {
+    private fun calculateKvp(input: SmallSavingsInput, config: SmallSavingsConfig, rate: Double): SmallSavingsResult {
         val principalBd = MoneyMath.bd(input.contributionAmount)
         val months = config.kvpDoublingMonths.coerceAtLeast(12)
         val yearsExact = months / 12.0

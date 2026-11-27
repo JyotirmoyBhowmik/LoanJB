@@ -208,7 +208,7 @@ fun AppLockScreen(
                     // Fail-safe recovery if user disabled device biometrics without setting an app PIN
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Button(onClick = onUnlocked, shape = RoundedCornerShape(12.dp)) {
-                            Text("Continue")
+                            Text(stringResource(R.string.ui_txt_continue))
                         }
                     }
                 }

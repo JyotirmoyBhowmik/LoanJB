@@ -17,12 +17,7 @@ data class HraInput(
     val marginalTaxSlabPercent: Double = 30.0
 )
 
-data class HraRuleBreakdown(
-    val title: String,
-    val formulaHint: String,
-    val amountAnnual: Double,
-    val isWinningLeast: Boolean
-)
+data class HraRuleBreakdown(val title: String, val formulaHint: String, val amountAnnual: Double, val isWinningLeast: Boolean)
 
 data class HraResult(
     val isValid: Boolean,
@@ -44,12 +39,7 @@ object HraEngine {
 
     private const val LANDLORD_PAN_ANNUAL_RENT_LIMIT = 100000.0
 
-    fun calculate(
-        input: HraInput,
-        metroPercent: Double,
-        nonMetroPercent: Double,
-        cessPercent: Double = 4.0
-    ): HraResult {
+    fun calculate(input: HraInput, metroPercent: Double, nonMetroPercent: Double, cessPercent: Double = 4.0): HraResult {
         val errors = mutableListOf<String>()
         if (input.basicPlusDaAnnual <= 0.0) errors.add("Basic + DA salary must be greater than 0.")
         if (input.hraReceivedAnnual < 0.0) errors.add("HRA received cannot be negative.")
@@ -258,11 +248,7 @@ data class SalaryTdsQuickResult(
 
 object AdvanceTaxAndTdsEngine {
 
-    fun calculateAdvanceTax(
-        input: AdvanceTaxInput,
-        threshold: Double,
-        scheduleRules: List<AdvanceTaxInstallmentRule>
-    ): AdvanceTaxResult {
+    fun calculateAdvanceTax(input: AdvanceTaxInput, threshold: Double, scheduleRules: List<AdvanceTaxInstallmentRule>): AdvanceTaxResult {
         val errors = mutableListOf<String>()
         if (input.estimatedAnnualTax < 0.0) errors.add("Estimated annual tax cannot be negative.")
         if (input.tdsTcsDeducted < 0.0) errors.add("TDS / TCS deducted cannot be negative.")
@@ -278,7 +264,8 @@ object AdvanceTaxAndTdsEngine {
                 netAdvanceTaxPayable = netTaxBd.toDouble(),
                 thresholdApplied = threshold,
                 isExempt = true,
-                exemptionReason = "Resident senior citizens (60+) with no business or profession income are exempt from Advance Tax under Section 207."
+                exemptionReason = "Resident senior citizens (60+) with no business or profession income " +
+                    "are exempt from Advance Tax under Section 207."
             )
         }
 
@@ -288,7 +275,10 @@ object AdvanceTaxAndTdsEngine {
                 netAdvanceTaxPayable = netTaxBd.toDouble(),
                 thresholdApplied = threshold,
                 isExempt = true,
-                exemptionReason = "Advance Tax is not required because net tax liability after TDS/TCS is below ${CurrencyFormatter.format(threshold, CurrencyCode.INR)} (Sec 208)."
+                exemptionReason = "Advance Tax is not required because net tax liability after TDS/TCS is below ${CurrencyFormatter.format(
+                    threshold,
+                    CurrencyCode.INR
+                )} (Sec 208)."
             )
         }
 
@@ -356,26 +346,32 @@ object AdvanceTaxAndTdsEngine {
         )
     }
 
-    fun calculateFdTds(
-        annualInterest: Double,
-        isSeniorCitizen: Boolean,
-        hasPan: Boolean,
-        catalog: TaxRulesCatalog
-    ): FdTdsQuickResult {
+    fun calculateFdTds(annualInterest: Double, isSeniorCitizen: Boolean, hasPan: Boolean, catalog: TaxRulesCatalog): FdTdsQuickResult {
         val safeInterest = annualInterest.coerceAtLeast(0.0)
         val threshold = if (isSeniorCitizen) catalog.fdTdsSeniorThreshold else catalog.fdTdsGeneralThreshold
         val rate = if (hasPan) catalog.tdsRateWithPan else catalog.tdsRateWithoutPan
         val applicable = safeInterest > threshold
         val tds = if (applicable) {
             MoneyMath.percentageOf(MoneyMath.bd(safeInterest), MoneyMath.bd(rate)).toDouble()
-        } else 0.0
+        } else {
+            0.0
+        }
         val net = MoneyMath.roundPaise((safeInterest - tds).coerceAtLeast(0.0))
 
         val note = when {
-            !applicable -> "Annual FD interest is within the ${CurrencyFormatter.format(threshold, CurrencyCode.INR)} Sec 194A threshold — no bank TDS applies."
+            !applicable -> "Annual FD interest is within the ${CurrencyFormatter.format(
+                threshold,
+                CurrencyCode.INR
+            )} Sec 194A threshold — no bank TDS applies."
             !hasPan -> "Without PAN, Section 206AA mandates higher ${rate.toInt()}% TDS on total interest."
-            isSeniorCitizen -> "Bank deducts ${rate.toInt()}% TDS above ${CurrencyFormatter.format(threshold, CurrencyCode.INR)}. Submit Form 15H if total taxable income is nil."
-            else -> "Bank deducts ${rate.toInt()}% TDS above ${CurrencyFormatter.format(threshold, CurrencyCode.INR)}. Submit Form 15G if total taxable income is below the basic exemption limit."
+            isSeniorCitizen -> "Bank deducts ${rate.toInt()}% TDS above ${CurrencyFormatter.format(
+                threshold,
+                CurrencyCode.INR
+            )}. Submit Form 15H if total taxable income is nil."
+            else -> "Bank deducts ${rate.toInt()}% TDS above ${CurrencyFormatter.format(
+                threshold,
+                CurrencyCode.INR
+            )}. Submit Form 15G if total taxable income is below the basic exemption limit."
         }
 
         return FdTdsQuickResult(
@@ -389,11 +385,7 @@ object AdvanceTaxAndTdsEngine {
         )
     }
 
-    fun calculateSalaryTds(
-        estimatedAnnualTax: Double,
-        tdsAlreadyDeducted: Double,
-        remainingMonthsInFy: Int
-    ): SalaryTdsQuickResult {
+    fun calculateSalaryTds(estimatedAnnualTax: Double, tdsAlreadyDeducted: Double, remainingMonthsInFy: Int): SalaryTdsQuickResult {
         val safeMonths = remainingMonthsInFy.coerceIn(1, 12)
         val remainingTaxBd = MoneyMath.roundPaiseBd(
             MoneyMath.bd(estimatedAnnualTax.coerceAtLeast(0.0))

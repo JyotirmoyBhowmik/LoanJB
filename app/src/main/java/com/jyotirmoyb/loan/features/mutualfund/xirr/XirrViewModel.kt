@@ -31,7 +31,8 @@ private fun sampleXirrEntries(): List<CashFlowEntry> = listOf(
     CashFlowEntry(id = 5, dateIso = "2026-01-10", amount = 82500.0, note = "Current Value")
 )
 
-class XirrViewModel(application: Application) : AndroidViewModel(application),
+class XirrViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<List<CashFlowEntry>, XirrResult> {
 
     override val id: String = "mf_xirr"

@@ -13,11 +13,7 @@ import kotlin.math.pow
  */
 object LoanInsightsCalculator {
 
-    fun buildSensitivityTable(
-        principal: Double,
-        baseRate: Double,
-        tenureMonths: Int
-    ): List<RateSensitivityRow> {
+    fun buildSensitivityTable(principal: Double, baseRate: Double, tenureMonths: Int): List<RateSensitivityRow> {
         val pBd = MoneyMath.bd(principal)
         val baseEmi = MoneyMath.standardEmiBd(pBd, MoneyMath.bd(baseRate), tenureMonths)
         val baseTotalInt = MoneyMath.roundPaiseBd(
@@ -44,11 +40,7 @@ object LoanInsightsCalculator {
     /**
      * Computes Flat Rate vs Reducing Balance Rate comparison + true Effective Annual Rate (IRR) of Flat loan.
      */
-    fun calculateFlatVsReducing(
-        principal: Double,
-        quotedAnnualRate: Double,
-        tenureMonths: Int
-    ): FlatVsReducingComparison {
+    fun calculateFlatVsReducing(principal: Double, quotedAnnualRate: Double, tenureMonths: Int): FlatVsReducingComparison {
         val pBd = MoneyMath.bd(principal)
         val rateBd = MoneyMath.bd(quotedAnnualRate)
         val yearsBd = BigDecimal(tenureMonths).divide(BigDecimal("12"), MoneyMath.MC)
@@ -57,7 +49,9 @@ object LoanInsightsCalculator {
         )
         val flatMonthlyEmiBd = if (tenureMonths > 0) {
             pBd.add(flatTotalInterestBd).divide(BigDecimal(tenureMonths), 2, RoundingMode.HALF_UP)
-        } else MoneyMath.ZERO
+        } else {
+            MoneyMath.ZERO
+        }
 
         val reducingMonthlyEmiBd = MoneyMath.standardEmiBd(pBd, rateBd, tenureMonths)
         val reducingTotalInterestBd = MoneyMath.roundPaiseBd(
@@ -114,7 +108,9 @@ object LoanInsightsCalculator {
             ceil(feesBd.toDouble() / monthlySavings.toDouble()).toInt()
         } else if (monthlySavings > BigDecimal.ZERO) {
             1
-        } else null
+        } else {
+            null
+        }
 
         return BalanceTransferResult(
             currentEmi = currentEmi.toDouble(),
@@ -150,10 +146,7 @@ object LoanInsightsCalculator {
         )
     }
 
-    fun calculateTaxBenefit(
-        input: CalculationInput,
-        yearlySummaries: List<YearlySummary>
-    ): TaxBenefitSummary? {
+    fun calculateTaxBenefit(input: CalculationInput, yearlySummaries: List<YearlySummary>): TaxBenefitSummary? {
         if (yearlySummaries.isEmpty()) return null
         val bracket = (input.taxBracketPercent / 100.0).coerceIn(0.0, 0.45)
 
@@ -177,7 +170,11 @@ object LoanInsightsCalculator {
                     firstYearPrincipalEligible = MoneyMath.roundPaise(yr1PrinEligible),
                     estimatedAnnualTaxSaved = yr1Saved,
                     estimatedTotalTaxSaved = totalSaved,
-                    notes = "Old Regime self-occupied caps: Interest up to ${CurrencyFormatter.format(cap24b)} (24b) + Principal up to ${CurrencyFormatter.format(cap80c)} (80C). Not available under New Regime for self-occupied property."
+                    notes = "Old Regime self-occupied caps: Interest up to ${CurrencyFormatter.format(
+                        cap24b
+                    )} (24b) + Principal up to ${CurrencyFormatter.format(
+                        cap80c
+                    )} (80C). Not available under New Regime for self-occupied property."
                 )
             }
             "education" -> {
@@ -192,7 +189,8 @@ object LoanInsightsCalculator {
                     firstYearPrincipalEligible = 0.0,
                     estimatedAnnualTaxSaved = yr1Saved,
                     estimatedTotalTaxSaved = totalSaved,
-                    notes = "100% of education loan interest paid is deductible with no upper monetary cap for up to $maxYears consecutive assessment years under the Old Tax Regime."
+                    notes = "100% of education loan interest paid is deductible with no upper monetary cap for up to " +
+                        "$maxYears consecutive assessment years under the Old Tax Regime."
                 )
             }
             else -> null

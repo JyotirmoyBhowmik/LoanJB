@@ -7,12 +7,12 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.FileProvider
+import com.jyotirmoyb.loan.R
 import com.jyotirmoyb.loan.domain.CalculationResult
 import com.jyotirmoyb.loan.domain.CurrencyCode
 import com.jyotirmoyb.loan.domain.CurrencyFormatter
 import com.jyotirmoyb.loan.domain.LoanComparisonReport
 import com.jyotirmoyb.loan.domain.LoanTrackerEngine
-import com.jyotirmoyb.loan.domain.STANDARD_PLANNING_DISCLAIMER
 import com.jyotirmoyb.loan.viewmodel.TrackedLoanSummary
 import java.io.File
 import java.io.FileOutputStream
@@ -25,33 +25,28 @@ object ScheduleExporter {
         return dir
     }
 
-    fun exportCsvAndShare(
-        context: Context,
-        title: String,
-        result: CalculationResult,
-        currency: CurrencyCode
-    ): Result<Unit> = runCatching {
+    fun exportCsvAndShare(context: Context, title: String, result: CalculationResult, currency: CurrencyCode): Result<Unit> = runCatching {
         val safeName = title.lowercase().replace(Regex("[^a-z0-9]+"), "_").trim('_').ifBlank { "loanjb_schedule" }
         val file = File(exportsDir(context), "${safeName}_schedule.csv")
         val sb = StringBuilder()
-        sb.appendLine("LoanJB Amortization Schedule - $title")
-        sb.appendLine("Currency,${currency.code}")
-        sb.appendLine("Monthly EMI,${result.monthlyEmi}")
-        sb.appendLine("Total Principal,${result.totalPrincipal}")
-        sb.appendLine("Total Interest,${result.totalInterest}")
-        sb.appendLine("Total Payment,${result.totalPayment}")
-        sb.appendLine("Effective Total Cost (incl. Fees),${result.effectiveTotalCost}")
+        sb.appendLine(context.getString(R.string.export_csv_title, title))
+        sb.appendLine("${context.getString(R.string.export_csv_currency)},${currency.code}")
+        sb.appendLine("${context.getString(R.string.export_csv_monthly_emi)},${result.monthlyEmi}")
+        sb.appendLine("${context.getString(R.string.export_csv_total_principal)},${result.totalPrincipal}")
+        sb.appendLine("${context.getString(R.string.export_csv_total_interest)},${result.totalInterest}")
+        sb.appendLine("${context.getString(R.string.export_csv_total_payment)},${result.totalPayment}")
+        sb.appendLine("${context.getString(R.string.export_csv_effective_cost)},${result.effectiveTotalCost}")
         sb.appendLine()
-        sb.appendLine("Month #,Date,Phase,Rate %,Opening Balance,EMI Paid,Principal Paid,Interest Paid,Extra Prepayment,Closing Balance")
+        sb.appendLine(context.getString(R.string.export_csv_columns))
         for (row in result.schedule) {
             sb.appendLine(
                 "${row.monthNumber},\"${row.monthLabel}\",\"${row.phaseLabel}\",${row.activeRate},${row.openingBalance},${row.emiPaid},${row.principalPaid},${row.interestPaid},${row.extraPrepayment},${row.closingBalance}"
             )
         }
         sb.appendLine()
-        sb.appendLine("\"$STANDARD_PLANNING_DISCLAIMER\"")
+        sb.appendLine("\"${context.getString(R.string.disclaimer_text)}\"")
         file.writeText(sb.toString())
-        shareFile(context, file, "text/csv", "Share Schedule CSV")
+        shareFile(context, file, "text/csv", context.getString(R.string.export_share_csv_title))
     }
 
     fun exportPdfAndShare(
@@ -134,17 +129,20 @@ object ScheduleExporter {
 
             if (pageNum == 1) {
                 canvas.drawRoundRect(margin, y, pageWidth - margin, y + 66f, 10f, 10f, headerBg)
-                canvas.drawText("LoanJB — $title", margin + 14f, y + 28f, titlePaint)
+                canvas.drawText(context.getString(R.string.export_pdf_header, title), margin + 14f, y + 28f, titlePaint)
                 canvas.drawText(variantSummary.take(80), margin + 14f, y + 48f, subTitlePaint)
                 y += 80f
 
                 canvas.drawRoundRect(margin, y, pageWidth - margin, y + 74f, 8f, 8f, cardBg)
                 val colW = contentWidth / 4f
                 val kpis = listOf(
-                    "MONTHLY EMI" to CurrencyFormatter.format(result.monthlyEmi, currency, true),
-                    "PRINCIPAL" to CurrencyFormatter.format(result.totalPrincipal, currency, false),
-                    "TOTAL INTEREST" to CurrencyFormatter.format(result.totalInterest, currency, false),
-                    "EFFECTIVE COST" to CurrencyFormatter.format(result.effectiveTotalCost, currency, false)
+                    context.getString(R.string.export_kpi_monthly_emi) to CurrencyFormatter.format(result.monthlyEmi, currency, true),
+                    context.getString(R.string.export_kpi_principal) to CurrencyFormatter.format(result.totalPrincipal, currency, false),
+                    context.getString(
+                        R.string.export_kpi_total_interest
+                    ) to CurrencyFormatter.format(result.totalInterest, currency, false),
+                    context.getString(R.string.export_kpi_effective_cost) to
+                        CurrencyFormatter.format(result.effectiveTotalCost, currency, false)
                 )
                 kpis.forEachIndexed { idx, (k, v) ->
                     val x = margin + 10f + idx * colW
@@ -152,14 +150,19 @@ object ScheduleExporter {
                     canvas.drawText(v, x, y + 44f, valuePaint)
                 }
                 canvas.drawText(
-                    "Tenure: ${result.actualTenureMonths} months  |  Fees: ${CurrencyFormatter.format(result.totalFees, currency, false)}  |  LTV: ${CurrencyFormatter.formatPercent(result.ltvPercent, 1)}",
+                    context.getString(
+                        R.string.export_pdf_meta_row,
+                        result.actualTenureMonths,
+                        CurrencyFormatter.format(result.totalFees, currency, false),
+                        CurrencyFormatter.formatPercent(result.ltvPercent, 1)
+                    ),
                     margin + 10f,
                     y + 64f,
                     labelPaint
                 )
                 y += 88f
             } else {
-                canvas.drawText("LoanJB — $title (Page $pageNum)", margin, y + 12f, labelPaint)
+                canvas.drawText(context.getString(R.string.export_pdf_header_page, title, pageNum), margin, y + 12f, labelPaint)
                 y += 22f
             }
 
@@ -173,7 +176,15 @@ object ScheduleExporter {
                 margin + 382f,
                 margin + 462f
             )
-            val headers = listOf("#", "Month", "Phase", "EMI", "Principal", "Interest", "Balance")
+            val headers = listOf(
+                context.getString(R.string.export_col_num),
+                context.getString(R.string.export_col_month),
+                context.getString(R.string.export_col_phase),
+                context.getString(R.string.export_col_emi),
+                context.getString(R.string.export_col_principal),
+                context.getString(R.string.export_col_interest),
+                context.getString(R.string.export_col_balance)
+            )
             headers.forEachIndexed { i, h ->
                 canvas.drawText(h, cols[i], y + 14f, tableHeaderPaint)
             }
@@ -202,7 +213,7 @@ object ScheduleExporter {
 
             canvas.drawLine(margin, pageHeight - 36f, pageWidth - margin, pageHeight - 36f, accentPaint)
             canvas.drawText(
-                "$STANDARD_PLANNING_DISCLAIMER • Page $pageNum",
+                context.getString(R.string.export_pdf_footer_page, context.getString(R.string.disclaimer_text), pageNum),
                 margin,
                 pageHeight - 20f,
                 footerPaint
@@ -215,14 +226,10 @@ object ScheduleExporter {
 
         FileOutputStream(file).use { out -> doc.writeTo(out) }
         doc.close()
-        shareFile(context, file, "application/pdf", "Share Schedule PDF")
+        shareFile(context, file, "application/pdf", context.getString(R.string.export_share_pdf_title))
     }
 
-    fun exportBrandedLoanReportPdfAndShare(
-        context: Context,
-        loan: TrackedLoanSummary,
-        currency: CurrencyCode
-    ): Result<Unit> = runCatching {
+    fun exportBrandedLoanReportPdfAndShare(context: Context, loan: TrackedLoanSummary, currency: CurrencyCode): Result<Unit> = runCatching {
         val safeName = loan.entity.nickname.lowercase()
             .replace(Regex("[^a-z0-9]+"), "_")
             .trim('_')
@@ -311,17 +318,27 @@ object ScheduleExporter {
 
             if (pageNum == 1) {
                 canvas.drawRoundRect(margin, y, pageWidth - margin, y + 84f, 10f, 10f, headerBg)
-                canvas.drawText("LOANJB • INDIA LOAN & AMORTIZATION REPORT", margin + 14f, y + 20f, brandPaint)
+                canvas.drawText(context.getString(R.string.export_branded_banner), margin + 14f, y + 20f, brandPaint)
                 canvas.drawText("${loan.entity.nickname} (${loan.entity.lender})", margin + 14f, y + 42f, titlePaint)
-                val nachLabel = if (loan.autoDebitNach) "Auto-Debit (NACH): Active" else "Payment Mode: Manual"
+                val nachLabel = if (loan.autoDebitNach) {
+                    context.getString(R.string.export_nach_active)
+                } else {
+                    context.getString(R.string.export_payment_manual)
+                }
                 canvas.drawText(
-                    "${loan.entity.categoryName}  •  EMI Day: ${loan.emiDayOfMonth}  •  $nachLabel  •  Generated: $generatedOn",
+                    context.getString(
+                        R.string.export_branded_meta,
+                        loan.entity.categoryName,
+                        loan.emiDayOfMonth,
+                        nachLabel,
+                        generatedOn
+                    ),
                     margin + 14f,
                     y + 62f,
                     subTitlePaint
                 )
                 canvas.drawText(
-                    "Plan: ${loan.entity.variantSummary.take(84)}",
+                    context.getString(R.string.export_branded_plan, loan.entity.variantSummary.take(84)),
                     margin + 14f,
                     y + 76f,
                     subTitlePaint
@@ -331,10 +348,12 @@ object ScheduleExporter {
                 canvas.drawRoundRect(margin, y, pageWidth - margin, y + 104f, 8f, 8f, cardBg)
                 val colW = contentWidth / 4f
                 val row1 = listOf(
-                    "MONTHLY EMI" to CurrencyFormatter.format(result.monthlyEmi, currency, false),
-                    "OUTSTANDING" to CurrencyFormatter.format(loan.outstandingPrincipal, currency, false),
-                    "TOTAL PRINCIPAL" to CurrencyFormatter.format(result.totalPrincipal, currency, false),
-                    "TOTAL INTEREST" to CurrencyFormatter.format(result.totalInterest, currency, false)
+                    context.getString(R.string.export_kpi_monthly_emi) to CurrencyFormatter.format(result.monthlyEmi, currency, false),
+                    context.getString(R.string.export_kpi_outstanding) to
+                        CurrencyFormatter.format(loan.outstandingPrincipal, currency, false),
+                    context.getString(R.string.export_kpi_total_principal) to
+                        CurrencyFormatter.format(result.totalPrincipal, currency, false),
+                    context.getString(R.string.export_kpi_total_interest) to CurrencyFormatter.format(result.totalInterest, currency, false)
                 )
                 row1.forEachIndexed { idx, (k, v) ->
                     val x = margin + 10f + idx * colW
@@ -343,10 +362,11 @@ object ScheduleExporter {
                 }
                 canvas.drawLine(margin + 10f, y + 50f, pageWidth - margin - 10f, y + 50f, dividerPaint)
                 val row2 = listOf(
-                    "INTEREST RATE" to "${CurrencyFormatter.formatPercent(loan.input.annualRate)} p.a.",
-                    "EMIS PAID" to "${loan.paidMonthNumbers.size} / ${result.schedule.size}",
-                    "NEXT DUE DATE" to loan.nextDueDateLabel.take(14),
-                    "LOAN-FREE DATE" to result.loanFreeDateLabel.ifBlank { "-" }
+                    context.getString(R.string.export_kpi_interest_rate) to
+                        context.getString(R.string.export_rate_pa, CurrencyFormatter.formatPercent(loan.input.annualRate)),
+                    context.getString(R.string.export_kpi_emis_paid) to "${loan.paidMonthNumbers.size} / ${result.schedule.size}",
+                    context.getString(R.string.export_kpi_next_due) to loan.nextDueDateLabel.take(14),
+                    context.getString(R.string.export_kpi_loan_free) to result.loanFreeDateLabel.ifBlank { "-" }
                 )
                 row2.forEachIndexed { idx, (k, v) ->
                     val x = margin + 10f + idx * colW
@@ -357,13 +377,32 @@ object ScheduleExporter {
 
                 canvas.drawRoundRect(margin, y, pageWidth - margin, y + 36f, 8f, 8f, savingsBg)
                 val savedSummary = if (loan.interestSaved > 0.0 || loan.monthsSaved > 0) {
-                    "Interest Saved So Far: ${CurrencyFormatter.format(loan.interestSaved, currency, false)} (${CurrencyFormatter.formatShortLabel(loan.interestSaved, currency)})  •  Tenure Saved: ${loan.monthsSaved} mo(s)"
+                    context.getString(
+                        R.string.export_branded_saved_summary,
+                        CurrencyFormatter.format(loan.interestSaved, currency, false),
+                        CurrencyFormatter.formatShortLabel(loan.interestSaved, currency),
+                        loan.monthsSaved
+                    )
                 } else {
-                    "Total Payable (Principal + Interest): ${CurrencyFormatter.format(result.totalPayment, currency, false)} (${CurrencyFormatter.formatShortLabel(result.totalPayment, currency)})"
+                    context.getString(
+                        R.string.export_branded_total_payable,
+                        CurrencyFormatter.format(result.totalPayment, currency, false),
+                        CurrencyFormatter.formatShortLabel(result.totalPayment, currency)
+                    )
                 }
                 canvas.drawText(savedSummary, margin + 12f, y + 16f, greenPaint.apply { textSize = 9.5f })
+                val form35Suffix = if (LoanTrackerEngine.isVehicleLoan(loan.entity.categoryId, loan.entity.categoryName)) {
+                    context.getString(R.string.export_checklist_form35_suffix)
+                } else {
+                    ""
+                }
                 canvas.drawText(
-                    "Closure Checklist Progress: ${loan.completedChecklist.size}/${loan.checklistItems.size} completed (NOC, Lien/CERSAI, CIBIL${if (LoanTrackerEngine.isVehicleLoan(loan.entity.categoryId, loan.entity.categoryName)) ", Form 35" else ""})",
+                    context.getString(
+                        R.string.export_checklist_progress,
+                        loan.completedChecklist.size,
+                        loan.checklistItems.size,
+                        form35Suffix
+                    ),
                     margin + 12f,
                     y + 30f,
                     labelPaint
@@ -371,7 +410,7 @@ object ScheduleExporter {
                 y += 46f
             } else {
                 canvas.drawText(
-                    "LoanJB — ${loan.entity.nickname} (${loan.entity.lender}) • Amortization Schedule (Page $pageNum)",
+                    context.getString(R.string.export_branded_page_header, loan.entity.nickname, loan.entity.lender, pageNum),
                     margin,
                     y + 12f,
                     labelPaint
@@ -390,12 +429,23 @@ object ScheduleExporter {
                 margin + 366f,
                 margin + 444f
             )
-            val headers = listOf("#", "Month", "Status", "Rate", "EMI", "Principal", "Interest", "Balance")
+            val headers = listOf(
+                context.getString(R.string.export_col_num),
+                context.getString(R.string.export_col_month),
+                context.getString(R.string.export_col_status),
+                context.getString(R.string.export_col_rate),
+                context.getString(R.string.export_col_emi),
+                context.getString(R.string.export_col_principal),
+                context.getString(R.string.export_col_interest),
+                context.getString(R.string.export_col_balance)
+            )
             headers.forEachIndexed { i, h ->
                 canvas.drawText(h, cols[i], y + 13f, tableHeaderPaint)
             }
             y += 22f
 
+            val paidLabel = context.getString(R.string.export_status_paid)
+            val dueLabel = context.getString(R.string.export_status_due)
             val maxRowsThisPage = if (pageNum == 1) rowsPerFirstPage else rowsPerNextPage
             var count = 0
             while (rowIndex < totalRows && count < maxRowsThisPage) {
@@ -407,7 +457,7 @@ object ScheduleExporter {
                 val baseline = y + 11f
                 canvas.drawText(r.monthNumber.toString(), cols[0], baseline, rowTextPaint)
                 canvas.drawText(r.monthLabel, cols[1], baseline, rowTextPaint)
-                canvas.drawText(if (isPaid) "PAID" else "DUE", cols[2], baseline, if (isPaid) rowPaidPaint else rowTextPaint)
+                canvas.drawText(if (isPaid) paidLabel else dueLabel, cols[2], baseline, if (isPaid) rowPaidPaint else rowTextPaint)
                 canvas.drawText("${String.format("%.2f", r.activeRate)}%", cols[3], baseline, rowTextPaint)
                 canvas.drawText(CurrencyFormatter.format(r.emiPaid, currency, false), cols[4], baseline, rowTextPaint)
                 canvas.drawText(CurrencyFormatter.format(r.principalPaid, currency, false), cols[5], baseline, rowPrincipalPaint)
@@ -421,7 +471,7 @@ object ScheduleExporter {
 
             canvas.drawLine(margin, pageHeight - 36f, pageWidth - margin, pageHeight - 36f, accentPaint)
             canvas.drawText(
-                "$STANDARD_PLANNING_DISCLAIMER  •  Page $pageNum",
+                context.getString(R.string.export_pdf_footer_page, context.getString(R.string.disclaimer_text), pageNum),
                 margin,
                 pageHeight - 20f,
                 footerPaint
@@ -434,39 +484,28 @@ object ScheduleExporter {
 
         FileOutputStream(file).use { out -> doc.writeTo(out) }
         doc.close()
-        shareFile(context, file, "application/pdf", "Share Branded Loan Report PDF")
+        shareFile(context, file, "application/pdf", context.getString(R.string.export_share_branded_title))
     }
 
-    fun exportBackupJsonAndShare(
-        context: Context,
-        jsonContent: String,
-        fileName: String = "loanjb_encrypted_backup.json"
-    ): Result<Unit> = runCatching {
-        val file = File(exportsDir(context), fileName)
-        file.writeText(jsonContent)
-        shareFile(context, file, "application/json", "Export LoanJB Encrypted Backup")
-    }
+    fun exportBackupJsonAndShare(context: Context, jsonContent: String, fileName: String = "loanjb_encrypted_backup.json"): Result<Unit> =
+        runCatching {
+            val file = File(exportsDir(context), fileName)
+            file.writeText(jsonContent)
+            shareFile(context, file, "application/json", context.getString(R.string.export_share_backup_title))
+        }
 
-    fun exportComparisonPdfAndShare(
-        context: Context,
-        report: LoanComparisonReport,
-        currency: CurrencyCode
-    ): Result<Unit> = runCatching {
-        require(report.scenarios.isNotEmpty()) { "Select at least one loan offer to export." }
+    fun exportComparisonPdfAndShare(context: Context, report: LoanComparisonReport, currency: CurrencyCode): Result<Unit> = runCatching {
+        require(report.scenarios.isNotEmpty()) { context.getString(R.string.export_err_select_offer) }
         val file = File(exportsDir(context), "loanjb_loan_comparison.pdf")
-        ComparisonReportExporter.writeComparisonPdf(file, report, currency)
-        shareFile(context, file, "application/pdf", "Share Comparison PDF")
+        ComparisonReportExporter.writeComparisonPdf(context, file, report, currency)
+        shareFile(context, file, "application/pdf", context.getString(R.string.export_share_comparison_pdf))
     }
 
-    fun exportComparisonImageAndShare(
-        context: Context,
-        report: LoanComparisonReport,
-        currency: CurrencyCode
-    ): Result<Unit> = runCatching {
-        require(report.scenarios.isNotEmpty()) { "Select at least one loan offer to share." }
+    fun exportComparisonImageAndShare(context: Context, report: LoanComparisonReport, currency: CurrencyCode): Result<Unit> = runCatching {
+        require(report.scenarios.isNotEmpty()) { context.getString(R.string.export_err_select_offer) }
         val file = File(exportsDir(context), "loanjb_loan_comparison.png")
-        ComparisonReportExporter.writeComparisonImage(file, report, currency)
-        shareFile(context, file, "image/png", "Share Comparison Image")
+        ComparisonReportExporter.writeComparisonImage(context, file, report, currency)
+        shareFile(context, file, "image/png", context.getString(R.string.export_share_comparison_image))
     }
 
     private fun shareFile(context: Context, file: File, mimeType: String, chooserTitle: String) {

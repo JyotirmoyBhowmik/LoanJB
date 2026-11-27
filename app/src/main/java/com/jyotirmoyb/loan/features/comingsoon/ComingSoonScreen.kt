@@ -34,11 +34,7 @@ import com.jyotirmoyb.loan.features.CalculatorRegistry
 import com.jyotirmoyb.loan.ui.components.FintechCard
 
 @Composable
-fun ComingSoonScreen(
-    moduleId: String,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ComingSoonScreen(moduleId: String, onBack: () -> Unit, modifier: Modifier = Modifier) {
     val module = CalculatorRegistry.findById(moduleId)
 
     Column(

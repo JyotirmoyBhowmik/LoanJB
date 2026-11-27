@@ -1,19 +1,13 @@
 package com.jyotirmoyb.loan.data.market
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import com.jyotirmoyb.loan.data.security.AesGcmCryptoEngine
+import com.jyotirmoyb.loan.data.security.KeystoreEncryptedPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-enum class MarketApiProviderSlot(
-    val prefKey: String,
-    val displayName: String,
-    val description: String,
-    val endpointHint: String
-) {
+enum class MarketApiProviderSlot(val prefKey: String, val displayName: String, val description: String, val endpointHint: String) {
     FX_EXCHANGERATE(
         prefKey = "api_key_fx_exchangerate",
         displayName = "USD–INR Live FX (ExchangeRate-API)",
@@ -43,43 +37,49 @@ data class ApiKeyStatusSnapshot(
 }
 
 /**
- * Stores user-entered optional market API keys strictly in Android EncryptedSharedPreferences
- * backed by an AES-256-GCM MasterKey in Android Keystore.
+ * Stores user-entered optional market API keys encrypted via Android Keystore AES-256-GCM
+ * ([KeystoreEncryptedPrefs]) and performs a one-time migration from legacy EncryptedSharedPreferences.
  *
  * Security invariants:
  * - No API keys are ever hardcoded in source code or assets.
  * - API keys are never written to plaintext preferences, Room tables, backups, or logs.
  * - If Android Keystore is unavailable (e.g. JVM unit tests), falls back strictly to an in-memory map.
  */
-class SecureApiKeyStore(context: Context) {
+class SecureApiKeyStore internal constructor(private val securePrefs: KeystoreEncryptedPrefs) {
 
-    private val appContext = context.applicationContext
-    private val inMemoryFallback = HashMap<String, String>()
-    private var encryptedPrefs: SharedPreferences? = null
-    private var usingEncryption: Boolean = false
+    constructor(context: Context) : this(
+        securePrefs = KeystoreEncryptedPrefs(
+            context = context,
+            prefsFileName = PREFS_FILE_NAME,
+            keyAlias = KEYSTORE_ALIAS,
+            legacyPrefsName = LEGACY_PREFS_FILE_NAME,
+            legacyKeys = MarketApiProviderSlot.entries.map { it.prefKey }
+        )
+    )
 
-    init {
-        encryptedPrefs = runCatching {
-            val masterKey = MasterKey.Builder(appContext)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            EncryptedSharedPreferences.create(
-                appContext,
-                PREFS_FILE_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        }.onSuccess {
-            usingEncryption = true
-        }.getOrNull()
-    }
+    internal constructor(
+        context: Context,
+        cryptoEngineOverride: AesGcmCryptoEngine?,
+        legacyReader: ((String, Collection<String>) -> Map<String, String>?)? = null,
+        legacyDeleter: ((String) -> Boolean)? = null
+    ) : this(
+        securePrefs = KeystoreEncryptedPrefs(
+            context = context,
+            prefsFileName = PREFS_FILE_NAME,
+            keyAlias = KEYSTORE_ALIAS,
+            legacyPrefsName = LEGACY_PREFS_FILE_NAME,
+            legacyKeys = MarketApiProviderSlot.entries.map { it.prefKey },
+            cryptoEngineOverride = cryptoEngineOverride,
+            legacyReader = legacyReader,
+            legacyDeleter = legacyDeleter
+        )
+    )
 
     private val _statusFlow = MutableStateFlow(buildSnapshot())
     val statusFlow: Flow<ApiKeyStatusSnapshot> = _statusFlow.asStateFlow()
 
     fun getApiKey(slot: MarketApiProviderSlot): String? {
-        val raw = encryptedPrefs?.getString(slot.prefKey, null) ?: inMemoryFallback[slot.prefKey]
+        val raw = securePrefs.getString(slot.prefKey)
         return raw?.trim()?.takeIf { it.isNotEmpty() }
     }
 
@@ -89,32 +89,17 @@ class SecureApiKeyStore(context: Context) {
             clearApiKey(slot)
             return
         }
-        val prefs = encryptedPrefs
-        if (prefs != null) {
-            prefs.edit().putString(slot.prefKey, cleaned).apply()
-        } else {
-            inMemoryFallback[slot.prefKey] = cleaned
-        }
+        securePrefs.putString(slot.prefKey, cleaned)
         _statusFlow.value = buildSnapshot()
     }
 
     fun clearApiKey(slot: MarketApiProviderSlot) {
-        val prefs = encryptedPrefs
-        if (prefs != null) {
-            prefs.edit().remove(slot.prefKey).apply()
-        } else {
-            inMemoryFallback.remove(slot.prefKey)
-        }
+        securePrefs.remove(slot.prefKey)
         _statusFlow.value = buildSnapshot()
     }
 
     fun clearAllKeys() {
-        val prefs = encryptedPrefs
-        if (prefs != null) {
-            prefs.edit().clear().apply()
-        } else {
-            inMemoryFallback.clear()
-        }
+        securePrefs.clear()
         _statusFlow.value = buildSnapshot()
     }
 
@@ -128,12 +113,14 @@ class SecureApiKeyStore(context: Context) {
         }
         return ApiKeyStatusSnapshot(
             configuredSlots = map,
-            isHardwareEncrypted = usingEncryption
+            isHardwareEncrypted = securePrefs.isHardwareBacked
         )
     }
 
     companion object {
-        private const val PREFS_FILE_NAME = "loanjb_secure_api_keys"
+        const val PREFS_FILE_NAME = "loanjb_secure_api_keys_v2"
+        const val LEGACY_PREFS_FILE_NAME = "loanjb_secure_api_keys"
+        private const val KEYSTORE_ALIAS = "loanjb_api_keys_aes_gcm_v1"
 
         fun maskKey(raw: String): String {
             val t = raw.trim()

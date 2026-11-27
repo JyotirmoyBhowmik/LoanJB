@@ -23,23 +23,13 @@ enum class InterestRateType {
 }
 
 @JsonClass(generateAdapter = true)
-data class RateChangeEvent(
-    val afterMonth: Int,
-    val newAnnualRate: Double
-)
+data class RateChangeEvent(val afterMonth: Int, val newAnnualRate: Double)
 
 @JsonClass(generateAdapter = true)
-data class TrancheEntry(
-    val monthNumber: Int,
-    val amount: Double
-)
+data class TrancheEntry(val monthNumber: Int, val amount: Double)
 
 @JsonClass(generateAdapter = true)
-data class FlexiEvent(
-    val monthNumber: Int,
-    val drawAmount: Double = 0.0,
-    val repayAmount: Double = 0.0
-)
+data class FlexiEvent(val monthNumber: Int, val drawAmount: Double = 0.0, val repayAmount: Double = 0.0)
 
 @JsonClass(generateAdapter = true)
 data class PrepaymentRule(
@@ -88,8 +78,8 @@ data class CalculationInput(
     val proRataFirstMonthEnabled: Boolean = false,
     // Benchmark / MCLR / Hybrid
     val benchmarkRatePercent: Double = 6.5, // RBI Repo / EBLR benchmark (from rates.json)
-    val spreadPercent: Double = 2.0,        // Bank spread over EBLR
-    val mclrResetMonths: Int = 6,           // 6 or 12 months reset for legacy MCLR
+    val spreadPercent: Double = 2.0, // Bank spread over EBLR
+    val mclrResetMonths: Int = 6, // 6 or 12 months reset for legacy MCLR
     val rateChanges: List<RateChangeEvent> = emptyList(),
     val hybridFixedMonths: Int = 36,
     val hybridFloatingRate: Double = 10.25,

@@ -38,7 +38,8 @@ data class LoanComparisonUiState(
     val snackbarMessage: String? = null
 )
 
-class LoanComparisonViewModel(application: Application) : AndroidViewModel(application),
+class LoanComparisonViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<List<ComparisonScenarioInput>, LoanComparisonReport> {
 
     override val id: String = "loan_comparison"
@@ -60,12 +61,15 @@ class LoanComparisonViewModel(application: Application) : AndroidViewModel(appli
     ) { values ->
         @Suppress("UNCHECKED_CAST")
         val entities = values[0] as List<CompareScenarioEntity>
+
         @Suppress("UNCHECKED_CAST")
         val savedLoans = values[1] as List<SavedLoanEntity>
         val catalog = values[2] as LoanCatalog
         val prefs = values[3] as com.jyotirmoyb.loan.data.UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = values[4] as Map<String, ResolvedConfigItem>
+
         @Suppress("UNCHECKED_CAST")
         val manualSelection = values[5] as Set<Long>
         val snackbar = values[6] as String?
@@ -111,8 +115,7 @@ class LoanComparisonViewModel(application: Application) : AndroidViewModel(appli
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LoanComparisonUiState())
 
-    override fun compute(input: List<ComparisonScenarioInput>): LoanComparisonReport =
-        LoanComparisonEngine.evaluate(input)
+    override fun compute(input: List<ComparisonScenarioInput>): LoanComparisonReport = LoanComparisonEngine.evaluate(input)
 
     fun toggleSelection(id: Long) {
         val current = uiState.value.selectedIds.toMutableSet()

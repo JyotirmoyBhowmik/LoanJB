@@ -16,13 +16,13 @@ import com.jyotirmoyb.loan.domain.FixedDepositResult
 import com.jyotirmoyb.loan.domain.PayoutFrequency
 import com.jyotirmoyb.loan.domain.TdsConfig
 import com.jyotirmoyb.loan.features.CalculatorEngineContract
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 data class FixedDepositUiState(
     val input: FixedDepositInput = defaultFdInput(),
@@ -60,7 +60,8 @@ private fun defaultFdInput(): FixedDepositInput {
     )
 }
 
-class FixedDepositViewModel(application: Application) : AndroidViewModel(application),
+class FixedDepositViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<FixedDepositInput, FixedDepositResult> {
 
     override val id: String = "fixed_deposit"
@@ -86,6 +87,7 @@ class FixedDepositViewModel(application: Application) : AndroidViewModel(applica
         val rateStr = arr[1] as String
         val userEdited = arr[2] as Boolean
         val prefs = arr[3] as com.jyotirmoyb.loan.data.UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = arr[4] as Map<String, ResolvedConfigItem>
         val snack = arr[5] as String?
@@ -126,8 +128,7 @@ class FixedDepositViewModel(application: Application) : AndroidViewModel(applica
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FixedDepositUiState())
 
-    override fun compute(input: FixedDepositInput): FixedDepositResult =
-        FixedDepositEngine.calculate(input, latestTdsConfig)
+    override fun compute(input: FixedDepositInput): FixedDepositResult = FixedDepositEngine.calculate(input, latestTdsConfig)
 
     fun setMode(mode: FdMode) {
         _input.value = _input.value.copy(mode = mode)

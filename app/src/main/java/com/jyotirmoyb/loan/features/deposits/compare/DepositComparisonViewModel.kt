@@ -44,7 +44,8 @@ private data class ComparisonRateOverrides(
     val debtText: String? = null
 )
 
-class DepositComparisonViewModel(application: Application) : AndroidViewModel(application),
+class DepositComparisonViewModel(application: Application) :
+    AndroidViewModel(application),
     CalculatorEngineContract<DepositComparisonInput, DepositComparisonReport> {
 
     override val id: String = "deposit_comparison"
@@ -70,6 +71,7 @@ class DepositComparisonViewModel(application: Application) : AndroidViewModel(ap
         val slab = arr[2] as Double
         val ov = arr[3] as ComparisonRateOverrides
         val prefs = arr[4] as UserPreferences
+
         @Suppress("UNCHECKED_CAST")
         val resolvedMap = arr[5] as Map<String, ResolvedConfigItem>
 
@@ -112,8 +114,7 @@ class DepositComparisonViewModel(application: Application) : AndroidViewModel(ap
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DepositComparisonUiState())
 
-    override fun compute(input: DepositComparisonInput): DepositComparisonReport =
-        DepositComparisonEngine.compare(input)
+    override fun compute(input: DepositComparisonInput): DepositComparisonReport = DepositComparisonEngine.compare(input)
 
     fun updateMonthly(amount: Double) {
         _monthlyContribution.value = amount
@@ -147,6 +148,5 @@ class DepositComparisonViewModel(application: Application) : AndroidViewModel(ap
         _overrides.value = ComparisonRateOverrides()
     }
 
-    private fun fmtRate(v: Double): String =
-        if (v % 1.0 == 0.0) "${v.toInt()}" else "%.2f".format(v).trimEnd('0').trimEnd('.')
+    private fun fmtRate(v: Double): String = if (v % 1.0 == 0.0) "${v.toInt()}" else "%.2f".format(v).trimEnd('0').trimEnd('.')
 }

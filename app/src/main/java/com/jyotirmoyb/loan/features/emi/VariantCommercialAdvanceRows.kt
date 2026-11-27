@@ -69,7 +69,7 @@ internal fun VariantCommercialAndTransferRows(
                     ).forEach { (name, cap) ->
                         AssistChip(
                             onClick = { onUpdateInput { it.copy(principal = cap) } },
-                            label = { Text("$name (${CurrencyFormatter.formatShortLabel(cap, currency)})") }
+                            label = { Text(stringResource(R.string.ui_txt_fmt, name, CurrencyFormatter.formatShortLabel(cap, currency))) }
                         )
                     }
                 }
@@ -196,7 +196,11 @@ internal fun VariantCommercialAndTransferRows(
     }
 
     // Balance Transfer Evaluator
-    if (input.categoryId == "home" || input.categoryId == "lap" || flags.contains("PURPOSE_BALANCE_TRANSFER") || input.balanceTransfer.enabled) {
+    if (input.categoryId == "home" ||
+        input.categoryId == "lap" ||
+        flags.contains("PURPOSE_BALANCE_TRANSFER") ||
+        input.balanceTransfer.enabled
+    ) {
         AdvanceSettingRow(
             title = stringResource(R.string.emi_bt_row),
             checked = input.balanceTransfer.enabled,
@@ -223,7 +227,9 @@ internal fun VariantCommercialAndTransferRows(
                         label = "Current Rate %",
                         valueText = bt.currentAnnualRate.toString(),
                         onValueChange = { txt ->
-                            txt.toDoubleOrNull()?.let { r -> onUpdateInput { it.copy(balanceTransfer = bt.copy(enabled = true, currentAnnualRate = r)) } }
+                            txt.toDoubleOrNull()?.let { r ->
+                                onUpdateInput { it.copy(balanceTransfer = bt.copy(enabled = true, currentAnnualRate = r)) }
+                            }
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -231,7 +237,9 @@ internal fun VariantCommercialAndTransferRows(
                         label = "New Rate %",
                         valueText = bt.newAnnualRate.toString(),
                         onValueChange = { txt ->
-                            txt.toDoubleOrNull()?.let { r -> onUpdateInput { it.copy(balanceTransfer = bt.copy(enabled = true, newAnnualRate = r)) } }
+                            txt.toDoubleOrNull()?.let { r ->
+                                onUpdateInput { it.copy(balanceTransfer = bt.copy(enabled = true, newAnnualRate = r)) }
+                            }
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -241,7 +249,9 @@ internal fun VariantCommercialAndTransferRows(
                         label = "Remaining Months",
                         valueText = bt.remainingMonths.toString(),
                         onValueChange = { txt ->
-                            txt.toIntOrNull()?.let { m -> onUpdateInput { it.copy(balanceTransfer = bt.copy(enabled = true, remainingMonths = m.coerceIn(6, 360))) } }
+                            txt.toIntOrNull()?.let { m ->
+                                onUpdateInput { it.copy(balanceTransfer = bt.copy(enabled = true, remainingMonths = m.coerceIn(6, 360))) }
+                            }
                         },
                         modifier = Modifier.weight(1f)
                     )

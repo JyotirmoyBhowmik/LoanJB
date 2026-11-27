@@ -31,10 +31,7 @@ data class NpsUiState(
     val hasCustomRates: Boolean = false
 )
 
-class NpsViewModel(
-    prefsRepo: UserPreferencesRepository,
-    ratesRepo: RatesRepository
-) : ViewModel() {
+class NpsViewModel(prefsRepo: UserPreferencesRepository, ratesRepo: RatesRepository) : ViewModel() {
 
     private data class Draft(
         val input: NpsInput = NpsInput(),
@@ -121,12 +118,8 @@ class NpsViewModel(
         draft.update { it.copy(hasCustomReturn = false, hasCustomAnnuitySplit = false, hasCustomAnnuityRate = false) }
     }
 
-    class Factory(
-        private val prefsRepo: UserPreferencesRepository,
-        private val ratesRepo: RatesRepository
-    ) : ViewModelProvider.Factory {
+    class Factory(private val prefsRepo: UserPreferencesRepository, private val ratesRepo: RatesRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            NpsViewModel(prefsRepo, ratesRepo) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = NpsViewModel(prefsRepo, ratesRepo) as T
     }
 }
